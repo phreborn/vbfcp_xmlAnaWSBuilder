@@ -1,0 +1,12 @@
+<!DOCTYPE Model SYSTEM 'AnaWSBuilder.dtd'>
+<Model Type="UserDef">
+  <Item Name="RooPolyVar::mHiggsCB(dmH, {sum::mCBterm0(mH,mCBpar0[-0.023045]), mCBpar1[-0.001083], 0})"/>
+  <Item Name="RooPolyVar::alphaCB(dmH, {aCBpar0[1.601700],aCBpar1[0.000000]}, 0)"/>
+  <Item Name="RooPolyVar::sigmaCB(dmH, {sCBpar0[1.482400],sCBpar1[0.007951]}, 0)"/>
+  <Item Name="RooPolyVar::frac(dmH, {fCBpar0[0.983370],fCBpar1[0.000000]}, 0)"/>
+  <Item Name="RooPolyVar::kGA(dmH, {kGApar0[4.606200],kGApar1[0.000000]}, 0)"/>
+  <Item Name="RooPolyVar::mHiggsGA(dmH, {sum::mGAterm0(mH,mGApar0[-0.344387]),mGApar1[0.021064]}, 0)"/>
+  <Item Name="RooGaussian::tailPdf(:observable:, prod::mHiggsTail(mHiggsGA,resp_MSS), prod::sigmaTail(resp_mRES,sigmaCB,kGA))"/>
+  <Item Name="RooCBShape::peakPdf(:observable:, prod::mHiggsCore(mHiggsCB,resp_MSS), prod::sigmaCore(resp_mRES,sigmaCB), alphaCB, 10)"/>
+  <ModelItem Name="SUM::signalPdf(frac*peakPdf,tailPdf)"/>
+</Model>

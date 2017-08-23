@@ -1,0 +1,123 @@
+<!ELEMENT Combination (Input+,POI*,Correlate*,Asimov*)>
+<!ATTLIST Combination
+          WorkspaceName      CDATA            #REQUIRED
+          ModelConfigName    CDATA            #REQUIRED
+          DataName           CDATA            #REQUIRED
+          OutputFile         CDATA            #REQUIRED
+> 
+
+<!ELEMENT Input (#PCDATA) >
+
+<!ELEMENT POI (#PCDATA) >
+
+<!ELEMENT Correlate (#PCDATA) >
+
+<!ELEMENT Asimov EMPTY>
+<!ATTLIST Asimov
+          Name              CDATA            #REQUIRED
+	  Setup             CDATA            #IMPLIED
+	  Action            CDATA            #IMPLIED
+	  SnapshotAll       CDATA            #IMPLIED
+	  SnapshotGlob      CDATA            #IMPLIED
+	  SnapshotNuis      CDATA            #IMPLIED
+	  SnapshotPOI       CDATA            #IMPLIED
+	  Injection         CDATA            #IMPLIED
+	  >
+
+<!ELEMENT Channel (Data,(Systematic | Item)*,Sample+)>
+<!ATTLIST Channel
+          Name              CDATA            #REQUIRED
+	  Type              CDATA            #REQUIRED
+	  Lumi              CDATA            #REQUIRED
+	  >
+
+<!ELEMENT Data EMPTY>
+<!ATTLIST Data
+          InputFile         CDATA            #REQUIRED
+          FileType          CDATA            #IMPLIED
+	  TreeName          CDATA            #IMPLIED
+	  VarName           CDATA            #IMPLIED
+          Observable        CDATA            #REQUIRED
+          Binning           CDATA            #REQUIRED
+          InjectGhost       CDATA            #REQUIRED
+	  >
+
+<!ELEMENT Item  EMPTY>
+<!ATTLIST Item 
+	  Name                 CDATA         #REQUIRED
+	  >
+
+<!ELEMENT Sample ( Systematic | NormFactor | ShapeFactor | ImportItems )*>
+<!ATTLIST Sample
+          Name              CDATA            #REQUIRED
+	  Norm              CDATA            #IMPLIED
+	  XSection          CDATA            #REQUIRED
+	  SelectionEff      CDATA            #REQUIRED
+          InputFile         CDATA            #REQUIRED
+          ImportSyst        CDATA            #IMPLIED
+          MultiplyLumi      CDATA            #IMPLIED
+	  SharePdf          CDATA            #IMPLIED
+	  > 
+
+<!ELEMENT Systematic EMPTY>
+<!ATTLIST Systematic
+          Name              CDATA            #REQUIRED
+          Constr            CDATA            #REQUIRED
+	  CentralValue      CDATA            #REQUIRED
+          Mag               CDATA            #REQUIRED
+	  WhereTo           CDATA            #REQUIRED
+	  Process           CDATA            #IMPLIED
+	  > 
+
+<!ELEMENT NormFactor EMPTY>
+<!ATTLIST NormFactor
+          Name              CDATA            #REQUIRED
+          Correlate         CDATA            #IMPLIED 
+	  > 
+
+<!ELEMENT ShapeFactor EMPTY>
+<!ATTLIST ShapeFactor
+          Name              CDATA            #REQUIRED
+	  >
+
+<!ELEMENT Model (Item | Rename | ModelItem | Fix | ExtSyst)*>
+
+<!ATTLIST Model
+	  Type              CDATA            #REQUIRED
+	  Input             CDATA            #IMPLIED
+	  WSName            CDATA            #IMPLIED
+	  ModelName         CDATA            #IMPLIED
+	  ObservableName    CDATA            #IMPLIED
+	  CacheBinning      CDATA            #IMPLIED
+	  >
+
+<!ELEMENT ModelItem  EMPTY>
+<!ATTLIST ModelItem
+	  Name                 CDATA         #REQUIRED
+	  >
+
+<!ELEMENT Rename  EMPTY>
+<!ATTLIST Rename
+	  OldName                 CDATA         #REQUIRED
+	  NewName                 CDATA         #REQUIRED
+	  >
+
+<!ELEMENT Fix  EMPTY>
+<!ATTLIST Fix
+	  Name                 CDATA         #REQUIRED
+	  Value                CDATA         #IMPLIED
+>
+
+<!ELEMENT ExtSyst  EMPTY>
+<!ATTLIST ExtSyst
+	  NPName                 CDATA         #REQUIRED
+	  GOName                 CDATA         #IMPLIED
+	  ConstrName             CDATA         #IMPLIED
+>
+
+<!ELEMENT ImportItems  EMPTY>
+<!ATTLIST ImportItems
+	  FileName             CDATA         #REQUIRED
+>
+
+<!ELEMENT SampleItems ( Systematic | NormFactor | ShapeFactor )*>

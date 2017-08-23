@@ -1,0 +1,285 @@
+<!DOCTYPE Channel SYSTEM 'AnaWSBuilder.dtd'>
+<Channel Name="ttHhad" Type="shape" Lumi="1">
+  <Data InputFile="Input/data/run1_ttH/ttHhad.txt" Observable="atlas_invMass_ttHhad[105,160]" Binning="500" InjectGhost="1"/>
+  
+  <Item Name="mH[125.09]"/>
+  <Item Name="sum::dmH(mH,minus125[-125])"/>
+
+  <Systematic Name="ATLAS_lumi_2012" Constr="logn" CentralValue="1" Mag="0.025300" WhereTo="yield"/>
+  <Systematic Name="lumi_2012" Constr="logn" CentralValue="1" Mag="0.010900" WhereTo="yield"/>
+  <Systematic Name="ATLAS_Hgg_Trigger_2012" Constr="logn" CentralValue="1" Mag="0.002000" WhereTo="yield"/>
+  <Systematic Name="ATLAS_PH_ID_2012" Constr="logn" CentralValue="1" Mag="0.041000" WhereTo="yield"/>
+  <Systematic Name="ATLAS_PH_ISO_2012" Constr="logn" CentralValue="1" Mag="0.038000" WhereTo="yield"/>
+  <Systematic Name="ATLAS_BR_gamgam" Constr="asym" CentralValue="1" Mag="0.024500,0.024300" WhereTo="yield"/>
+  
+  <Systematic Name="ATLAS_MSS_EM_Zee" Constr="gaus" CentralValue="1" Mag="0.000430" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_PSbarrel" Constr="gaus" CentralValue="1" Mag="0.000420" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_PSendcap" Constr="gaus" CentralValue="1" Mag="0.000050" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_S12barrel" Constr="gaus" CentralValue="1" Mag="0.000190" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_S12endcap" Constr="gaus" CentralValue="1" Mag="0.000020" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_LeakageUnconv" Constr="gaus" CentralValue="1" Mag="0.000410" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_LeakageConv" Constr="gaus" CentralValue="1" Mag="0.000710" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_MatID1" Constr="gaus" CentralValue="1" Mag="0.000620" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_MatID2" Constr="gaus" CentralValue="1" Mag="0.000210" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_MatID3" Constr="gaus" CentralValue="1" Mag="0.000060" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_MatID4" Constr="gaus" CentralValue="1" Mag="0.000020" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_MatCryobarrel" Constr="gaus" CentralValue="1" Mag="0.000170" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_MatCryoendcap" Constr="gaus" CentralValue="1" Mag="0.000180" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_MatCalobarrel" Constr="gaus" CentralValue="1" Mag="0.000160" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_LArElecUnconvbarrel" Constr="gaus" CentralValue="1" Mag="0.000860" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_LArElecUnconvendcap" Constr="gaus" CentralValue="1" Mag="0.000260" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_LArUnconvCalibbarrel" Constr="gaus" CentralValue="1" Mag="0.000290" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_LArCalibbarrel" Constr="gaus" CentralValue="1" Mag="0.001010" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_LArCalibendcap" Constr="gaus" CentralValue="1" Mag="0.000110" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_LArElecCalib" Constr="gaus" CentralValue="1" Mag="0.000030" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_L1Gain" Constr="gaus" CentralValue="1" Mag="0.000140" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_L2Gain" Constr="gaus" CentralValue="1" Mag="0.001850" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_G4" Constr="gaus" CentralValue="1" Mag="0.000140" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_ConvEfficiency" Constr="gaus" CentralValue="1" Mag="0.000190" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_ConvFakeRate" Constr="gaus" CentralValue="1" Mag="0.000100" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_ConvRadius" Constr="gaus" CentralValue="1" Mag="0.000120" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_EM_Pedestal_2012" Constr="gaus" CentralValue="1" Mag="0.000220" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_BkgModeling_ttHhad" Constr="gaus" CentralValue="1" Mag="0.002000" WhereTo="shape"/>
+  <Systematic Name="ATLAS_MSS_PV" Constr="gaus" CentralValue="1" Mag="0.000300" WhereTo="shape"/>
+  <Item Name="prod::resp_MSS(response::ATLAS_MSS_EM_Zee,response::ATLAS_MSS_EM_PSbarrel,response::ATLAS_MSS_EM_PSendcap,response::ATLAS_MSS_EM_S12barrel,response::ATLAS_MSS_EM_S12endcap,response::ATLAS_MSS_EM_LeakageUnconv,response::ATLAS_MSS_EM_LeakageConv,response::ATLAS_MSS_EM_MatID1,response::ATLAS_MSS_EM_MatID2,response::ATLAS_MSS_EM_MatID3,response::ATLAS_MSS_EM_MatID4,response::ATLAS_MSS_EM_MatCryobarrel,response::ATLAS_MSS_EM_MatCryoendcap,response::ATLAS_MSS_EM_MatCalobarrel,response::ATLAS_MSS_EM_LArElecUnconvbarrel,response::ATLAS_MSS_EM_LArElecUnconvendcap,response::ATLAS_MSS_EM_LArUnconvCalibbarrel,response::ATLAS_MSS_EM_LArCalibbarrel,response::ATLAS_MSS_EM_LArCalibendcap,response::ATLAS_MSS_EM_LArElecCalib,response::ATLAS_MSS_EM_L1Gain,response::ATLAS_MSS_EM_L2Gain,response::ATLAS_MSS_EM_G4,response::ATLAS_MSS_EM_ConvEfficiency,response::ATLAS_MSS_EM_ConvFakeRate,response::ATLAS_MSS_EM_ConvRadius,response::ATLAS_MSS_EM_Pedestal_2012,response::ATLAS_MSS_BkgModeling_ttHhad,response::ATLAS_MSS_PV,)"/>
+  
+  <Systematic Name="ATLAS_EM_mRes_CT" Constr="logn" CentralValue="1" Mag="0.096300" WhereTo="shape"/>
+  <Systematic Name="ATLAS_EM_mRes_ST" Constr="logn" CentralValue="1" Mag="0.036300" WhereTo="shape"/>
+  <Systematic Name="ATLAS_EM_mRes_MAT" Constr="logn" CentralValue="1" Mag="0.063400" WhereTo="shape"/>
+  <Systematic Name="ATLAS_EM_mRes_PU" Constr="logn" CentralValue="1" Mag="0.018900" WhereTo="shape"/>
+  <Item Name="prod::resp_mRES(response::ATLAS_EM_mRes_CT,response::ATLAS_EM_mRes_ST,response::ATLAS_EM_mRes_MAT,response::ATLAS_EM_mRes_PU,)"/>
+
+  <Systematic Name="QCDscale_Higgs_ggH" Constr="asym" CentralValue="1" Mag="0.072000,0.078000" WhereTo="yield" Process="ggF"/>
+  <Systematic Name="QCDscale_Higgs_ggH_ttHAC" Constr="logn" CentralValue="1" Mag="0.500000" WhereTo="yield" Process="ggF"/>
+
+  <Sample Name="ggH" XSection="1" SelectionEff="1" InputFile="config/ttH/model/signal_ttHhad.xml" ImportSyst=":common:,ggF" MultiplyLumi="0" SharePdf="commonSig">
+    <NormFactor Name="RooPolyVar::yieldParam_ggH(dmH, {yp0_ggH[0.035529], yp1_ggH[0.000000], yp2_ggH[0.000000], yp3_ggH[0.000000]},0)"/>
+    <Systematic Name="ATLAS_UEPS" Constr="gaus" CentralValue="1" Mag="-0.600000" WhereTo="yield"/>
+    <Systematic Name="pdf_Higgs_ggH" Constr="asym" CentralValue="1" Mag="0.075000,0.069000" WhereTo="yield"/>
+    <Systematic Name="HF" Constr="logn" CentralValue="1" Mag="1.000001" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_PU_Rand" Constr="gaus" CentralValue="1" Mag="-0.022900" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JER" Constr="gaus" CentralValue="1" Mag="0.012300" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JVF" Constr="gaus" CentralValue="1" Mag="-0.065500" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_MU" Constr="gaus" CentralValue="1" Mag="0.000400" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_PU_RhoTopo_ggH" Constr="gaus" CentralValue="1" Mag="0.022600" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_FlavComp_ggH" Constr="gaus" CentralValue="1" Mag="0.052700" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_FlavResp" Constr="gaus" CentralValue="1" Mag="0.034800" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_Modelling1" Constr="gaus" CentralValue="1" Mag="0.021300" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_EtaInterCal" Constr="gaus" CentralValue="1" Mag="0.012600" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_Merged" Constr="gaus" CentralValue="1" Mag="0.037100" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag14_2012" Constr="gaus" CentralValue="1" Mag="0.012000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag19_2012" Constr="gaus" CentralValue="1" Mag="0.001580" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag20_2012" Constr="gaus" CentralValue="1" Mag="0.002020" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag23_2012" Constr="gaus" CentralValue="1" Mag="0.000120" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag24_2012" Constr="gaus" CentralValue="1" Mag="0.004390" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_ctag23_2012" Constr="gaus" CentralValue="1" Mag="0.085300" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_ctag24_2012" Constr="gaus" CentralValue="1" Mag="0.015400" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag32_2012" Constr="gaus" CentralValue="1" Mag="0.142000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag47_2012" Constr="gaus" CentralValue="1" Mag="0.010900" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag48_2012" Constr="gaus" CentralValue="1" Mag="0.022700" WhereTo="yield"/>
+    <NormFactor Name="mu[1,0,5]" />
+    <NormFactor Name="mu_ggH[1]" />
+  </Sample>
+  <Sample Name="VBF" XSection="1" SelectionEff="1" InputFile="config/ttH/model/signal_ttHhad.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
+    <NormFactor Name="RooPolyVar::yieldParam_VBF(dmH, {yp0_VBF[0.004795], yp1_VBF[0.000000], yp2_VBF[0.000000], yp3_VBF[0.000000]},0)"/>
+    <Systematic Name="ATLAS_UEPS" Constr="gaus" CentralValue="1" Mag="-0.040000" WhereTo="yield"/>
+    <Systematic Name="pdf_Higgs_qqH" Constr="asym" CentralValue="1" Mag="0.026000,0.028000" WhereTo="yield"/>
+    <Systematic Name="QCDscale_Higgs_qqH" Constr="asym" CentralValue="1" Mag="0.002000,0.002000" WhereTo="yield"/>
+    <Systematic Name="HF" Constr="logn" CentralValue="1" Mag="1.000001" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_PU_Rand" Constr="gaus" CentralValue="1" Mag="-0.026000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JER" Constr="gaus" CentralValue="1" Mag="-0.015800" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JVF" Constr="gaus" CentralValue="1" Mag="-0.070900" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_MU" Constr="gaus" CentralValue="1" Mag="-0.015400" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_PU_RhoTopo_VBF" Constr="gaus" CentralValue="1" Mag="-0.017200" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_FlavComp_VBF" Constr="gaus" CentralValue="1" Mag="0.181200" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_FlavResp" Constr="gaus" CentralValue="1" Mag="0.045800" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_Modelling1" Constr="gaus" CentralValue="1" Mag="-0.017200" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_EtaInterCal" Constr="gaus" CentralValue="1" Mag="-0.038400" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_Merged" Constr="gaus" CentralValue="1" Mag="0.027200" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag14_2012" Constr="gaus" CentralValue="1" Mag="0.004520" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag19_2012" Constr="gaus" CentralValue="1" Mag="0.003660" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag20_2012" Constr="gaus" CentralValue="1" Mag="0.000530" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag23_2012" Constr="gaus" CentralValue="1" Mag="0.004990" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag24_2012" Constr="gaus" CentralValue="1" Mag="0.008070" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_ctag23_2012" Constr="gaus" CentralValue="1" Mag="0.020000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_ctag24_2012" Constr="gaus" CentralValue="1" Mag="0.019200" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag32_2012" Constr="gaus" CentralValue="1" Mag="0.001090" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag47_2012" Constr="gaus" CentralValue="1" Mag="0.014400" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag48_2012" Constr="gaus" CentralValue="1" Mag="0.037500" WhereTo="yield"/>
+    <NormFactor Name="mu[1,0,5]" />
+    <NormFactor Name="mu_VBF[1]" />
+  </Sample>
+  <Sample Name="WH" XSection="1" SelectionEff="1" InputFile="config/ttH/model/signal_ttHhad.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
+    <NormFactor Name="RooPolyVar::yieldParam_WH(dmH, {yp0_WH[0.003328], yp1_WH[0.000000], yp2_WH[0.000000], yp3_WH[0.000000]},0)"/>
+    <Systematic Name="pdf_Higgs_qqH" Constr="asym" CentralValue="1" Mag="0.023000,0.023000" WhereTo="yield"/>
+    <Systematic Name="QCDscale_Higgs_VH" Constr="asym" CentralValue="1" Mag="0.010000,0.010000" WhereTo="yield"/>
+    <Systematic Name="HF" Constr="logn" CentralValue="1" Mag="1.000001" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag14_2012" Constr="gaus" CentralValue="1" Mag="0.002940" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag19_2012" Constr="gaus" CentralValue="1" Mag="0.003850" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag20_2012" Constr="gaus" CentralValue="1" Mag="0.001510" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag23_2012" Constr="gaus" CentralValue="1" Mag="0.005560" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag24_2012" Constr="gaus" CentralValue="1" Mag="0.005290" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_ctag23_2012" Constr="gaus" CentralValue="1" Mag="0.021200" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_ctag24_2012" Constr="gaus" CentralValue="1" Mag="0.018400" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag32_2012" Constr="gaus" CentralValue="1" Mag="0.000410" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag47_2012" Constr="gaus" CentralValue="1" Mag="0.016100" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag48_2012" Constr="gaus" CentralValue="1" Mag="0.037600" WhereTo="yield"/>
+    <Systematic Name="ATLAS_UEPS" Constr="gaus" CentralValue="1" Mag="-0.300000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_PU_Rand" Constr="gaus" CentralValue="1" Mag="-0.014600" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JER" Constr="gaus" CentralValue="1" Mag="0.054700" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JVF" Constr="gaus" CentralValue="1" Mag="-0.081000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_MU" Constr="gaus" CentralValue="1" Mag="0.008000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_PU_RhoTopo_VH" Constr="gaus" CentralValue="1" Mag="0.071800" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_FlavComp_VH" Constr="gaus" CentralValue="1" Mag="0.134400" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_FlavResp" Constr="gaus" CentralValue="1" Mag="0.081500" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_Modelling1" Constr="gaus" CentralValue="1" Mag="0.064900" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_EtaInterCal" Constr="gaus" CentralValue="1" Mag="0.047500" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_Merged" Constr="gaus" CentralValue="1" Mag="0.040800" WhereTo="yield"/>
+    <NormFactor Name="mu[1,0,5]" />
+    <NormFactor Name="mu_WH[1]" />
+  </Sample>
+  <Sample Name="ZH" XSection="1" SelectionEff="1" InputFile="config/ttH/model/signal_ttHhad.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
+    <NormFactor Name="RooPolyVar::yieldParam_ZH(dmH, {yp0_ZH[0.006342], yp1_ZH[0.000000], yp2_ZH[0.000000], yp3_ZH[0.000000]},0)"/>
+    <Systematic Name="pdf_Higgs_qqH" Constr="asym" CentralValue="1" Mag="0.025000,0.025000" WhereTo="yield"/>
+    <Systematic Name="QCDscale_Higgs_VH" Constr="asym" CentralValue="1" Mag="0.031000,0.031000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag14_2012" Constr="gaus" CentralValue="1" Mag="0.008470" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag19_2012" Constr="gaus" CentralValue="1" Mag="0.001310" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag20_2012" Constr="gaus" CentralValue="1" Mag="0.002840" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag23_2012" Constr="gaus" CentralValue="1" Mag="0.002530" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag24_2012" Constr="gaus" CentralValue="1" Mag="0.002040" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_ctag23_2012" Constr="gaus" CentralValue="1" Mag="0.006490" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_ctag24_2012" Constr="gaus" CentralValue="1" Mag="0.001800" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag32_2012" Constr="gaus" CentralValue="1" Mag="0.000690" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag47_2012" Constr="gaus" CentralValue="1" Mag="0.009010" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag48_2012" Constr="gaus" CentralValue="1" Mag="0.016000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_UEPS" Constr="gaus" CentralValue="1" Mag="-0.300000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_PU_Rand" Constr="gaus" CentralValue="1" Mag="-0.014600" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JER" Constr="gaus" CentralValue="1" Mag="0.054700" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JVF" Constr="gaus" CentralValue="1" Mag="-0.081000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_MU" Constr="gaus" CentralValue="1" Mag="0.008000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_PU_RhoTopo_VH" Constr="gaus" CentralValue="1" Mag="0.071800" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_FlavComp_VH" Constr="gaus" CentralValue="1" Mag="0.134400" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_FlavResp" Constr="gaus" CentralValue="1" Mag="0.081500" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_Modelling1" Constr="gaus" CentralValue="1" Mag="0.064900" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_EtaInterCal" Constr="gaus" CentralValue="1" Mag="0.047500" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_Merged" Constr="gaus" CentralValue="1" Mag="0.040800" WhereTo="yield"/>
+    <NormFactor Name="mu[1,0,5]" />
+    <NormFactor Name="mu_ZH[1]" />
+  </Sample>
+  <Sample Name="ttH" XSection="1" SelectionEff="1" InputFile="config/ttH/model/signal_ttHhad.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
+    <NormFactor Name="RooPolyVar::yieldParam_ttH(dmH, {yp0_ttH[0.413240], yp1_ttH[-0.008459], yp2_ttH[-0.000077], yp3_ttH[0.000000]},0)"/>
+    <Systematic Name="ATLAS_UEPS" Constr="gaus" CentralValue="1" Mag="-0.110000" WhereTo="yield"/>
+    <Systematic Name="pdf_Higgs_ttH" Constr="asym" CentralValue="1" Mag="0.081000,0.081000" WhereTo="yield"/>
+    <Systematic Name="QCDscale_Higgs_ttH" Constr="asym" CentralValue="1" Mag="0.038000,0.093000" WhereTo="yield"/>
+    <Systematic Name="MOD_ttH_MU" Constr="logn" CentralValue="1" Mag="0.003000" WhereTo="yield"/>
+    <Systematic Name="MOD_ttH_SCALE" Constr="logn" CentralValue="1" Mag="0.022000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_stat_8TeV_ttH_ttHhad" Constr="logn" CentralValue="1" Mag="0.007000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_PU_Rand" Constr="gaus" CentralValue="1" Mag="-0.003700" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JER" Constr="gaus" CentralValue="1" Mag="-0.005000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JVF" Constr="gaus" CentralValue="1" Mag="-0.014800" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_MU" Constr="gaus" CentralValue="1" Mag="0.002700" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_PU_RhoTopo_ttH" Constr="gaus" CentralValue="1" Mag="0.028100" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_FlavComp_ttH" Constr="gaus" CentralValue="1" Mag="0.048800" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_FlavResp" Constr="gaus" CentralValue="1" Mag="0.024600" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_Modelling1" Constr="gaus" CentralValue="1" Mag="0.026300" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_EtaInterCal" Constr="gaus" CentralValue="1" Mag="0.018000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_Merged" Constr="gaus" CentralValue="1" Mag="0.017000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag14_2012" Constr="gaus" CentralValue="1" Mag="0.007430" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag19_2012" Constr="gaus" CentralValue="1" Mag="0.004930" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag20_2012" Constr="gaus" CentralValue="1" Mag="0.002460" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag23_2012" Constr="gaus" CentralValue="1" Mag="0.008820" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag24_2012" Constr="gaus" CentralValue="1" Mag="0.006750" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_ctag23_2012" Constr="gaus" CentralValue="1" Mag="0.002810" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_ctag24_2012" Constr="gaus" CentralValue="1" Mag="0.000320" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag32_2012" Constr="gaus" CentralValue="1" Mag="0.000080" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag47_2012" Constr="gaus" CentralValue="1" Mag="0.002160" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag48_2012" Constr="gaus" CentralValue="1" Mag="0.004710" WhereTo="yield"/>
+    <NormFactor Name="mu[1,0,5]" />
+    <NormFactor Name="mu_ttH[1]" />
+  </Sample>
+  <Sample Name="bbH" XSection="1" SelectionEff="1" InputFile="config/ttH/model/signal_ttHhad.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
+    <NormFactor Name="RooPolyVar::yieldParam_bbH(dmH, {yp0_bbH[0.000217], yp1_bbH[-0.000006], yp2_bbH[0.000003], yp3_bbH[0.000000]},0)"/>
+    <Systematic Name="pdf_Higgs_ggH" Constr="asym" CentralValue="1" Mag="0.064000,0.064000" WhereTo="yield"/>
+    <Systematic Name="QCDscale_Higgs_bbH" Constr="asym" CentralValue="1" Mag="0.130000,0.230000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag14_2012" Constr="gaus" CentralValue="1" Mag="0.007430" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag19_2012" Constr="gaus" CentralValue="1" Mag="0.004930" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag20_2012" Constr="gaus" CentralValue="1" Mag="0.002460" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag23_2012" Constr="gaus" CentralValue="1" Mag="0.008820" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag24_2012" Constr="gaus" CentralValue="1" Mag="0.006750" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_ctag23_2012" Constr="gaus" CentralValue="1" Mag="0.002810" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_ctag24_2012" Constr="gaus" CentralValue="1" Mag="0.000320" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag32_2012" Constr="gaus" CentralValue="1" Mag="0.000080" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag47_2012" Constr="gaus" CentralValue="1" Mag="0.002160" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag48_2012" Constr="gaus" CentralValue="1" Mag="0.004710" WhereTo="yield"/>
+    <NormFactor Name="mu[1,0,5]" />
+    <NormFactor Name="mu_bbH[1]" />
+  </Sample>
+  <Sample Name="tHjb" XSection="1" SelectionEff="1" InputFile="config/ttH/model/signal_ttHhad.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
+    <NormFactor Name="RooPolyVar::yieldParam_tHjb(dmH, {yp0_tHjb[0.016587], yp1_tHjb[0.000000], yp2_tHjb[0.000000], yp3_tHjb[0.000000]},0)"/>
+    <Systematic Name="QCDscale_Higgs_tHjb_ttHAC" Constr="logn" CentralValue="1" Mag="0.080000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_stat_8TeV_tHjb_ttHhad" Constr="logn" CentralValue="1" Mag="0.024500" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_PU_Rand" Constr="gaus" CentralValue="1" Mag="-0.005700" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JER" Constr="gaus" CentralValue="1" Mag="0.015300" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JVF" Constr="gaus" CentralValue="1" Mag="-0.028800" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_MU" Constr="gaus" CentralValue="1" Mag="0.007200" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_PU_RhoTopo_tHjb" Constr="gaus" CentralValue="1" Mag="0.057800" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_FlavComp_tHjb" Constr="gaus" CentralValue="1" Mag="0.104800" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_FlavResp" Constr="gaus" CentralValue="1" Mag="0.051200" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_Modelling1" Constr="gaus" CentralValue="1" Mag="0.052700" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_EtaInterCal" Constr="gaus" CentralValue="1" Mag="0.047600" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_Merged" Constr="gaus" CentralValue="1" Mag="0.031200" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag14_2012" Constr="gaus" CentralValue="1" Mag="0.011240" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag19_2012" Constr="gaus" CentralValue="1" Mag="0.008190" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag20_2012" Constr="gaus" CentralValue="1" Mag="0.004130" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag23_2012" Constr="gaus" CentralValue="1" Mag="0.016290" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag24_2012" Constr="gaus" CentralValue="1" Mag="0.011490" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_ctag23_2012" Constr="gaus" CentralValue="1" Mag="0.002860" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_ctag24_2012" Constr="gaus" CentralValue="1" Mag="0.002690" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag32_2012" Constr="gaus" CentralValue="1" Mag="0.000310" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag47_2012" Constr="gaus" CentralValue="1" Mag="0.004750" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag48_2012" Constr="gaus" CentralValue="1" Mag="0.009800" WhereTo="yield"/>
+    <Systematic Name="QCDscale_Higgs_tHjb" Constr="asym" CentralValue="1" Mag="0.060000,0.050000" WhereTo="yield"/>
+    <Systematic Name="pdf_Higgs_gqH" Constr="asym" CentralValue="1" Mag="0.040000,0.040000" WhereTo="yield"/>
+    <Systematic Name="QCDscale_Higgs_WtH" Constr="asym" CentralValue="1" Mag="0.092000,0.068000" WhereTo="yield"/>
+    <Systematic Name="pdf_Higgs_WtH" Constr="asym" CentralValue="1" Mag="0.100000,0.100000" WhereTo="yield"/>
+    <NormFactor Name="mu[1,0,5]" />
+    <NormFactor Name="mu_tHjb[1]" />
+  </Sample>
+  <Sample Name="WtH" XSection="1" SelectionEff="1" InputFile="config/ttH/model/signal_ttHhad.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
+    <NormFactor Name="RooPolyVar::yieldParam_WtH(dmH, {yp0_WtH[0.010399], yp1_WtH[0.000000], yp2_WtH[0.000000], yp3_WtH[0.000000]},0)"/>
+    <Systematic Name="QCDscale_Higgs_WtH_ttHAC" Constr="logn" CentralValue="1" Mag="0.080000" WhereTo="yield"/>
+    <Systematic Name="ATLAS_stat_8TeV_WtH_ttHhad" Constr="logn" CentralValue="1" Mag="0.027700" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_PU_Rand" Constr="gaus" CentralValue="1" Mag="-0.000900" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JER" Constr="gaus" CentralValue="1" Mag="0.043100" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JVF" Constr="gaus" CentralValue="1" Mag="-0.006500" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_MU" Constr="gaus" CentralValue="1" Mag="0.009200" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_PU_RhoTopo_WtH" Constr="gaus" CentralValue="1" Mag="0.046400" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_FlavComp_WtH" Constr="gaus" CentralValue="1" Mag="0.069200" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_FlavResp" Constr="gaus" CentralValue="1" Mag="0.034400" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_Modelling1" Constr="gaus" CentralValue="1" Mag="0.040600" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_EtaInterCal" Constr="gaus" CentralValue="1" Mag="0.030600" WhereTo="yield"/>
+    <Systematic Name="ATLAS_JES_Merged" Constr="gaus" CentralValue="1" Mag="0.039700" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag14_2012" Constr="gaus" CentralValue="1" Mag="0.006910" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag19_2012" Constr="gaus" CentralValue="1" Mag="0.004290" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag20_2012" Constr="gaus" CentralValue="1" Mag="0.002680" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag23_2012" Constr="gaus" CentralValue="1" Mag="0.009340" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_btag24_2012" Constr="gaus" CentralValue="1" Mag="0.005670" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_ctag23_2012" Constr="gaus" CentralValue="1" Mag="0.006150" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_ctag24_2012" Constr="gaus" CentralValue="1" Mag="0.003460" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag32_2012" Constr="gaus" CentralValue="1" Mag="0.000340" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag47_2012" Constr="gaus" CentralValue="1" Mag="0.005510" WhereTo="yield"/>
+    <Systematic Name="ATLAS_BTag_mistag48_2012" Constr="gaus" CentralValue="1" Mag="0.010170" WhereTo="yield"/>
+    <Systematic Name="QCDscale_Higgs_tHjb" Constr="asym" CentralValue="1" Mag="0.060000,0.050000" WhereTo="yield"/>
+    <Systematic Name="pdf_Higgs_gqH" Constr="asym" CentralValue="1" Mag="0.040000,0.040000" WhereTo="yield"/>
+    <Systematic Name="QCDscale_Higgs_WtH" Constr="asym" CentralValue="1" Mag="0.092000,0.068000" WhereTo="yield"/>
+    <Systematic Name="pdf_Higgs_WtH" Constr="asym" CentralValue="1" Mag="0.100000,0.100000" WhereTo="yield"/>
+    <NormFactor Name="mu[1,0,5]" />
+    <NormFactor Name="mu_WtH[1]" />
+  </Sample>
+  <Sample Name="spurious" XSection="1" SelectionEff="1" InputFile="config/ttH/model/signal_ttHhad.xml" ImportSyst=":self:" MultiplyLumi="0" SharePdf="commonSig">
+    <Systematic Name="ATLAS_Hgg_BIAS_ttHhad" Constr="gaus" CentralValue="0" Mag="0.240000" WhereTo="yield"/>
+  </Sample>
+  <Sample Name="background" XSection="1" SelectionEff="1" InputFile="config/ttH/model/background_ttHhad.xml" ImportSyst=":self:" MultiplyLumi="0">
+    <NormFactor Name="nbkg_ttHhad[15.000000,0,100000]" />
+  </Sample>
+</Channel>

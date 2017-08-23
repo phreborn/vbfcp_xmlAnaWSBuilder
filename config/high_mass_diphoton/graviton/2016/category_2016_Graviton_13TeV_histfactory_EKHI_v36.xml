@@ -1,0 +1,38 @@
+<!DOCTYPE Channel SYSTEM 'AnaWSBuilder.dtd'>
+<Channel Name="inclusive_13TeV_2016_EKHI" Type="shape" Lumi="33.5196">
+  <Data InputFile="Input/data/high_mass_diphoton/data16/mass_points_data16_13TeV_EKHI_33.5ifb_h015.txt" Observable="obs_x_channel[200,5000]" Binning="960" InjectGhost="1"/>
+  
+  <Item Name="mG[750, 700, 800]"/>
+  <Item Name="GkM[0.1, 0, 1]"/>
+  <Item Name="expr::mnX('(@0 - 100.)/100.', mG)"/>
+
+  <Item Name="expr::uncert_ph_eff('(@1 + @2*exp(@3*@0))/100.', mG, sigmaEffSignal0[3.08], sigmaEffSignal1[-45.1], sigmaEffSignal2[-0.00901])"/>
+
+  <Item Name="expr::uncert_ph_cal_iso('(@1 + @2*exp(@3*@0))/100.', mG, sigmaCalIsol0[0.0448], sigmaCalIsol1[-1.15], sigmaCalIsol2[-0.00135])"/>
+  <Item Name="expr::uncert_ph_trk_iso('(@1 + @2*@0)/100.', mG, sigmaTrkIsol0[1.349], sigmaTrkIsol1[-0.00002571])"/>
+  <Item Name="expr::uncert_ph_iso('sqrt(@0*@0+@1*@1)', uncert_ph_cal_iso, uncert_ph_trk_iso)"/>
+  
+  <Item Name="expr::cbSigmaSignal0('@1 + @2*@0', mnX, sCBSignal0[2.16397], sCBSignal1[0.749941])"/>
+  <Item Name="expr::cbSigmaSignalUp('@1 + @2*@0', mnX, sCBSignal0Up[2.61879], sCBSignal1Up[1.02842])"/>
+  <Item Name="expr::cbSigmaSignalDn('@1 + @2*@0', mnX, sCBSignal0Dn[2.01965], sCBSignal1Dn[0.466404])"/>
+  
+  <Item Name="expr::uncert_mres_hi('(@1 - @0)/@0', cbSigmaSignal0, cbSigmaSignalUp)"/>
+  <Item Name="expr::uncert_mres_lo('(@0 - @1)/@0', cbSigmaSignal0, cbSigmaSignalDn)"/>
+
+  <Sample Name="signal" XSection="1" SelectionEff="1" InputFile="config/high_mass_diphoton/graviton/2016/signal_2016_Graviton_13TeV_2D_EKHI_v36.xml" MultiplyLumi="1">
+    <Systematic Name="ATLAS_lumi"      Constr="logn" CentralValue="1" Mag="0.0114" WhereTo="yield"/>
+    <Systematic Name="ATLAS_lumi_2016" Constr="logn" CentralValue="1" Mag="0.0323" WhereTo="yield"/>
+    <Systematic Name="ATLAS_PH_EFF"    Constr="logn" CentralValue="1" Mag="uncert_ph_eff" WhereTo="yield"/>
+    <Systematic Name="ATLAS_PH_ISO"    Constr="logn" CentralValue="1" Mag="uncert_ph_iso" WhereTo="yield"/>
+    <Systematic Name="ATLAS_mRes"      Constr="asym" CentralValue="1" Mag="uncert_mres_hi,uncert_mres_lo" WhereTo="shape"/>
+    <!-- <Systematic Name="ATLAS_ESS"       Constr="logn" CentralValue="1" Mag="uncert_ess" WhereTo="shape"/> -->
+    <NormFactor Name="expr::AX('(@1 + @2*exp(@3*@0) + @4*exp(@5*@0))', mG, AX0[0.657], AX1[-0.346], AX2[-0.00419], AX3[-0.223], AX4[-0.000630])"/>
+    <Systematic Name="ATLAS_AX" Constr="logn" CentralValue="1" Mag="0.029" WhereTo="yield"/>
+    <NormFactor Name="xs[0,0,1000]" />
+    <NormFactor Name="xs_2016[1]" />
+  </Sample>
+  
+  <Sample Name="background" XSection="1" SelectionEff="1" InputFile="config/high_mass_diphoton/graviton/2016/background_2016_Graviton_13TeV_histfactory_EKHI_v36.xml" MultiplyLumi="0">
+    <NormFactor Name="nbkg_inclusive_13TeV_2016_EKHI[7000,0,100000]" />
+  </Sample>
+</Channel>

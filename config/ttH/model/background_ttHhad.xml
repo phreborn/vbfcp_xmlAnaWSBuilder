@@ -1,0 +1,4 @@
+<!DOCTYPE Model SYSTEM 'AnaWSBuilder.dtd'>
+<Model Type="UserDef">
+	<ModelItem Name="RooExponential::bkgPdf_ttHhad(:observable:,slope_ttHhad[-0.02628,-5.0,-0.0000005])"/>
+</Model>

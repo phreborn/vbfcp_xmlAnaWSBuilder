@@ -1,0 +1,10 @@
+<!DOCTYPE Combination  SYSTEM 'AnaWSBuilder.dtd'>  
+<Combination WorkspaceName="combined" ModelConfigName="ModelConfig" DataName="res300_dataSet" OutputFile="workspace/bbyy/resonant_300.root" >
+  <Input>config/bbyy/sr.xml</Input>
+  <Input>config/bbyy/side.xml</Input>
+  <POI>mu</POI>
+  <Asimov Name="POISnap"  Setup=""  Action="savesnapshot" SnapshotPOI="nominalPOI"/>
+  <Asimov Name="NPSnap"   Setup="mu=0"      Action="fixsyst:fit:float:savesnapshot:nominalPOI" SnapshotNuis="nominalNuis" SnapshotGlob="nominalGlobs"/>
+  <Asimov Name="AsimovB"  Setup="mu=0"      Action="fit:genasimov:float:matchglob:savesnapshot:nominalGlobs" SnapshotAll="ucmles_0"/>
+  <Asimov Name="fit_mu" Setup="mu=1_0_50" Action="fit:savesnapshot:reset" SnapshotAll="ucmles"/>
+</Combination>

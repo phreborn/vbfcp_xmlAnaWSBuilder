@@ -1,0 +1,86 @@
+<!ELEMENT Combination (Input+,POI*,Asimov*)>
+<!ATTLIST Combination
+        WorkspaceName      CDATA            #REQUIRED
+        ModelConfigName    CDATA            #REQUIRED
+        DataName           CDATA            #REQUIRED
+        OutputFile         CDATA            #REQUIRED
+> 
+
+<!ELEMENT Input (#PCDATA) >
+
+<!ELEMENT POI (#PCDATA) >
+
+<!ELEMENT Asimov EMPTY>
+<!ATTLIST Asimov
+          Name              CDATA            #REQUIRED
+	  Setup             CDATA            #IMPLIED
+	  Action            CDATA            #IMPLIED
+	  Snapshot          CDATA            #IMPLIED
+	  >
+
+<!ELEMENT Channel (Data,(Systematic | Item)*,Sample+)>
+<!ATTLIST Channel
+          Name              CDATA            #REQUIRED
+	  Type              CDATA            #REQUIRED
+	  >
+
+<!ELEMENT Data EMPTY>
+<!ATTLIST Data
+          InputFile         CDATA            #REQUIRED
+          Observable        CDATA            #REQUIRED
+          Binning           CDATA            #REQUIRED
+          InjectGhost       CDATA            #REQUIRED
+	  >
+
+<!ELEMENT Item  EMPTY>
+<!ATTLIST Item 
+	  Name                 CDATA         #REQUIRED
+	  >
+
+<!ELEMENT Sample ( Systematic | NormFactor | ShapeFactor )*>
+<!ATTLIST Sample
+          Name              CDATA            #REQUIRED
+	  Norm              CDATA            #REQUIRED
+          InputFile         CDATA            #REQUIRED
+          ReceiveCommonSyst CDATA            #REQUIRED
+	  > 
+
+<!ELEMENT Systematic EMPTY>
+<!ATTLIST Systematic
+          Name              CDATA            #REQUIRED
+          Constr            CDATA            #REQUIRED
+	  CentralValue      CDATA            #REQUIRED
+          Mag               CDATA            #REQUIRED
+	  WhereTo           CDATA            #REQUIRED
+	  > 
+
+<!ELEMENT NormFactor EMPTY>
+<!ATTLIST NormFactor
+          Name              CDATA            #REQUIRED
+	  > 
+
+<!ELEMENT ShapeFactor EMPTY>
+<!ATTLIST ShapeFactor
+          Name              CDATA            #REQUIRED
+	  >
+
+<!ELEMENT Model (Item | Rename | ModelItem)*>
+
+<!ATTLIST Model
+	  Type              CDATA            #REQUIRED
+	  Input             CDATA            #IMPLIED
+	  WSName            CDATA            #IMPLIED
+	  ModelName         CDATA            #IMPLIED
+	  ObservableName    CDATA            #IMPLIED
+	  >
+
+<!ELEMENT ModelItem  EMPTY>
+<!ATTLIST ModelItem
+	  Name                 CDATA         #REQUIRED
+	  >
+
+<!ELEMENT Rename  EMPTY>
+<!ATTLIST Rename
+	  OldName                 CDATA         #REQUIRED
+	  NewName                 CDATA         #REQUIRED
+	  >
