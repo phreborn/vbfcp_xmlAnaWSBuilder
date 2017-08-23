@@ -1,0 +1,1 @@
+You are more than welcome to contribute to the development of the software. Please submit your changes through merge requests (instead of directly pushing to the master branch). Thank you.
