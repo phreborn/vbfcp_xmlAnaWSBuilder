@@ -203,8 +203,8 @@ double FlexibleInterpVarMkII::PolyInterpValue(int i, double x) const {
          // GHL: Swagato's suggestions
          double pow_up       =  std::pow(((RooAbsReal*)(_highList.at(j)))->getVal()/_nominal, x0);
          double pow_down     =  std::pow(((RooAbsReal*)(_lowList.at(j)))->getVal()/_nominal,  x0);
-         double logHi        =  std::log(((RooAbsReal*)(_highList.at(j)))->getVal()) ; 
-         double logLo        =  std::log(((RooAbsReal*)(_lowList.at(j)))->getVal() );
+         double logHi        =  std::log(((RooAbsReal*)(_highList.at(j)))->getVal()/_nominal) ; 
+         double logLo        =  std::log(((RooAbsReal*)(_lowList.at(j)))->getVal()/_nominal);
          double pow_up_log   = ((RooAbsReal*)(_highList.at(j)))->getVal() <= 0.0 ? 0.0 : pow_up      * logHi;
          double pow_down_log = ((RooAbsReal*)(_lowList.at(j)))->getVal() <= 0.0 ? 0.0 : -pow_down    * logLo;
          double pow_up_log2  = ((RooAbsReal*)(_highList.at(j)))->getVal() <= 0.0 ? 0.0 : pow_up_log  * logHi;
