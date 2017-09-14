@@ -1,6 +1,6 @@
 <!DOCTYPE Channel SYSTEM 'AnaWSBuilder.dtd'>
 <Channel Name="inclusive_13TeV_2016_EKHI" Type="shape" Lumi="33.5196">
-  <Data InputFile="Input/data/high_mass_diphoton/data16/mass_points_data16_13TeV_EKHI_33.5ifb_h015.txt" Observable="obs_x_channel[200,5000]" Binning="960" InjectGhost="1"/>
+  <Data InputFile="Input/data/run2_high_mass_diphoton/data16/mass_points_data16_13TeV_EKHI_33.5ifb_h015.txt" Observable="obs_x_channel[200,5000]" Binning="960" InjectGhost="1"/>
   
   <Item Name="mG[750, 700, 800]"/>
   <Item Name="GkM[0.1, 0, 1]"/>

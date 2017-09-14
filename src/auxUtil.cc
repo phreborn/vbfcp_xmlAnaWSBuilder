@@ -109,7 +109,7 @@ void auxUtil::Summary(ModelConfig *mc, TString dataName, TString outputFigName, 
     else firstPOI->setVal(1);
     pdfi->plotOn(frame.get(), LineColor(kRed), Normalization(1.0,RooAbsReal::RelativeExpected));
     c.cd();
-    frame->SetMinimum(1e-13);
+    frame->SetMinimum(auxUtil::epsilon*10);
     if(plotOption.Contains("logy")){
       frame->SetMinimum(1e-1);
       c.SetLogy();
