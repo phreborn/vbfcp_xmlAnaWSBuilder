@@ -223,6 +223,7 @@ TString auxUtil::getAttributeValue( TXMLNode* rootNode, TString attributeKey, bo
     if(allowEmpty) attributeValue=defaultStr;
     else alertAndAbort("Attribute "+attributeKey+" cannot be found in node "+rootNode->GetNodeName());
   }
+  removeWhiteSpace(attributeValue);
   return attributeValue;
 }
 
