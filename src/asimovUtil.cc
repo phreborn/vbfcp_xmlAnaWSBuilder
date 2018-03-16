@@ -85,9 +85,9 @@ void asimovUtil::generateAsimov(ModelConfig *mc, TString dataName){
         const RooArgSet *poi = mc->GetParametersOfInterest();
         for(vector<TString>::iterator fixed = fixedVarList.begin(); fixed != fixedVarList.end(); ++fixed){
           if (poi->find(*fixed)) continue;
-          cout<<"\tREGTEST: Releasing variable "<<*fixed<<endl;
+          // cout<<"\tREGTEST: Releasing variable "<<*fixed<<endl;
           w->var(*fixed)->setConstant(false);
-          w->var(*fixed)->Print();
+          // w->var(*fixed)->Print();
         }
         fixedVar="";
       }
