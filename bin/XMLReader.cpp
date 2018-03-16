@@ -56,6 +56,14 @@ int main( int argc , char **argv){
     return 0;
   }
 
+  RooMsgService::instance().getStream(1).removeTopic(RooFit::NumIntegration) ;
+  RooMsgService::instance().getStream(1).removeTopic(RooFit::Fitting) ;
+  RooMsgService::instance().getStream(1).removeTopic(RooFit::Minimization) ;
+  RooMsgService::instance().getStream(1).removeTopic(RooFit::InputArguments) ;
+  RooMsgService::instance().getStream(1).removeTopic(RooFit::Eval) ;
+
+  RooMsgService::instance().setGlobalKillBelow(RooFit::ERROR);
+
   xmlAnaWSBuilder *wsBuilder=new xmlAnaWSBuilder(inputFile);
   wsBuilder->setDebug(isVerbose);
   wsBuilder->setUseBinned(binned);
