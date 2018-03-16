@@ -1,4 +1,4 @@
-<!ELEMENT Combination (Input+,POI*,Asimov*)>
+<!ELEMENT Combination (Input+,POI*,Correlate*,Asimov*)>
 <!ATTLIST Combination
           WorkspaceName      CDATA            #REQUIRED
           ModelConfigName    CDATA            #REQUIRED
@@ -9,6 +9,8 @@
 <!ELEMENT Input (#PCDATA) >
 
 <!ELEMENT POI (#PCDATA) >
+
+<!ELEMENT Correlate (#PCDATA) >
 
 <!ELEMENT Asimov EMPTY>
 <!ATTLIST Asimov
@@ -22,14 +24,12 @@
 	  Injection         CDATA            #IMPLIED
 	  >
 
-<!ELEMENT Channel (Data,Correlate*,(Systematic | Item)*,Sample+)>
+<!ELEMENT Channel (Data,(Systematic | Item)*,Sample+)>
 <!ATTLIST Channel
           Name              CDATA            #REQUIRED
 	  Type              CDATA            #REQUIRED
 	  Lumi              CDATA            #REQUIRED
 	  >
-
-<!ELEMENT Correlate (#PCDATA) >
 
 <!ELEMENT Data EMPTY>
 <!ATTLIST Data
@@ -39,7 +39,7 @@
 	  VarName           CDATA            #IMPLIED
           Observable        CDATA            #REQUIRED
           Binning           CDATA            #REQUIRED
-          InjectGhost       CDATA            #IMPLIED
+          InjectGhost       CDATA            #REQUIRED
 	  >
 
 <!ELEMENT Item  EMPTY>
@@ -51,11 +51,8 @@
 <!ATTLIST Sample
           Name              CDATA            #REQUIRED
 	  Norm              CDATA            #IMPLIED
-	  XSection          CDATA            #IMPLIED
-	  BR                CDATA            #IMPLIED
-	  SelectionEff      CDATA            #IMPLIED
-	  Acceptance        CDATA            #IMPLIED
-	  Correction        CDATA            #IMPLIED
+	  XSection          CDATA            #REQUIRED
+	  SelectionEff      CDATA            #REQUIRED
           InputFile         CDATA            #REQUIRED
           ImportSyst        CDATA            #IMPLIED
           MultiplyLumi      CDATA            #IMPLIED
@@ -75,6 +72,7 @@
 <!ELEMENT NormFactor EMPTY>
 <!ATTLIST NormFactor
           Name              CDATA            #REQUIRED
+          Correlate         CDATA            #IMPLIED 
 	  > 
 
 <!ELEMENT ShapeFactor EMPTY>
