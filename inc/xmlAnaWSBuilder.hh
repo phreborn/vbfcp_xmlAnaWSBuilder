@@ -18,17 +18,18 @@ using namespace RooFit;
 using namespace RooStats;
 
 struct Sample{
-  TString procName;
-  vector<TString> procType;		// systematics to be imported
-  double yield;
-  TString inputFile;		// For parametrization input if needed
-  TString normFactors;	// Collection of scale factors for normalization
-  TString correlatedNFs;	// Collection of scale factors to not be renamed
-  TString shapeFactors;	// Collection of scale factors for shape
-  RooArgSet expected;		// Collection of response terms and scale factors to be timed to the signal yield
+  TString procName;	        // Name of the process 
+  TString inputFile;		// Input XML file for constructing pdf (if needed)
+  vector<TString> normFactors;	// Collection of scale factors for normalization
+  vector<TString> shapeFactors;	// Collection of scale factors for shape
+  vector<TString> systGroups;	// List of systematic groups to be imported
+  RooArgSet expected;		// Collection of response terms and scale factors to be multiplied to the yield
   TString modelName;		// Name of pdf model for the process
-  TString normName;		// Name of the final normalization
-  TString sharePdfGroup;
+  TString normName;		// Name of normalization function for the process
+  TString sharePdfGroup;	// Whether this process share a PDF with other processes
+
+  friend bool operator==(const Sample& x, const Sample& y){return x.procName==y.procName;}
+  friend bool operator==(const Sample& x, const TString& y){return x.procName==y;}
 };
 
 struct Systematic{
@@ -43,9 +44,6 @@ struct Systematic{
   TString errLoExpr;
   TString errHiExpr;
 };
-
-typedef std::map<TString, Sample>::iterator it_sample;
-typedef std::map<TString, vector<Systematic> >::iterator it_syst;
 
 class xmlAnaWSBuilder : public TObject{
 private:
@@ -75,7 +73,7 @@ private:
   
   // Vectors and maps which will be cleared after generating model for each channel
   map<TString, vector<Systematic> > _Systematics;
-  map<TString, Sample> _Samples;
+  vector<Sample> _Samples;
   vector<TString> _ItemsLowPriority;  
   vector<TString> _ItemsHighPriority;  
 
@@ -123,6 +121,14 @@ private:
   static TString SUMPDFNAME;
   static TString FINALPDFNAME;
 
+  static TString LUMINAME;
+  static TString XSNAME;
+  static TString BRNAME;
+  static TString NORMNAME;
+  static TString ACCEPTANCENAME;
+  static TString EFFICIENCYNAME;
+  static TString CORRECTIONNAME;
+  
   static TString LT;
   static TString LE;
   static TString GT;

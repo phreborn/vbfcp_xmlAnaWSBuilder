@@ -36,6 +36,15 @@ TString xmlAnaWSBuilder::EXPECTATIONPREFIX="expectation__";
 TString xmlAnaWSBuilder::SUMPDFNAME="_modelSB";
 TString xmlAnaWSBuilder::FINALPDFNAME="_model";
 
+// Factor names
+TString xmlAnaWSBuilder::LUMINAME="_luminosity";
+TString xmlAnaWSBuilder::XSNAME="_xs";
+TString xmlAnaWSBuilder::BRNAME="_BR";
+TString xmlAnaWSBuilder::NORMNAME="_norm";
+TString xmlAnaWSBuilder::ACCEPTANCENAME="_A";
+TString xmlAnaWSBuilder::CORRECTIONNAME="_C";
+TString xmlAnaWSBuilder::EFFICIENCYNAME="_eff";
+
 // C++ logics not displayable in XML format
 TString xmlAnaWSBuilder::LT=":lt:";
 TString xmlAnaWSBuilder::LE=":le:";
@@ -232,27 +241,39 @@ void xmlAnaWSBuilder::readSample(TXMLNode* sampleNode){
   // sample.yield=atof(auxUtil::getAttributeValue(sampleNode, "Norm"));
   sample.inputFile=auxUtil::getAttributeValue(sampleNode, "InputFile");
 
-  TString importSystList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, COMMON);
-  auxUtil::removeWhiteSpace(importSystList);
-  sample.procType=auxUtil::splitString(importSystList.Data(),',');
-  sort( sample.procType.begin(), sample.procType.end() );
-  sample.procType.erase( unique( sample.procType.begin(), sample.procType.end() ), sample.procType.end() );
-  sample.procType.erase( remove( sample.procType.begin(), sample.procType.end(), sample.procName ), sample.procType.end() ); 
+  TString importSystGroupList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, COMMON);
+  auxUtil::removeWhiteSpace(importSystGroupList);
+  sample.systGroups=auxUtil::splitString(importSystGroupList.Data(),',');
+  sort( sample.systGroups.begin(), sample.systGroups.end() );
+  sample.systGroups.erase( unique( sample.systGroups.begin(), sample.systGroups.end() ), sample.systGroups.end() );
+  sample.systGroups.erase( remove( sample.systGroups.begin(), sample.systGroups.end(), sample.procName ), sample.systGroups.end() ); 
   
-  double norm=atof(auxUtil::getAttributeValue(sampleNode, "Norm", true, "1")); // default value 1
-  double xsection=atof(auxUtil::getAttributeValue(sampleNode, "XSection")); // mandatory
-  double selectionEff=atof(auxUtil::getAttributeValue(sampleNode, "SelectionEff")); // mandatory
+  TString norm=auxUtil::getAttributeValue(sampleNode, "Norm", true, ""); // default value 1
+  TString xsection=auxUtil::getAttributeValue(sampleNode, "XSection", true, ""); // default value 1
+  TString br=auxUtil::getAttributeValue(sampleNode, "BR", true, ""); // default value 1
+  TString selectionEff=auxUtil::getAttributeValue(sampleNode, "SelectionEff", true, ""); // default value 1
+  TString acceptance=auxUtil::getAttributeValue(sampleNode, "Acceptance", true, ""); // default value 1
+  TString correction=auxUtil::getAttributeValue(sampleNode, "Correction", true, ""); // default value 1
   
-  bool isMultiplyLumi=atoi(auxUtil::getAttributeValue(sampleNode, "MultiplyLumi", true, "1")); // default value true
-  sample.yield=norm*(isMultiplyLumi?_luminosity:1)*xsection*selectionEff;
+  bool isMultiplyLumi=auxUtil::to_bool(auxUtil::getAttributeValue(sampleNode, "MultiplyLumi", true, "1")); // default value true
+
+  // Assamble the yield central value
+  if(isMultiplyLumi) sample.normFactors.push_back(LUMINAME);
+  if(norm!="") sample.normFactors.push_back(NORMNAME+"_"+sample.procName+"["+norm+"]");
+  if(xsection!="") sample.normFactors.push_back(XSNAME+"_"+sample.procName+"["+xsection+"]");
+  if(br!="") sample.normFactors.push_back(BRNAME+"_"+sample.procName+"["+br+"]");
+  if(selectionEff!="") sample.normFactors.push_back(EFFICIENCYNAME+"_"+sample.procName+"["+selectionEff+"]");
+  if(acceptance!="") sample.normFactors.push_back(ACCEPTANCENAME+"_"+sample.procName+"["+acceptance+"]");
+  if(correction!="") sample.normFactors.push_back(ACCEPTANCENAME+"_"+sample.procName+"["+correction+"]");
 
   sample.sharePdfGroup=auxUtil::getAttributeValue(sampleNode, "SharePdf", true, ""); // default value false
   
   TXMLNode* subNode = sampleNode->GetChildren();
   if(_debug) cout<<"\tREGTEST: Reading sample "<<sample.procName<<endl;
   readSampleChildren( subNode, sample ); // read xml file
-  if(_debug) cout<<"\tREGTEST: Process: "<<sample.procName<<", norm factors: "<<sample.normFactors<<endl;
-  _Samples[sample.procName]=sample;
+
+  if(find(_Samples.begin(), _Samples.end(), sample)==_Samples.end()) _Samples.push_back(sample);
+  else auxUtil::alertAndAbort("Sample "+sample.procName+" has been included more than once.");
   return;
 }
 
@@ -264,13 +285,13 @@ void xmlAnaWSBuilder::readSampleChildren(TXMLNode* subNode, Sample& sample){
     }
     else if ( subNode->GetNodeName() == TString( "NormFactor" ) ){
       TString normFactor=getItemExpr(subNode, "Name", sample.procName);
-      sample.normFactors+=normFactor+";";
-      bool keepCorr=atoi(auxUtil::getAttributeValue(subNode, "Correlate", true, "0")); // default value false
-      if (keepCorr) sample.correlatedNFs+=normFactor+";";
+      sample.normFactors.push_back(normFactor);
+      bool keepCorr=auxUtil::to_bool(auxUtil::getAttributeValue(subNode, "Correlate", true, "0")); // default value false
+      if (keepCorr) _ItemsCorrelate.push_back(normFactor);
     }
     else if ( subNode->GetNodeName() == TString( "ShapeFactor" ) ){
       TString shapeFactor=getItemExpr(subNode, "Name", sample.procName);
-      sample.shapeFactors+=shapeFactor+";";
+      sample.shapeFactors.push_back(shapeFactor);
     }
     else if ( subNode->GetNodeName() == TString( "ImportItems" ) ){
       TString inputFileName=getItemExpr(subNode, "FileName", sample.procName);
@@ -314,7 +335,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   /* all the attributes of a channel */
 
   unique_ptr<RooWorkspace> wfactory(new RooWorkspace("factory_"+channelname));
-  
+  implementObj(wfactory.get(), LUMINAME+Form("[%f]", _luminosity)); // First thing: create a luminosity variable
   /* walk through the key node */
 
   while ( node != 0 ){
@@ -403,9 +424,12 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
     RooArgSet *respCollection=NULL, *respCollectionYield=NULL;
     
     if(process==ALLPROC) respCollectionYield=&expected;      // Systematics to be applied to all resonant processes
-    else if(_Samples.find(process)!=_Samples.end()) respCollectionYield=&_Samples[process].expected;
-    else respCollectionYield=&expectedMap[process];
-
+    else{
+      auto it=find(_Samples.begin(), _Samples.end(), process);
+      if(it!=_Samples.end()) respCollectionYield=&it->expected;
+      else respCollectionYield=&expectedMap[process];
+    }
+    
     for(Systematic syst : systArr){
       if(syst.whereTo==YIELD){
 	respCollection=respCollectionYield;
@@ -436,67 +460,45 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
     implementObj(wfactory.get(), expectationSystSrcStr);
   }
   
-  vector<TString> correlatedNFs;
-  for(it_sample it=_Samples.begin();it!=_Samples.end();it++){
-    Sample *sample=&it->second;
-    auxUtil::printTitle(sample->procName.Data(), 20, "<");
-    vector<TString> normFactors=auxUtil::splitString(sample->normFactors,';');
-    int nnorm=normFactors.size();
-
-    for(int inorm=0;inorm<nnorm;inorm++){
-      TString varName=implementObj(wfactory.get(), normFactors[inorm]);
-      sample->expected.add(*wfactory->arg(varName));
-    }
-
-    vector<TString> corrNFs=auxUtil::splitString(sample->correlatedNFs,';');
-    for( int inorm=0; inorm<(int)corrNFs.size(); inorm++) {
-      vector<TString> corrNF = auxUtil::splitString(corrNFs[inorm],'[');
-      correlatedNFs.push_back(corrNF[0]); // quick hack to ignore bracket text, better to use regex
-    }
- 
-    vector<TString> shapeFactors=auxUtil::splitString(sample->shapeFactors,';');
-    int nshape=shapeFactors.size();
-    for(int ishape=0;ishape<nshape;ishape++){
-      implementObj(wfactory.get(), shapeFactors[ishape]);
-    }
+  for(auto& sample : _Samples){
+    if(_debug) auxUtil::printTitle(sample.procName.Data(), 20, "<");
     
-    TString expectationStr=auxUtil::generateExpr("prod::"+EXPECTATIONPREFIX+"proc_"+sample->procName+"(", &sample->expected);
-    if(_debug) cout<<"Generating the scale factor "<<expectationStr<<"...";
-    implementObj(wfactory.get(), expectationStr);
-    if(_debug) cout<<"Done"<<endl;
-    TString yieldName=YIELDPREFIX+sample->procName+"_expected";
-    sample->normName=YIELDPREFIX+sample->procName;
-    implementObj(wfactory.get(), Form("%s[%f]",yieldName.Data(), sample->yield));
+    implementObjArray(wfactory.get(), sample.shapeFactors);
 
-    TString normStr="prod::"+sample->normName+"("+yieldName;
-    for(TString systSrc : sample->procType){
-      if(systSrc == SELF){
-	normStr="prod::"+sample->normName+"("+yieldName;
-	break;			     // If :self: appears anywhere, do not do anything
-      }
-      else if(systSrc == COMMON) normStr+=", "+EXPECTATIONPREFIX+"common"; // Common systematics
-      else{
-	if(expectedMap.find(systSrc)==expectedMap.end()) auxUtil::alertAndAbort("Unknown systematic source "+systSrc);
-	normStr+=", "+EXPECTATIONPREFIX+systSrc;
+    sample.normName=YIELDPREFIX+sample.procName;
+    
+    TString normStr="prod::"+sample.normName+"("+implementObjArray(wfactory.get(), sample.normFactors);
+
+    if(sample.expected.getSize()>0){
+      TString expectationStr=auxUtil::generateExpr("prod::"+EXPECTATIONPREFIX+"proc_"+sample.procName+"(", &sample.expected);
+      normStr+=", "+implementObj(wfactory.get(), expectationStr);
+    }
+
+    if(find(sample.systGroups.begin(), sample.systGroups.end(), SELF)==sample.systGroups.end()){ // If :self: appears anywhere, do not do anything
+      for(TString systGrp : sample.systGroups){
+	if(systGrp == COMMON && expected.getSize()>0) normStr+=", "+EXPECTATIONPREFIX+"common"; // Common systematics
+	else{
+	  if(expectedMap.find(systGrp)==expectedMap.end()) auxUtil::alertAndAbort("Unknown systematic group "+systGrp);
+	  normStr+=", "+EXPECTATIONPREFIX+systGrp;
+	}
       }
     }
-    normStr+=", "+EXPECTATIONPREFIX+"proc_"+sample->procName+")";
+    auxUtil::closeFuncExpr(normStr);
+    
     implementObj(wfactory.get(), normStr);
-    cout<<"\tREGTEST: Yield for channel \""<<channelname<<"\" process \""<<sample->procName<<"\": "<<wfactory->function(sample->normName)->getVal()<<endl;
+    
+    cout<<"\tREGTEST: Yield for channel \""<<channelname<<"\" process \""<<sample.procName<<"\": "<<wfactory->function(sample.normName)->getVal()<<endl;
     if(_debug) wfactory->Print();
-    getModel(wfactory.get(), sample, channeltype, &nuispara , &constraints , &globobs);
+    getModel(wfactory.get(), &sample, channeltype, &nuispara , &constraints , &globobs);
   }
 
   if(_debug) wfactory->Print();
 
   // Generate the combined PDF
   TString sumPdfStr="SUM::"+SUMPDFNAME+"(";
-  for(it_sample it=_Samples.begin();it!=_Samples.end();it++){
-    Sample *sample=&it->second;
-    if(_debug) cout<<sample->normName<<" and "<<sample->modelName<<endl;
-    sumPdfStr+=sample->normName+"*"+sample->modelName+",";
-  }
-  auxUtil::closeFuncExpr(&sumPdfStr);
+  for(auto sample : _Samples) sumPdfStr+=sample.normName+"*"+sample.modelName+",";
+
+  auxUtil::closeFuncExpr(sumPdfStr);
   if(_debug) cout<<sumPdfStr<<endl;
   implementObj(wfactory.get(), sumPdfStr);
   // sumPdfStr=auxUtil::getObjName(sumPdfStr);
