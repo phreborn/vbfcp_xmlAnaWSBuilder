@@ -26,7 +26,7 @@ public:
   static TString getAttributeValue( TXMLNode* rootNode, TString attributeKey, bool allowEmpty=false, TString defaultStr="");
 
   static TString generateExpr(TString head, RooArgSet *set, bool closeExpr=true);
-  static void closeFuncExpr(TString *expr){(*expr)+=")"; (*expr).ReplaceAll(" ",""); (*expr).ReplaceAll(",)",")");}
+  static void closeFuncExpr(TString &expr){expr+=")"; removeWhiteSpace(expr); expr.ReplaceAll(",)",")");}
   static TString getObjName(TString inputName);
   
   static void defineSet(RooWorkspace *w, RooArgSet set, TString setName);

@@ -68,7 +68,7 @@ TString auxUtil::generateExpr(TString head, RooArgSet *set, bool closeExpr){
   while((parg=dynamic_cast<RooAbsArg*>(iter->Next()))){
     exprStr+=TString(parg->GetName())+",";
   }
-  if(closeExpr) closeFuncExpr(&exprStr);
+  if(closeExpr) closeFuncExpr(exprStr);
   return exprStr;
 }
 
