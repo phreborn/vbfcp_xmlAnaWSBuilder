@@ -262,3 +262,11 @@ vector<TString> auxUtil::decomposeFuncStr(TString function){
   if(function.Contains("expr::")) itemList.erase(itemList.begin()); // TODO: find other special syntax to be taken care of
   return itemList;
 }
+
+bool auxUtil::to_bool(TString str) {
+  str.ToLower();
+  std::istringstream is(str.Data());
+  bool b;
+  is >> std::boolalpha >> b;
+  return b;
+}

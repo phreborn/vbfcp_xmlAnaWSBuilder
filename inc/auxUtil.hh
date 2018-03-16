@@ -49,6 +49,8 @@ public:
   static int stripSign(TString &expr);
   static void removeWhiteSpace(TString &item);
   static vector<TString> decomposeFuncStr(TString function);
+  static bool to_bool(TString str);
+  
   static double epsilon;
   ClassDef(auxUtil, 0);
 };
