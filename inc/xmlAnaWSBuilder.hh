@@ -76,13 +76,13 @@ private:
   vector<Sample> _Samples;
   vector<TString> _ItemsLowPriority;  
   vector<TString> _ItemsHighPriority;  
-
+  vector<TString> _ItemsCorrelate;
+  
   // Vectors and variables which will NOT be cleared after generating model for each channel
   vector<TString> _xmlPath;
   vector<TString> _CN;
   vector<TString> _Type;
   vector<TString> _POIList;
-  vector<TString> _ItemsCorrelate;
 
   // Flags
   bool _useBinned;
@@ -144,7 +144,7 @@ private:
   void readSampleChildren(TXMLNode* subNode, Sample& sample);
   void getModel(RooWorkspace *w, Sample *sample, TString channeltype="shape", RooArgSet *nuispara=NULL, RooArgSet *constraints=NULL, RooArgSet *globobs=NULL);
   void checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara);
-  void clearUp(){_Systematics.clear();_ItemsLowPriority.clear(); _ItemsHighPriority.clear(); _Samples.clear();}
+  void clearUp(){_Systematics.clear();_ItemsLowPriority.clear(); _ItemsHighPriority.clear(); _ItemsCorrelate.clear(); _Samples.clear();}
   void attachConstraints(RooWorkspace *w, TString sumPdfStr, RooArgSet *constraints, TString finalModelName);
   TString getItemExpr(TXMLNode *node, TString attrName, TString process="");
   RooDataSet* readInData(RooRealVar *x, RooRealVar *w);

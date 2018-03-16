@@ -83,11 +83,6 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
       auxUtil::removeWhiteSpace(poiStr);
       _POIList=auxUtil::splitString(poiStr.Data(),',');
     } 
-    if(nodeName=="Correlate"){
-      TString itemStr=node->GetText();
-      auxUtil::removeWhiteSpace(itemStr);
-      _ItemsCorrelate=auxUtil::splitString(itemStr.Data(),',');
-    }
     if(nodeName=="Input"){
       _xmlPath.push_back(node->GetText());
     } 
@@ -357,7 +352,13 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
       }
       _injectGhost=atoi(auxUtil::getAttributeValue(node, "InjectGhost"));
     }
-    
+
+    if( node->GetNodeName() == TString("Correlate") ){	// If you would like to put some parameters which are not POI correlated
+      TString itemStr=node->GetText();
+      auxUtil::removeWhiteSpace(itemStr);
+      _ItemsCorrelate=auxUtil::splitString(itemStr.Data(),',');
+    }
+
     if ( node->GetNodeName() == TString( "Systematic" ) ){
       readSyst(node, ALLPROC);
     }
@@ -365,8 +366,6 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
     if ( node->GetNodeName() == TString( "Item" ) ){
       // Cannot provide a specifc process here. user has to define by him/her/itself.
       TString item=getItemExpr(node, "Name");
-      bool keepCorr=atoi(auxUtil::getAttributeValue(node, "Correlate", true, "0")); // default value false
-      if (keepCorr) _ItemsCorrelate.push_back(item);
       if(item.Contains(RESPONSEPREFIX)) _ItemsLowPriority.push_back(item);
       else _ItemsHighPriority.push_back(item);
     }
@@ -508,21 +507,24 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   // Keep Track of Correlated variables
   TString correlated = "";
   
-  // remove duplicates from list of correlatedNFs (must be sorted to work)
-  sort( correlatedNFs.begin(), correlatedNFs.end() );
-  correlatedNFs.erase( unique( correlatedNFs.begin(), correlatedNFs.end() ), correlatedNFs.end() );
+  // remove duplicates from list of _ItemsCorrelate (must be sorted to work)
+  sort( _ItemsCorrelate.begin(), _ItemsCorrelate.end() );
+  _ItemsCorrelate.erase( unique( _ItemsCorrelate.begin(), _ItemsCorrelate.end() ), _ItemsCorrelate.end() );
 
-  for(vector<TString>::iterator corrNF = correlatedNFs.begin(); corrNF != correlatedNFs.end(); ++corrNF)
-    correlated += *corrNF+",";
-
+  for(auto item : _ItemsCorrelate){
+    if(!wfactory->obj(item)) continue; // Does not exist
+    if(!wfactory->var(item)) auxUtil::alertAndAbort("Correlated variable "+item+" is not properly implemented as RooRealVar in the workspace."); // Only variables can be keep the names unchanged.
+    correlated+=item+",";
+  }
+  
   correlated += auxUtil::generateExpr("",&nuispara,false);
 
-  for(vector<TString>::iterator poi = _POIList.begin(); poi != _POIList.end(); ++poi)
-    correlated+=*poi+",";
-
-  for(vector<TString>::iterator item = _ItemsCorrelate.begin(); item != _ItemsCorrelate.end(); ++item)
-    correlated+=*item+",";
-
+  for(auto poi : _POIList){
+    if(!wfactory->obj(poi)) continue; // Does not exist
+    if(!wfactory->var(poi)) auxUtil::alertAndAbort("POI "+poi+" is not properly implemented as RooRealVar in the workspace."); // Only variables can be keep the names unchanged.
+    correlated+=poi+",";
+  }
+  
   correlated+=_observableName;
 
   // Now, import the pdf to a new workspace, where the renaming of objects will happen automatically
