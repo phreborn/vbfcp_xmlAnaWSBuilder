@@ -985,11 +985,10 @@ TString xmlAnaWSBuilder::implementObj(RooWorkspace *w, TString expr, bool checkE
   return varName;
 }
 
-void xmlAnaWSBuilder::implementObjArray(RooWorkspace *w, vector<TString> objArr){
-  int nitem=objArr.size();
-  for(int iitem=0;iitem<nitem;iitem++){
-    implementObj(w, objArr[iitem]);
-  }
+TString xmlAnaWSBuilder::implementObjArray(RooWorkspace *w, vector<TString> objArr){
+  TString outputStr="";
+  for(auto item : objArr) outputStr+=implementObj(w, item)+",";
+  return outputStr.Chop();
 }
 
 TString xmlAnaWSBuilder::implementUncertExpr(RooWorkspace *w, TString expr, TString varName, int uncertType){

@@ -149,7 +149,7 @@ private:
   TString getItemExpr(TXMLNode *node, TString attrName, TString process="");
   RooDataSet* readInData(RooRealVar *x, RooRealVar *w);
   TString implementObj(RooWorkspace *w, TString expr, bool checkExistBeforeImp=false);
-  void implementObjArray(RooWorkspace *w, vector<TString> objArr);
+  TString implementObjArray(RooWorkspace *w, vector<TString> objArr);
   TString implementUncertExpr(RooWorkspace *w, TString expr, TString varName, int uncertType);
   
 public:
