@@ -350,7 +350,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
       	_inputDataTreeName=auxUtil::getAttributeValue(node, "TreeName");
       	_inputDataVarName=auxUtil::getAttributeValue(node, "VarName");
       }
-      _injectGhost=atoi(auxUtil::getAttributeValue(node, "InjectGhost"));
+      _injectGhost=auxUtil::to_bool(auxUtil::getAttributeValue(node, "InjectGhost", true, "0")); // Default false
     }
 
     if( node->GetNodeName() == TString("Correlate") ){	// If you would like to put some parameters which are not POI correlated
