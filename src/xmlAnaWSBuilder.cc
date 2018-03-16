@@ -970,8 +970,8 @@ TString xmlAnaWSBuilder::implementObj(RooWorkspace *w, TString expr, bool checkE
   }
 
   // Otherwise we just blindly implement
-  cout<<"\tREGTEST: Generating "<<auxUtil::translateItemType(type)<<" "<<expr<<endl;
-  w->factory(expr);
+  if(_debug) cout<<"\tREGTEST: Generating "<<auxUtil::translateItemType(type)<<" "<<expr<<endl;
+  if(!w->factory(expr)) auxUtil::alertAndAbort("Creation of expression "+expr+" failed. Please double check the syntax");
   
   return varName;
 }
