@@ -101,7 +101,7 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   cout<<"ModelConfig name: "<<_mcName<<endl;
   cout<<"Data name: "<<_dataName<<endl;
   cout<<"POI: ";
-  for(vector<TString>::iterator poi = _POIList.begin(); poi != _POIList.end(); ++poi) cout<<*poi<<" ";
+  for(auto poi : _POIList) cout<<*poi<<" ";
   cout<<endl;
   cout<<_Nch<<" categories to be included"<<endl;
   for(int ich=0;ich<_Nch;ich++) cout<<"XML file "<<ich<<": "<<_xmlPath[ich]<<endl;
@@ -131,10 +131,10 @@ void xmlAnaWSBuilder::generateWS(){
     channellist.defineType(_CN[ich]) ;
     CombinedPdf.addPdf(*w[ich]->pdf(FINALPDFNAME+"_"+_CN[ich]),_CN[ich]) ;
 
-    nuisanceParameters.add( *w[ich]->set("nuisanceParameters"));
-    globalObservables.add(*w[ich]->set("globalObservables"));
+    nuisanceParameters.add(*w[ich]->set("nuisanceParameters"), true);
+    globalObservables.add(*w[ich]->set("globalObservables"), true);
     Observables.add(*w[ich]->set("Observables"));
-    POI.add( *w[ich]->set("POI"));
+    POI.add(*w[ich]->set("POI"), true);
 
     datasetMap[_CN[ich].Data()] = dynamic_cast<RooDataSet*>(w[ich]->data("obsdata"));
     datasetMap_binned[_CN[ich].Data()] = dynamic_cast<RooDataSet*>(w[ich]->data("obsdatabinned"));
@@ -417,9 +417,9 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   implementObjArray(wfactory.get(), _ItemsHighPriority);
 
   // Secondly implement systematics and import them into the workspace
-  for(it_syst it=_Systematics.begin(); it!=_Systematics.end(); it++){
-    TString process=it->first;
-    vector<Systematic> systArr=it->second;
+  for(auto syst : _Systematics){
+    TString process=syst.first;
+    vector<Systematic> systArr=syst.second;
     RooArgSet *respCollection=NULL, *respCollectionYield=NULL;
     
     if(process==ALLPROC) respCollectionYield=&expected;      // Systematics to be applied to all resonant processes
@@ -447,17 +447,9 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   if(_debug) wfactory->Print();
 
   // Finally organize the scale factors on each sample
-  // The common one will be generated even if it is empty
-  TString expectationCommonStr=auxUtil::generateExpr("prod::"+EXPECTATIONPREFIX+"common(", &expected);
-  if(_debug) cout<<"\tREGTEST: Generating "<<expectationCommonStr;
-  implementObj(wfactory.get(), expectationCommonStr);
-  if(_debug) cout<<"Done."<<endl;
+  if(expected.getSize()>0) implementObj(wfactory.get(), auxUtil::generateExpr("prod::"+EXPECTATIONPREFIX+"common(", &expected));
 
-  for(map<TString, RooArgSet>::iterator it=expectedMap.begin(); it!=expectedMap.end(); it++){
-    TString systSrc=it->first;
-    TString expectationSystSrcStr=auxUtil::generateExpr("prod::"+EXPECTATIONPREFIX+systSrc+"(", &it->second);
-    implementObj(wfactory.get(), expectationSystSrcStr);
-  }
+  for(auto it : expectedMap) implementObj(wfactory.get(), auxUtil::generateExpr("prod::"+EXPECTATIONPREFIX+it.first+"(", &it.second));
   
   for(auto& sample : _Samples){
     if(_debug) auxUtil::printTitle(sample.procName.Data(), 20, "<");
@@ -528,7 +520,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   correlated+=_observableName;
 
   // Now, import the pdf to a new workspace, where the renaming of objects will happen automatically
-  cout<<"\tREGTEST: The following variables will not be renamed: "<<correlated<<endl;
+  if(_debug) cout<<"\tREGTEST: The following variables will not be renamed: "<<correlated<<endl;
   wchannel->import( (*wfactory->pdf(SUMPDFNAME)) , RenameAllNodes(channelname), RenameAllVariablesExcept(channelname,correlated), Silence());
 
   // Import constraint terms. Note we should not rename the constraint term gaussians
@@ -598,8 +590,8 @@ void xmlAnaWSBuilder::NPMaker(RooWorkspace *w, Systematic *syst, RooArgSet *nuis
   TString responseName=RESPONSEPREFIX+syst->whereTo+varName; // Important: a NP can be applied to both shape and yield.
 
   if(syst->constrTerm==ASYMMETRIC) {
-    cout << "\tREGTEST: Set up nuisance parameter "
-	 << syst->NPName << " as asymmetric uncertainty on process "<< syst->process <<endl;
+    if(_debug) cout << "\tREGTEST: Set up nuisance parameter "
+		    << syst->NPName << " as asymmetric uncertainty on process "<< syst->process <<endl;
     RooRealVar nuis_var(syst->NPName,syst->NPName,0,-5,5);
     RooRealVar beta_var("beta_"+varName,"beta_"+varName,syst->beta);
     RooProduct nuis_times_beta(varName+"_times_beta",varName+"_times_beta",RooArgSet(nuis_var,beta_var));
@@ -644,16 +636,16 @@ void xmlAnaWSBuilder::NPMaker(RooWorkspace *w, Systematic *syst, RooArgSet *nuis
     if(syst->constrTerm==GAUSSIAN){
       // The reason we need to keep plain implementation for Gaussian uncertainty is mainly due to spurious signal.
       // If we use FlexibleInterpVar, the response will be truncated at 0, but we need the response to go negative.
-      cout << "\tREGTEST: Set up nuisance parameter "
-	   << syst->NPName << " as gaussian uncertainty on process "<< syst->process <<endl;
+      if(_debug) cout << "\tREGTEST: Set up nuisance parameter "
+		      << syst->NPName << " as gaussian uncertainty on process "<< syst->process <<endl;
       TString uncertName=implementUncertExpr(w, syst->errHiExpr, varName, auxUtil::SYMMERROR);
       TString uncert_wrapper_expr="prod::uncert_"+GAUSSIAN+"_"+varName+"("+nuis_times_beta_expr+", "+uncertName+")";
       TString expected_expr="sum::"+responseName+"("+nominal_expr+", "+uncert_wrapper_expr+")";
       implementObj(w, expected_expr);
     }
     else if(syst->constrTerm==LOGNORMAL){
-      cout << "\tREGTEST: Set up nuisance parameter "
-	   << syst->NPName << " as lognormal uncertainty on process "<< syst->process <<endl;
+      if(_debug) cout << "\tREGTEST: Set up nuisance parameter "
+		      << syst->NPName << " as lognormal uncertainty on process "<< syst->process <<endl;
       TString uncertName=implementUncertExpr(w, syst->errHiExpr, varName, auxUtil::SYMMERROR);
       TString log_kappa_expr="expr::log_kappa_"+varName+"('log(1+@0/@1)', "+uncertName+", "+nominal_expr+")";
       
@@ -684,7 +676,7 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, TString channelt
 
   if(bool(w->pdf(sample->modelName))){
     if(isSharedPdf){
-      cout<<"\tREGTEST: PDF "<<sample->modelName<<" has been created in the workspace."<<endl;
+      if(_debug) cout<<"\tREGTEST: PDF "<<sample->modelName<<" has been created in the workspace."<<endl;
       return; // Use shared pdf
     }
     else auxUtil::alertAndAbort("PDF "+sample->modelName+" already exists but the user asks to create it again. Please intervene...");
@@ -709,7 +701,7 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, TString channelt
     TString modelType=auxUtil::getAttributeValue(rootNode, "Type");
     modelType.ToLower();
     if(modelType==USERDEF){
-      cout<<"\tREGTEST: Creating user-defined pdf from "<<inputFileName<<endl;
+      if(_debug) cout<<"\tREGTEST: Creating user-defined pdf from "<<inputFileName<<endl;
       int cacheBinning=atoi(auxUtil::getAttributeValue(rootNode, "CacheBinning", true, "-1"));
       if(cacheBinning>0) w->var(_observableName)->setBins(cacheBinning, "cache"); // For the accuracy of Fourier transformation
       while ( node != 0 ){
@@ -733,7 +725,6 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, TString channelt
     }
     else if(modelType==EXTERNAL){
       // In this case a workspace containing the model is used as input
-      // NOTE: THIS PART HAS NOT BEEN VALIDED YET
       TString inputWSFileName=auxUtil::getAttributeValue(rootNode, "Input");
       TString wsName=auxUtil::getAttributeValue(rootNode, "WSName");
       TString modelName=auxUtil::getAttributeValue(rootNode, "ModelName");
@@ -912,7 +903,7 @@ void xmlAnaWSBuilder::checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara){
 
 TString xmlAnaWSBuilder::getItemExpr(TXMLNode *node, TString attrName, TString process){
   TString expr=auxUtil::getAttributeValue(node, attrName);
-  auxUtil::removeWhiteSpace(expr);
+
   expr.ReplaceAll(RESPONSE, RESPONSEPREFIX+SHAPE); // Implement proper response terms. Assume only shape uncertainty would appear
   expr.ReplaceAll(OBSERVABLE, _observableName); // Implement proper observables
   expr.ReplaceAll(LT,"<");
