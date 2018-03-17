@@ -188,11 +188,13 @@ void xmlAnaWSBuilder::generateWS(){
   cout<<"========================================================================"<<endl;
 }
 
-void xmlAnaWSBuilder::readSyst(TXMLNode* systNode, TString process){
+void xmlAnaWSBuilder::readSyst(TXMLNode* systNode, TString domain){
   Systematic syst;
   syst.NPName=auxUtil::getAttributeValue(systNode, "Name");
-  if(process==ALLPROC) syst.process=auxUtil::getAttributeValue(systNode, "Process", true, process); // If the process of the systematic is specified, use the specified process. Otherwise use the default one
-  else syst.process=process;
+  syst.process=auxUtil::getAttributeValue(systNode, "Process", true, ""); // If the process of the systematic is specified, use the specified process. Otherwise use the default one
+  if(syst.process=="") syst.process=domain;
+  else if(domain!=ALLPROC) syst.process=domain+"_"+syst.process; // If the systematic is not from common area, need to give it a different name
+
   syst.whereTo=auxUtil::getAttributeValue(systNode, "WhereTo");
   syst.nominal=atof(auxUtil::getAttributeValue(systNode, "CentralValue"));
   syst.constrTerm=auxUtil::getAttributeValue(systNode, "Constr");
