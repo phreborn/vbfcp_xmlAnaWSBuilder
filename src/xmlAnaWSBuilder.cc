@@ -227,7 +227,8 @@ void xmlAnaWSBuilder::readSyst(TXMLNode* systNode, TString process){
     syst.errHiExpr=syst.errLoExpr=uncert;
   }
 
-  _Systematics[syst.process].push_back(syst);
+  if(find(_Systematics[syst.process].begin(), _Systematics[syst.process].end(), syst)==_Systematics[syst.process].end()) _Systematics[syst.process].push_back(syst);
+  else auxUtil::alertAndAbort("Systematic "+syst.NPName+" applied on "+syst.whereTo+" is duplicated for process "+syst.process);
 }
 
 void xmlAnaWSBuilder::readSample(TXMLNode* sampleNode){
