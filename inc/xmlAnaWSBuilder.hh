@@ -28,7 +28,7 @@ struct Sample{
   TString normName;		// Name of normalization function for the process
   TString sharePdfGroup;	// Whether this process share a PDF with other processes
 
-  friend bool operator==(const Sample& x, const Sample& y){return x.procName==y.procName;}
+  friend bool operator==(const Sample& x, const Sample& y){return x.procName==y.procName;} // Process name is the only identity for a sample. Duplicating it is not allowed.
   friend bool operator==(const Sample& x, const TString& y){return x.procName==y;}
 };
 
@@ -43,6 +43,8 @@ struct Systematic{
 
   TString errLoExpr;
   TString errHiExpr;
+
+  friend bool operator==(const Systematic& x, const Systematic& y){return (x.NPName==y.NPName&&x.process==y.process&&x.whereTo==y.whereTo);} // NP name, NP group (process) and NP destination identify a systematic. Duplicating it is not allowed.
 };
 
 class xmlAnaWSBuilder : public TObject{
