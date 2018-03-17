@@ -101,7 +101,7 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   cout<<"ModelConfig name: "<<_mcName<<endl;
   cout<<"Data name: "<<_dataName<<endl;
   cout<<"POI: ";
-  for(auto poi : _POIList) cout<<*poi<<" ";
+  for(auto poi : _POIList) cout<<poi<<" ";
   cout<<endl;
   cout<<_Nch<<" categories to be included"<<endl;
   for(int ich=0;ich<_Nch;ich++) cout<<"XML file "<<ich<<": "<<_xmlPath[ich]<<endl;
@@ -197,7 +197,7 @@ void xmlAnaWSBuilder::readSyst(TXMLNode* systNode, TString process){
   syst.nominal=atof(auxUtil::getAttributeValue(systNode, "CentralValue"));
   syst.constrTerm=auxUtil::getAttributeValue(systNode, "Constr");
   if(syst.nominal<=0&&(syst.constrTerm==LOGNORMAL||syst.constrTerm==ASYMMETRIC))
-    auxUtil::alertAndAbort("For constraint term type "+syst.constrTerm+Form(" non-positive central value (%f) is not acceptable.", syst.nominal));
+    auxUtil::alertAndAbort("For constraint term type "+syst.constrTerm+Form(" non-positive central value (%f) is not acceptable", syst.nominal));
   TString uncert=auxUtil::getAttributeValue(systNode, "Mag");
   
   auxUtil::removeWhiteSpace(uncert);
@@ -268,7 +268,7 @@ void xmlAnaWSBuilder::readSample(TXMLNode* sampleNode){
   readSampleChildren( subNode, sample ); // read xml file
 
   if(find(_Samples.begin(), _Samples.end(), sample)==_Samples.end()) _Samples.push_back(sample);
-  else auxUtil::alertAndAbort("Sample "+sample.procName+" has been included more than once.");
+  else auxUtil::alertAndAbort("Sample "+sample.procName+" has been included more than once");
   return;
 }
 
@@ -505,7 +505,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
 
   for(auto item : _ItemsCorrelate){
     if(!wfactory->obj(item)) continue; // Does not exist
-    if(!wfactory->var(item)) auxUtil::alertAndAbort("Correlated variable "+item+" is not properly implemented as RooRealVar in the workspace."); // Only variables can be keep the names unchanged.
+    if(!wfactory->var(item)) auxUtil::alertAndAbort("Correlated variable "+item+" is not properly implemented as RooRealVar in the workspace"); // Only variables can be keep the names unchanged.
     correlated+=item+",";
   }
   
@@ -513,7 +513,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
 
   for(auto poi : _POIList){
     if(!wfactory->obj(poi)) continue; // Does not exist
-    if(!wfactory->var(poi)) auxUtil::alertAndAbort("POI "+poi+" is not properly implemented as RooRealVar in the workspace."); // Only variables can be keep the names unchanged.
+    if(!wfactory->var(poi)) auxUtil::alertAndAbort("POI "+poi+" is not properly implemented as RooRealVar in the workspace"); // Only variables can be keep the names unchanged.
     correlated+=poi+",";
   }
   
@@ -679,7 +679,7 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, TString channelt
       if(_debug) cout<<"\tREGTEST: PDF "<<sample->modelName<<" has been created in the workspace."<<endl;
       return; // Use shared pdf
     }
-    else auxUtil::alertAndAbort("PDF "+sample->modelName+" already exists but the user asks to create it again. Please intervene...");
+    else auxUtil::alertAndAbort("PDF "+sample->modelName+" already exists but the user asks to create it again");
   }
   
   if(_debug) cout<<sample->modelName<<endl;
@@ -763,7 +763,7 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, TString channelt
 	  doNotTouch+=NPName+",";
 	  if(GOName!=""){
 	    if(!wModel->var(NPName)||!wModel->var(GOName)||!wModel->pdf(constrName)){
-	      auxUtil::alertAndAbort("Something is wrong with "+NPName+" "+GOName+" "+constrName+". Please double check!");
+	      auxUtil::alertAndAbort("Something is wrong with "+NPName+" "+GOName+" "+constrName);
 	    }
 	    TString newConstrName=CONSTRTERMPREFIX+NPName;
 	    TString newGOName=GLOBALOBSPREFIX+NPName;
@@ -971,7 +971,7 @@ TString xmlAnaWSBuilder::implementObj(RooWorkspace *w, TString expr, bool checkE
 
   // Otherwise we just blindly implement
   if(_debug) cout<<"\tREGTEST: Generating "<<auxUtil::translateItemType(type)<<" "<<expr<<endl;
-  if(!w->factory(expr)) auxUtil::alertAndAbort("Creation of expression "+expr+" failed. Please double check the syntax");
+  if(!w->factory(expr)) auxUtil::alertAndAbort("Creation of expression "+expr+" failed");
   
   return varName;
 }
