@@ -284,8 +284,6 @@ void xmlAnaWSBuilder::readSampleChildren(TXMLNode* subNode, Sample& sample){
     else if ( subNode->GetNodeName() == TString( "NormFactor" ) ){
       TString normFactor=getItemExpr(subNode, "Name", sample.procName);
       sample.normFactors.push_back(normFactor);
-      bool keepCorr=auxUtil::to_bool(auxUtil::getAttributeValue(subNode, "Correlate", true, "0")); // default value false
-      if (keepCorr) _ItemsCorrelate.push_back(normFactor);
     }
     else if ( subNode->GetNodeName() == TString( "ShapeFactor" ) ){
       TString shapeFactor=getItemExpr(subNode, "Name", sample.procName);
@@ -363,6 +361,10 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
     }
 
     if ( node->GetNodeName() == TString( "Systematic" ) ){
+      readSyst(node, ALLPROC);
+    }
+
+    if ( node->GetNodeName() == TString( "ImportItems" ) ){
       readSyst(node, ALLPROC);
     }
 
@@ -472,7 +474,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
       for(TString systGrp : sample.systGroups){
 	if(systGrp == COMMON && expected.getSize()>0) normStr+=", "+EXPECTATIONPREFIX+"common"; // Common systematics
 	else{
-	  if(expectedMap.find(systGrp)==expectedMap.end()) auxUtil::alertAndAbort("Unknown systematic group "+systGrp);
+	  if(expectedMap.find(systGrp)==expectedMap.end()) auxUtil::alertAndAbort("Unknown systematic group "+systGrp+" in Sample "+sample.procName);
 	  normStr+=", "+EXPECTATIONPREFIX+systGrp;
 	}
       }
@@ -501,7 +503,9 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
 
   // Keep Track of Correlated variables
   TString correlated = "";
-  
+
+  for(auto poi : _POIList) _ItemsCorrelate.push_back(poi);
+
   // remove duplicates from list of _ItemsCorrelate (must be sorted to work)
   sort( _ItemsCorrelate.begin(), _ItemsCorrelate.end() );
   _ItemsCorrelate.erase( unique( _ItemsCorrelate.begin(), _ItemsCorrelate.end() ), _ItemsCorrelate.end() );
@@ -514,12 +518,6 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   
   correlated += auxUtil::generateExpr("",&nuispara,false);
 
-  for(auto poi : _POIList){
-    if(!wfactory->obj(poi)) continue; // Does not exist
-    if(!wfactory->var(poi)) auxUtil::alertAndAbort("POI "+poi+" is not properly implemented as RooRealVar in the workspace"); // Only variables can be keep the names unchanged.
-    correlated+=poi+",";
-  }
-  
   correlated+=_observableName;
 
   // Now, import the pdf to a new workspace, where the renaming of objects will happen automatically

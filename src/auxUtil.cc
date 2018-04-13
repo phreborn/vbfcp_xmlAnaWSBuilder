@@ -271,3 +271,12 @@ bool auxUtil::to_bool(TString str) {
   is >> std::boolalpha >> b;
   return b;
 }
+
+TXMLNode *auxUtil::findNode(TXMLNode* rootNode, TString nodeName){
+  TXMLNode* node=rootNode->GetChildren();
+  while ( node != 0 ){
+    if(nodeName==TString(node->GetNodeName())) return node;
+    node=node->GetNextNode();
+  }
+  return NULL;
+}

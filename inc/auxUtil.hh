@@ -50,7 +50,7 @@ public:
   static void removeWhiteSpace(TString &item);
   static vector<TString> decomposeFuncStr(TString function);
   static bool to_bool(TString str);
-  
+  static TXMLNode* findNode(TXMLNode* rootNode, TString nodeName);
   static double epsilon;
   ClassDef(auxUtil, 0);
 };
