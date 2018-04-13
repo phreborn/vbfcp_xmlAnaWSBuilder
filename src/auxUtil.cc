@@ -72,7 +72,7 @@ TString auxUtil::generateExpr(TString head, RooArgSet *set, bool closeExpr){
   return exprStr;
 }
 
-void auxUtil::Summary(ModelConfig *mc, TString dataName, TString outputFigName, TString plotOption){
+void auxUtil::Summary(ModelConfig *mc, TString dataName, TString outputFigName, TString plotOption, bool verbose){
   RooMsgService::instance().setGlobalKillBelow(RooFit::FATAL);
   gErrorIgnoreLevel=kWarning;
   RooWorkspace *w=mc->GetWS();
@@ -121,10 +121,12 @@ void auxUtil::Summary(ModelConfig *mc, TString dataName, TString outputFigName, 
   firstPOI->setVal(muhat);
   printTitle("POI",width);
   mc->GetParametersOfInterest()->Print("v");
-  printTitle("Nuisance parameters",width);
-  mc->GetNuisanceParameters()->Print();
-  printTitle("Global observables",width);
-  mc->GetGlobalObservables()->Print();
+  if(verbose){
+    printTitle("Nuisance parameters",width);
+    mc->GetNuisanceParameters()->Print();
+    printTitle("Global observables",width);
+    mc->GetGlobalObservables()->Print();
+  }
   printTitle("Dataset",width);
   list<RooAbsData*> allData=w->allData();
   for (list<RooAbsData*>::iterator data = allData.begin(); data != allData.end(); data++) {

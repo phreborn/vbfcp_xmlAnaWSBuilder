@@ -33,7 +33,7 @@ public:
   static void defineSet(RooWorkspace *w, vector<TString> set, TString setName);
 
   // static void collectEverything(ModelConfig *mc, RooArgSet *set){set->add(*mc->GetNuisanceParameters());set->add(*mc->GetGlobalObservables());set->add(*mc->GetParametersOfInterest());}
-  static void Summary(ModelConfig *mc, TString dataName, TString outputFigName, TString option="");
+  static void Summary(ModelConfig *mc, TString dataName, TString outputFigName, TString option="", bool verbose=false);
   static void Reset(RooArgSet* original, RooArgSet* snapshot);
 
   static void releaseTheGhost(RooDataSet *obsdata, RooRealVar *x, RooRealVar *w, double ghostwt=1e-9);

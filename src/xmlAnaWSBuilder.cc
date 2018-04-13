@@ -179,7 +179,7 @@ void xmlAnaWSBuilder::generateWS(){
   outputFigName.ReplaceAll(".root",".pdf");
   
   cout<<"========================================================================"<<endl;
-  auxUtil::Summary(_mConfig.get(),_dataName, outputFigName, _plotOpt);
+  auxUtil::Summary(_mConfig.get(),_dataName, outputFigName, _plotOpt, _debug);
   cout<<"Workspace "<<_wsName<<" has be successfully generated and saved in file "<<_outputFileName<<endl;
   cout<<"Plots for each category are summarized in "<<outputFigName<<endl;
   auxUtil::printTime();
