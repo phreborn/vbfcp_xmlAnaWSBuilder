@@ -143,7 +143,7 @@ private:
   void generateSingleChannel(TString xmlName, RooWorkspace *wchannel);
   void readSyst(TXMLNode* systNode, TString process="allproc");
   void readSample(TXMLNode* sampleNode);
-  void readSampleChildren(TXMLNode* subNode, Sample& sample);
+  void readSampleXMLNode(TXMLNode* node, Sample& sample);
   void getModel(RooWorkspace *w, Sample *sample, TString channeltype="shape", RooArgSet *nuispara=NULL, RooArgSet *constraints=NULL, RooArgSet *globobs=NULL);
   void checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara);
   void clearUp(){_Systematics.clear();_ItemsLowPriority.clear(); _ItemsHighPriority.clear(); _ItemsCorrelate.clear(); _Samples.clear();}
@@ -153,7 +153,7 @@ private:
   TString implementObj(RooWorkspace *w, TString expr, bool checkExistBeforeImp=false);
   TString implementObjArray(RooWorkspace *w, vector<TString> objArr);
   TString implementUncertExpr(RooWorkspace *w, TString expr, TString varName, int uncertType);
-  
+  void readChannelXMLNode(TXMLNode *node);
 public:
   xmlAnaWSBuilder(TString inputFile);
   void generateWS();

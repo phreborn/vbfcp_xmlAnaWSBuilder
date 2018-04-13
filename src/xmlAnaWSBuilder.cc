@@ -268,29 +268,33 @@ void xmlAnaWSBuilder::readSample(TXMLNode* sampleNode){
   
   TXMLNode* subNode = sampleNode->GetChildren();
   if(_debug) cout<<"\tREGTEST: Reading sample "<<sample.procName<<endl;
-  readSampleChildren( subNode, sample ); // read xml file
+  readSampleXMLNode( subNode, sample ); // read xml file
 
   if(find(_Samples.begin(), _Samples.end(), sample)==_Samples.end()) _Samples.push_back(sample);
   else auxUtil::alertAndAbort("Sample "+sample.procName+" has been included more than once");
   return;
 }
 
-void xmlAnaWSBuilder::readSampleChildren(TXMLNode* subNode, Sample& sample){
-  while ( subNode != 0 ){
-    if ( subNode->GetNodeName() == TString( "Systematic" ) ){
-      if(_debug) cout<<"\tREGTEST: Reading systematic: "<<auxUtil::getAttributeValue(subNode, "Name")<<endl;
-      readSyst(subNode, sample.procName);
+void xmlAnaWSBuilder::readSampleXMLNode(TXMLNode* node, Sample& sample){
+  while ( node != 0 ){
+    if ( node->GetNodeName() == TString( "Systematic" ) ){
+      if(_debug) cout<<"\tREGTEST: Reading systematic: "<<auxUtil::getAttributeValue(node, "Name")<<endl;
+      readSyst(node, sample.procName);
     }
-    else if ( subNode->GetNodeName() == TString( "NormFactor" ) ){
-      TString normFactor=getItemExpr(subNode, "Name", sample.procName);
+    else if ( node->GetNodeName() == TString( "NormFactor" ) ){
+      TString normFactor=getItemExpr(node, "Name", sample.procName);
       sample.normFactors.push_back(normFactor);
+      bool isCorrelated=auxUtil::to_bool(auxUtil::getAttributeValue(node, "Correlate", true, "0"));
+      if(isCorrelated) _ItemsCorrelate.push_back(normFactor);
     }
-    else if ( subNode->GetNodeName() == TString( "ShapeFactor" ) ){
-      TString shapeFactor=getItemExpr(subNode, "Name", sample.procName);
+    else if ( node->GetNodeName() == TString( "ShapeFactor" ) ){
+      TString shapeFactor=getItemExpr(node, "Name", sample.procName);
       sample.shapeFactors.push_back(shapeFactor);
+      bool isCorrelated=auxUtil::to_bool(auxUtil::getAttributeValue(node, "Correlate", true, "0"));
+      if(isCorrelated) _ItemsCorrelate.push_back(shapeFactor);
     }
-    else if ( subNode->GetNodeName() == TString( "ImportItems" ) ){
-      TString inputFileName=getItemExpr(subNode, "FileName", sample.procName);
+    else if ( node->GetNodeName() == TString( "ImportItems" ) ){
+      TString inputFileName=auxUtil::getAttributeValue(node, "FileName");
       TDOMParser xmlparser;
       auxUtil::parseXMLFile(&xmlparser, inputFileName);
       cout<<"\tREGTEST: Importing Items for "<< sample.procName << " from " << inputFileName << endl;
@@ -298,9 +302,9 @@ void xmlAnaWSBuilder::readSampleChildren(TXMLNode* subNode, Sample& sample){
       TXMLDocument* xmldoc=xmlparser.GetXMLDocument();
       TXMLNode* rootNode=xmldoc->GetRootNode();
       TXMLNode* importNode=rootNode->GetChildren();
-      readSampleChildren( importNode, sample );
+      readSampleXMLNode( importNode, sample );
     }
-    subNode=subNode->GetNextNode();
+    node=node->GetNextNode();
   }
 }
 
@@ -317,7 +321,6 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
 
   TXMLDocument* xmldoc=xmlparser.GetXMLDocument();
   TXMLNode* rootNode = xmldoc->GetRootNode();
-  TXMLNode* node = rootNode->GetChildren();
 
   // Get the category name and property from
   TString channelname=auxUtil::getAttributeValue(rootNode, "Name");
@@ -332,54 +335,34 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
 
   unique_ptr<RooWorkspace> wfactory(new RooWorkspace("factory_"+channelname));
   implementObj(wfactory.get(), LUMINAME+Form("[%f]", _luminosity)); // First thing: create a luminosity variable
-  /* walk through the key node */
 
-  while ( node != 0 ){
-    // Common systematics: which apply to all processes in this channel unless specified
-    if ( node->GetNodeName() == TString( "Data" ) ){
-      _observableName=auxUtil::getAttributeValue(node, "Observable");
-      _observableName=implementObj(wfactory.get(), _observableName);
-      _xMin=wfactory->var(_observableName)->getMin();
-      _xMax=wfactory->var(_observableName)->getMax();
+  TXMLNode *dataNode=auxUtil::findNode(rootNode, "Data"); // This attribute is only allowed to appear once per-channel, and cannot be hided in a sub-XML file
+  if (!dataNode) auxUtil::alertAndAbort("No data node found in channel XML file "+xmlName);
+  
+  _observableName=auxUtil::getAttributeValue(dataNode, "Observable");
+  _observableName=implementObj(wfactory.get(), _observableName);
+  _xMin=wfactory->var(_observableName)->getMin();
+  _xMax=wfactory->var(_observableName)->getMax();
       
-      int nbinx=atoi(auxUtil::getAttributeValue(node, "Binning"));
-      wfactory->var(_observableName)->setBins(nbinx);
-      _inputDataFileName=auxUtil::getAttributeValue(node, "InputFile");
-      _inputDataFileType=auxUtil::getAttributeValue(node, "FileType", true, ASCII);
-      _inputDataFileType.ToLower();
-      if(_inputDataFileType!=ASCII){	// means that we are reading data from a tree
-      	_inputDataTreeName=auxUtil::getAttributeValue(node, "TreeName");
-      	_inputDataVarName=auxUtil::getAttributeValue(node, "VarName");
-      }
-      _injectGhost=auxUtil::to_bool(auxUtil::getAttributeValue(node, "InjectGhost", true, "0")); // Default false
-    }
-
-    if( node->GetNodeName() == TString("Correlate") ){	// If you would like to put some parameters which are not POI correlated
-      TString itemStr=node->GetText();
-      auxUtil::removeWhiteSpace(itemStr);
-      _ItemsCorrelate=auxUtil::splitString(itemStr.Data(),',');
-    }
-
-    if ( node->GetNodeName() == TString( "Systematic" ) ){
-      readSyst(node, ALLPROC);
-    }
-
-    if ( node->GetNodeName() == TString( "ImportItems" ) ){
-      readSyst(node, ALLPROC);
-    }
-
-    if ( node->GetNodeName() == TString( "Item" ) ){
-      // Cannot provide a specifc process here. user has to define by him/her/itself.
-      TString item=getItemExpr(node, "Name");
-      if(item.Contains(RESPONSEPREFIX)) _ItemsLowPriority.push_back(item);
-      else _ItemsHighPriority.push_back(item);
-    }
-
-    if ( node->GetNodeName() == TString( "Sample" ) ){
-      readSample(node);
-    }
-    node = node->GetNextNode();
+  int nbinx=atoi(auxUtil::getAttributeValue(dataNode, "Binning"));
+  wfactory->var(_observableName)->setBins(nbinx);
+  _inputDataFileName=auxUtil::getAttributeValue(dataNode, "InputFile");
+  _inputDataFileType=auxUtil::getAttributeValue(dataNode, "FileType", true, ASCII);
+  _inputDataFileType.ToLower();
+  if(_inputDataFileType!=ASCII){	// means that we are reading data from a tree
+    _inputDataTreeName=auxUtil::getAttributeValue(dataNode, "TreeName");
+    _inputDataVarName=auxUtil::getAttributeValue(dataNode, "VarName");
   }
+  _injectGhost=auxUtil::to_bool(auxUtil::getAttributeValue(dataNode, "InjectGhost", true, "0")); // Default false
+
+  TXMLNode *correlateNode=auxUtil::findNode(rootNode, "Correlate"); // This attribute is only allowed to appear at most once per-channel, and cannot be hided in a sub-XML file
+  if(correlateNode){	// If you would like to put some parameters which are not POI correlated
+    TString itemStr=correlateNode->GetText();
+    auxUtil::removeWhiteSpace(itemStr);
+    _ItemsCorrelate=auxUtil::splitString(itemStr.Data(),',');
+  }
+
+  readChannelXMLNode(rootNode->GetChildren());
 
   // Bug reported by Jared and Leo: if a high priority item contains a low priority item as proxy, the creation will fail. Therefore we need to go through the proxies used in high-priority items and move those which contain low-priority proxies to low-priority
   for(vector<TString>::iterator it=_ItemsHighPriority.begin(); it!=_ItemsHighPriority.end();){
@@ -986,4 +969,35 @@ TString xmlAnaWSBuilder::implementObjArray(RooWorkspace *w, vector<TString> objA
 TString xmlAnaWSBuilder::implementUncertExpr(RooWorkspace *w, TString expr, TString varName, int uncertType){
   if(expr.IsFloat()) return implementObj(w, auxUtil::translateUncertType(uncertType)+varName+"["+expr+"]");
   else return implementObj(w, expr);
+}
+
+void xmlAnaWSBuilder::readChannelXMLNode(TXMLNode *node){
+  while ( node != 0 ){
+    if ( node->GetNodeName() == TString( "Item" ) ){
+      TString item=getItemExpr(node, "Name");
+      if(item.Contains(RESPONSEPREFIX)) _ItemsLowPriority.push_back(item);
+      else _ItemsHighPriority.push_back(item);
+    }
+    
+    else if ( node->GetNodeName() == TString( "Systematic" ) ){
+      readSyst(node, ALLPROC);
+    }
+
+    else if ( node->GetNodeName() == TString( "Sample" ) ){
+      readSample(node);
+    }
+
+    else if ( node->GetNodeName() == TString( "ImportItems" ) || node->GetNodeName() == TString( "IncludeSysts" ) ){
+      TString inputFileName=auxUtil::getAttributeValue(node, "FileName");
+      TDOMParser xmlparser;
+      auxUtil::parseXMLFile(&xmlparser, inputFileName);
+      cout<<"\tREGTEST: Importing Items from " << inputFileName << endl;
+
+      TXMLDocument* xmldoc=xmlparser.GetXMLDocument();
+      TXMLNode* rootNode=xmldoc->GetRootNode();
+      TXMLNode* importNode=rootNode->GetChildren();
+      readChannelXMLNode( importNode );
+    }
+    node=node->GetNextNode();
+  }
 }
