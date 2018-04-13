@@ -22,7 +22,7 @@
 	  Injection         CDATA            #IMPLIED
 	  >
 
-<!ELEMENT Channel (Data,Correlate*,(Systematic | Item)*,Sample+)>
+<!ELEMENT Channel (Data,Correlate*,(Systematic | Item | ImportItems | IncludeSysts)*,Sample+)>
 <!ATTLIST Channel
           Name              CDATA            #REQUIRED
 	  Type              CDATA            #REQUIRED
@@ -75,11 +75,13 @@
 <!ELEMENT NormFactor EMPTY>
 <!ATTLIST NormFactor
           Name              CDATA            #REQUIRED
+	  Correlate         CDATA            #IMPLIED
 	  > 
 
 <!ELEMENT ShapeFactor EMPTY>
 <!ATTLIST ShapeFactor
           Name              CDATA            #REQUIRED
+          Correlate         CDATA            #IMPLIED
 	  >
 
 <!ELEMENT Model (Item | Rename | ModelItem | Fix | ExtSyst)*>
@@ -108,18 +110,24 @@
 <!ATTLIST Fix
 	  Name                 CDATA         #REQUIRED
 	  Value                CDATA         #IMPLIED
->
+	  >
 
 <!ELEMENT ExtSyst  EMPTY>
 <!ATTLIST ExtSyst
 	  NPName                 CDATA         #REQUIRED
 	  GOName                 CDATA         #IMPLIED
 	  ConstrName             CDATA         #IMPLIED
->
+	  >
 
 <!ELEMENT ImportItems  EMPTY>
 <!ATTLIST ImportItems
 	  FileName             CDATA         #REQUIRED
->
+	  >
 
-<!ELEMENT SampleItems ( Systematic | NormFactor | ShapeFactor )*>
+<!ELEMENT IncludeSysts  EMPTY> <!-- Obsolete: please use ImportItems -->
+<!ATTLIST IncludeSysts
+	  FileName             CDATA         #REQUIRED
+	  >
+
+<!ELEMENT SampleItems ( Systematic | Item | NormFactor | ShapeFactor )*>
+
