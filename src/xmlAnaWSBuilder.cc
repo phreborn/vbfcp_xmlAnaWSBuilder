@@ -455,7 +455,9 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
 
     if(find(sample.systGroups.begin(), sample.systGroups.end(), SELF)==sample.systGroups.end()){ // If :self: appears anywhere, do not do anything
       for(TString systGrp : sample.systGroups){
-	if(systGrp == COMMON && expected.getSize()>0) normStr+=", "+EXPECTATIONPREFIX+"common"; // Common systematics
+	if(systGrp == COMMON){
+	  if(expected.getSize()>0) normStr+=", "+EXPECTATIONPREFIX+"common"; // Common systematics: only add if exist
+	}
 	else{
 	  if(expectedMap.find(systGrp)==expectedMap.end()) auxUtil::alertAndAbort("Unknown systematic group "+systGrp+" in Sample "+sample.procName);
 	  normStr+=", "+EXPECTATIONPREFIX+systGrp;
