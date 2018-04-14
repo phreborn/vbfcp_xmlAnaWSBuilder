@@ -876,11 +876,13 @@ void xmlAnaWSBuilder::checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara){
     // There are redundant nuisance parameters in the model, which we do not care...
     cerr<<"\tWARNING: There supposed to be "<<nPOI+nNP<<" free parameters, but only seen "<<floatSet.getSize()<<" in the channel "<<_CN.back()<<endl;
     cout<<"\tIn principle not a issue, but please make sure you understand what you are doing."<<endl;
-    cout<<"++++++++++++++++++++++ all the free parameters ++++++++++++++++++++++"<<endl;
-    floatSet.Print();
-    cout<<"++++++++++++++++++++++ all the nuisance parameters ++++++++++++++++++++++"<<endl;
-    nuispara->Print();
-    cout<<"++++++++++++++++++++++ end of printout ++++++++++++++++++++++"<<endl;
+    if(_debug){
+      cout<<"++++++++++++++++++++++ all the free parameters ++++++++++++++++++++++"<<endl;
+      floatSet.Print();
+      cout<<"++++++++++++++++++++++ all the nuisance parameters ++++++++++++++++++++++"<<endl;
+      nuispara->Print();
+      cout<<"++++++++++++++++++++++ end of printout ++++++++++++++++++++++"<<endl;
+    }
   }
   else{
     cout<<"\tREGTEST: Number of nuisance parameters looks good!"<<endl;
