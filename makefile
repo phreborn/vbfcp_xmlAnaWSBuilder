@@ -19,8 +19,8 @@ endif
 ifeq ($(shell root-config --platform), macosx)
 # please install boost on your machine
 else
-	BOOST_INC = -I/afs/cern.ch/sw/lcg/external/Boost/1.55.0_python2.7/x86_64-slc6-gcc47-opt/include
-	BOOST_LIB = -L/afs/cern.ch/sw/lcg/external/Boost/1.55.0_python2.7/x86_64-slc6-gcc47-opt/lib
+	BOOST_INC = -I/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/boost/boost-1.60.0-python2.7-x86_64-slc6-gcc49/boost-1.60.0-python2.7-x86_64-slc6-gcc49/include/
+	BOOST_LIB = -L/cvmfs/atlas.cern.ch/repo/ATLASLocalRootBase/x86_64/boost/boost-1.60.0-python2.7-x86_64-slc6-gcc49/boost-1.60.0-python2.7-x86_64-slc6-gcc49/lib/
 endif
 
 # Compiler and flags -----------------------------------------------------------
