@@ -30,7 +30,7 @@ void printHelp(TString exe){
   cout<<" -s [ --minimizerStrategy ] arg  Minimizer strategy (default 1)"<<endl;
   cout<<" -t [ --minimizerTolerance ] arg Minimizer tolerance (default 1e-3)"<<endl;
   cout<<" -n [ --nllOffset ] arg          Enable nllOffset (default on)"<<endl;
-  cout<<" -p [ --printLevel ] arg         Fit log print level (default 0)"<<endl;
+  cout<<" -p [ --printLevel ] arg         Fit log print level (default 2)"<<endl;
   cout<<" -b [ --binned ] arg             Fit to binned data (default unbinned)"<<endl;
   cout<<" -o [ --plotOption ] arg         Plot option (default empty)"<<endl;
   cout<<" -h [ --help ]                   Produce help message"<<endl;
