@@ -16,12 +16,12 @@ void asimovUtil::generateAsimov(ModelConfig *mc, TString dataName){
   int nAsimov=_asimovNames.size();
   RooAbsData *data=w->data(dataName);
 
-  unique_ptr<RooArgSet> everything(dynamic_cast<RooArgSet*>(w->allVars().snapshot()));
-  // auxUtil::collectEverything(mc, &everything);
-  w->saveSnapshot(RAW, *everything);
+  RooArgSet everything;
+  auxUtil::collectEverything(mc, &everything);
+  w->saveSnapshot(RAW, everything);
   
   for(int iAsimov=0;iAsimov<nAsimov;iAsimov++){
-    unique_ptr<RooArgSet> originalSnapshot(dynamic_cast<RooArgSet*>(everything->snapshot()));
+    unique_ptr<RooArgSet> originalSnapshot(dynamic_cast<RooArgSet*>(everything.snapshot()));
     TString fixedVar="";
     
     _asimovSetups[iAsimov].ReplaceAll(" ","");
@@ -77,8 +77,7 @@ void asimovUtil::generateAsimov(ModelConfig *mc, TString dataName){
       // Reset to initial parameter values
       else if(action==RAW) w->loadSnapshot(RAW);
       // Reset to parameter values at beginning of this round
-      else if(action==RESET) // auxUtil::Reset(&everything, originalSnapshot.get());
-	      *everything=*originalSnapshot;
+      else if(action==RESET) auxUtil::Reset(&everything, originalSnapshot.get());
       // Float fixed nuisance parameters
       else if(action==FLOAT){
         vector<TString> fixedVarList=auxUtil::splitString(fixedVar,',');
@@ -132,7 +131,7 @@ void asimovUtil::generateAsimov(ModelConfig *mc, TString dataName){
       else if(action==SAVESNAPSHOT){
 	if(_SnapshotsAll[iAsimov]!=""){
 	  cout<<"\tREGTEST: Saving snapshot "<<_SnapshotsAll[iAsimov]<<" for current parameters of interest, nuisance parameters, and global observables"<<endl;
-	  w->saveSnapshot(_SnapshotsAll[iAsimov], *everything);
+	  w->saveSnapshot(_SnapshotsAll[iAsimov], everything);
 	  _Snapshots.push_back(_SnapshotsAll[iAsimov]);
 	}
 	if(_SnapshotsNuis[iAsimov]!=""){
