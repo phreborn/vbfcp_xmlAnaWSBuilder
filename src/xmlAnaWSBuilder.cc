@@ -165,7 +165,7 @@ void xmlAnaWSBuilder::generateWS(){
   RooDataSet obsDatabinned(_dataName+"binned","Binned combined data ", args, Index(channellist), Import(datasetMap_binned) ,WeightVar(wt));
   
   _combWS->import(obsData);
-  _combWS->import(obsDatabinned);
+  if(obsDatabinned.numEntries()<obsData.numEntries()) _combWS->import(obsDatabinned);
   w.clear();
 
   // Save the original snapshot
