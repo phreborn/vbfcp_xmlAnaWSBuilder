@@ -329,7 +329,8 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   
   channeltype.ToLower();
 
-  _CN.push_back(channelname);
+  if(find(_CN.begin(), _CN.end(), channelname)==_CN.end()) _CN.push_back(channelname);
+  else auxUtil::alertAndAbort("Category name "+channelname+" used in XML file"+xmlName+" is already used by other categories. Please use a different name.");
   _Type.push_back(channeltype);
   /* all the attributes of a channel */
 
