@@ -267,10 +267,13 @@ vector<TString> auxUtil::decomposeFuncStr(TString function){
 }
 
 bool auxUtil::to_bool(TString str) {
-  str.ToLower();
-  std::istringstream is(str.Data());
   bool b;
-  is >> std::boolalpha >> b;
+  if(str.IsDigit()) b=str.Atoi();
+  else{				// Is a string
+    str.ToLower();
+    std::istringstream is(str.Data());
+    is >> std::boolalpha >> b;
+  }
   return b;
 }
 
