@@ -34,6 +34,7 @@ struct Sample{
 
 struct Systematic{
   TString NPName;
+  TString domain;
   TString process;
   TString whereTo;
   TString constrTerm;

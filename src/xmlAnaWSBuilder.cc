@@ -192,9 +192,16 @@ void xmlAnaWSBuilder::readSyst(TXMLNode* systNode, TString domain){
   Systematic syst;
   syst.NPName=auxUtil::getAttributeValue(systNode, "Name");
   syst.process=auxUtil::getAttributeValue(systNode, "Process", true, ""); // If the process of the systematic is specified, use the specified process. Otherwise use the default one
-  if(syst.process=="") syst.process=domain;
-  else if(domain!=ALLPROC) syst.process=domain+"_"+syst.process; // If the systematic is not from common area, need to give it a different name
-
+  if(domain==ALLPROC){		// Common systematics
+    if(syst.process!="") syst.domain=syst.process; // If a process name is specified, use it as domain name and remove it from common systematic
+    else syst.domain=domain;			   // Otherwise consider it as common systematic
+  }
+  else{
+    syst.domain=domain;		// For systematics under a sample, the domain is always the sample name
+    if(syst.process=="") syst.process=domain;
+    else syst.process=domain+"_"+syst.process; // If the systematic has a process, attach it to domain name as process name
+  }
+  
   syst.whereTo=auxUtil::getAttributeValue(systNode, "WhereTo");
   syst.nominal=atof(auxUtil::getAttributeValue(systNode, "CentralValue"));
   syst.constrTerm=auxUtil::getAttributeValue(systNode, "Constr");
@@ -229,7 +236,7 @@ void xmlAnaWSBuilder::readSyst(TXMLNode* systNode, TString domain){
     syst.errHiExpr=syst.errLoExpr=uncert;
   }
 
-  if(find(_Systematics[syst.process].begin(), _Systematics[syst.process].end(), syst)==_Systematics[syst.process].end()) _Systematics[syst.process].push_back(syst);
+  if(find(_Systematics[syst.domain].begin(), _Systematics[syst.domain].end(), syst)==_Systematics[syst.domain].end()) _Systematics[syst.domain].push_back(syst);
   else auxUtil::alertAndAbort("Systematic "+syst.NPName+" applied on "+syst.whereTo+" is duplicated for process "+syst.process);
 }
 
@@ -407,15 +414,15 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
 
   // Secondly implement systematics and import them into the workspace
   for(auto syst : _Systematics){
-    TString process=syst.first;
+    TString domain=syst.first;
     vector<Systematic> systArr=syst.second;
     RooArgSet *respCollection=NULL, *respCollectionYield=NULL;
     
-    if(process==ALLPROC) respCollectionYield=&expected;      // Systematics to be applied to all resonant processes
+    if(domain==ALLPROC) respCollectionYield=&expected;      // Systematics to be applied to all resonant processes
     else{
-      auto it=find(_Samples.begin(), _Samples.end(), process);
+      auto it=find(_Samples.begin(), _Samples.end(), domain);
       if(it!=_Samples.end()) respCollectionYield=&it->expected;
-      else respCollectionYield=&expectedMap[process];
+      else respCollectionYield=&expectedMap[domain];
     }
     
     for(Systematic syst : systArr){
@@ -570,7 +577,7 @@ int xmlAnaWSBuilder::CN2IDX(TString channelname){
 void xmlAnaWSBuilder::NPMaker(RooWorkspace *w, Systematic *syst, RooArgSet *nuispara, RooArgSet *constraints , RooArgSet *globobs, RooArgSet *expected){
   
   TString varName=syst->whereTo+"_"+syst->NPName;
-  if(syst->process!=ALLPROC) varName+="_"+syst->process;
+  if(syst->domain!=ALLPROC) varName+="_"+syst->process;
 
   TString globName=GLOBALOBSPREFIX+syst->NPName;
   TString constrName=CONSTRTERMPREFIX+syst->NPName;
