@@ -285,13 +285,13 @@ void xmlAnaWSBuilder::readSampleXMLNode(TXMLNode* node, Sample& sample){
       TString normFactor=getItemExpr(node, "Name", sample.procName);
       sample.normFactors.push_back(normFactor);
       bool isCorrelated=auxUtil::to_bool(auxUtil::getAttributeValue(node, "Correlate", true, "0"));
-      if(isCorrelated) _ItemsCorrelate.push_back(normFactor);
+      if(isCorrelated) _ItemsCorrelate.push_back(auxUtil::getObjName(normFactor));
     }
     else if ( node->GetNodeName() == TString( "ShapeFactor" ) ){
       TString shapeFactor=getItemExpr(node, "Name", sample.procName);
       sample.shapeFactors.push_back(shapeFactor);
       bool isCorrelated=auxUtil::to_bool(auxUtil::getAttributeValue(node, "Correlate", true, "0"));
-      if(isCorrelated) _ItemsCorrelate.push_back(shapeFactor);
+      if(isCorrelated) _ItemsCorrelate.push_back(auxUtil::getObjName(shapeFactor));
     }
     else if ( node->GetNodeName() == TString( "ImportItems" ) ){
       TString inputFileName=auxUtil::getAttributeValue(node, "FileName");
