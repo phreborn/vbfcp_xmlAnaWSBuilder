@@ -569,12 +569,12 @@ int xmlAnaWSBuilder::CN2IDX(TString channelname){
 
 void xmlAnaWSBuilder::NPMaker(RooWorkspace *w, Systematic *syst, RooArgSet *nuispara, RooArgSet *constraints , RooArgSet *globobs, RooArgSet *expected){
   
-  TString varName=syst->NPName;
+  TString varName=syst->whereTo+"_"+syst->NPName;
   if(syst->process!=ALLPROC) varName+="_"+syst->process;
 
   TString globName=GLOBALOBSPREFIX+syst->NPName;
   TString constrName=CONSTRTERMPREFIX+syst->NPName;
-  TString responseName=RESPONSEPREFIX+syst->whereTo+varName; // Important: a NP can be applied to both shape and yield.
+  TString responseName=RESPONSEPREFIX+varName; // Important: a NP can be applied to both shape and yield.
 
   if(syst->constrTerm==ASYMMETRIC) {
     if(_debug) cout << "\tREGTEST: Set up nuisance parameter "
@@ -893,7 +893,7 @@ void xmlAnaWSBuilder::checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara){
 TString xmlAnaWSBuilder::getItemExpr(TXMLNode *node, TString attrName, TString process){
   TString expr=auxUtil::getAttributeValue(node, attrName);
 
-  expr.ReplaceAll(RESPONSE, RESPONSEPREFIX+SHAPE); // Implement proper response terms. Assume only shape uncertainty would appear
+  expr.ReplaceAll(RESPONSE, RESPONSEPREFIX+SHAPE+"_"); // Implement proper response terms. Assume only shape uncertainty would appear
   expr.ReplaceAll(OBSERVABLE, _observableName); // Implement proper observables
   expr.ReplaceAll(LT,"<");
   expr.ReplaceAll(LE,"<=");
