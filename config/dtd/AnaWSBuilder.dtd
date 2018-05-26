@@ -1,4 +1,4 @@
-<!ELEMENT Combination (Input+,POI*,Asimov*)>
+<!ELEMENT Combination (Input+,POI*,Correlate*,Asimov*)> <!-- Correlate here is dummy and only included for backward compatibility -->
 <!ATTLIST Combination
           WorkspaceName      CDATA            #REQUIRED
           ModelConfigName    CDATA            #REQUIRED
