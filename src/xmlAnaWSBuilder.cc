@@ -106,7 +106,7 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   cout<<_Nch<<" categories to be included"<<endl;
   for(int ich=0;ich<_Nch;ich++) cout<<"XML file "<<ich<<": "<<_xmlPath[ich]<<endl;
   _asimovHandler->printSummary();
-  // if(_useBinned) cout<<"Binned data will be used for profiling models"<<endl;
+  if(_useBinned) cout<<"\tREGTEST: Binned data will be used for fits to be performed"<<endl;
   cout<<"======================================="<<endl;
   // Start working...
   _combWS=auto_ptr<RooWorkspace>(new RooWorkspace(_wsName));
@@ -166,6 +166,10 @@ void xmlAnaWSBuilder::generateWS(){
   
   _combWS->import(obsData);
   if(obsDatabinned.numEntries()<obsData.numEntries()) _combWS->import(obsDatabinned);
+  else{
+    cout<<"\tREGTEST: No need to keep binned dataset, as the number of data events is smaller than the number of bins in all categories"<<endl;
+    _useBinned=false;
+  }
   w.clear();
 
   // Save the original snapshot
