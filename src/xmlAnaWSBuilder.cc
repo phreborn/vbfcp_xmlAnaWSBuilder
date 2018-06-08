@@ -106,7 +106,8 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   cout<<_Nch<<" categories to be included"<<endl;
   for(int ich=0;ich<_Nch;ich++) cout<<"XML file "<<ich<<": "<<_xmlPath[ich]<<endl;
   _asimovHandler->printSummary();
-  if(_useBinned) cout<<"\tREGTEST: Binned data will be used for fits to be performed"<<endl;
+  // if(_useBinned) cout<<"\tREGTEST: Binned data will be used for fits to be performed"<<endl;
+  _useBinned=false;
   cout<<"======================================="<<endl;
   // Start working...
   _combWS=auto_ptr<RooWorkspace>(new RooWorkspace(_wsName));
