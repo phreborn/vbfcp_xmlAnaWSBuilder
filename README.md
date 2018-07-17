@@ -1,5 +1,5 @@
-# xmlAnaWSBuilder by Hongtao Yang <Hongtao.Yang@cern.ch>
-# Developed based on workspace building code by Haichen Wang, with many nice ideas and developments contributed by Jared Vasquez as well as other early users.
+# XML Analytic Workspace Builder
+# Developed based on workspace building code by Haichen Wang
 
 ================================================
 
@@ -7,17 +7,15 @@
 
 > source setup.sh
 
-Then simply
+Then simply do
 
 > make
 
-The make file is not working perfectly yet, so whenever you change the structure of the class or find anything dubious please always run
+The ROOT version used in the setup.sh script is the current HComb (HSG7) ROOT:
 
-> make clean
+https://twiki.cern.ch/twiki/bin/view/AtlasProtected/HSG7RootBuild
 
-> make
+Users can modify the script to setup their preferred version of ROOT in their preferred way.
 
-first before debugging.
-
-For more info on usage, please visit https://twiki.cern.ch/twiki/bin/view/AtlasProtected/XmlAnaWSBuilder
+For how to use the software, please checkout https://twiki.cern.ch/twiki/bin/view/AtlasProtected/XmlAnaWSBuilder
 
