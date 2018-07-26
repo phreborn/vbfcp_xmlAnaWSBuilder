@@ -1,0 +1,12 @@
+<!DOCTYPE Model SYSTEM 'AnaWSBuilder.dtd'>
+<Model Type="UserDef" CacheBinning="100000">
+<Item Name="muCBNom[125.218]"/>
+<Item Name="sigmaCBNom[1.45454]"/>
+<Item Name="alphaCBLo[1.64719]"/>
+<Item Name="alphaCBHi[1.67187]"/>
+<Item Name="nCBLo[4.94469]"/>
+<Item Name="nCBHi[5.32902]"/>
+<Item Name="prod::muCB(muCBNom,resp_SCALE,response::ATLAS_LHCmass)"/>
+<Item Name="prod::sigmaCB(sigmaCBNom,resp_RES)"/>
+<ModelItem Name="RooTwoSidedCBShape::signal(:observable:, muCB, sigmaCB, alphaCBLo, nCBLo, alphaCBHi, nCBHi)"/>
+</Model>
