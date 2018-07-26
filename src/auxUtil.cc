@@ -285,3 +285,11 @@ TXMLNode *auxUtil::findNode(TXMLNode* rootNode, TString nodeName){
   }
   return NULL;
 }
+
+bool auxUtil::checkExist(TString name) {
+  if (FILE *file = fopen(name, "r")) {
+    fclose(file);
+    return true;
+  }
+  else return false;
+}

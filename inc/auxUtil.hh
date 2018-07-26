@@ -51,6 +51,9 @@ public:
   static vector<TString> decomposeFuncStr(TString function);
   static bool to_bool(TString str);
   static TXMLNode* findNode(TXMLNode* rootNode, TString nodeName);
+
+  static bool checkExist(TString name);
+  
   static double epsilon;
   ClassDef(auxUtil, 0);
 };

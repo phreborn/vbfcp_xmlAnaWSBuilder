@@ -368,6 +368,8 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   }
   _injectGhost=auxUtil::to_bool(auxUtil::getAttributeValue(dataNode, "InjectGhost", true, "0")); // Default false
 
+  dataFileSanityCheck();	// Check now and report, before it is too late
+  
   TXMLNode *correlateNode=auxUtil::findNode(rootNode, "Correlate"); // This attribute is only allowed to appear at most once per-channel, and cannot be hided in a sub-XML file
   if(correlateNode){	// If you would like to put some parameters which are not POI correlated
     TString itemStr=correlateNode->GetText();
@@ -1016,5 +1018,17 @@ void xmlAnaWSBuilder::readChannelXMLNode(TXMLNode *node){
       readChannelXMLNode( importNode );
     }
     node=node->GetNextNode();
+  }
+}
+
+void xmlAnaWSBuilder::dataFileSanityCheck(){
+  if(!auxUtil::checkExist(_inputDataFileName)) auxUtil::alertAndAbort("Cannot find input data file "+_inputDataFileName);
+  if(_inputDataFileType!=ASCII){	// means that we are reading data from a tree
+    TFile *f=TFile::Open(_inputDataFileName);
+    TTree *t=dynamic_cast<TTree*>(f->Get(_inputDataTreeName));
+    if(!t) auxUtil::alertAndAbort("Cannot find TTree "+_inputDataTreeName+" in data file "+_inputDataFileName);
+    TBranch *b=t->FindBranch(_inputDataVarName);
+    if(!b) auxUtil::alertAndAbort("Cannot find TBranch "+_inputDataVarName+" in TTree "+_inputDataTreeName+" in data file "+_inputDataFileName);
+    f->Close();
   }
 }

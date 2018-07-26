@@ -161,6 +161,7 @@ public:
   void setDebug(bool flag){_debug=flag;};
   void setUseBinned(bool flag){_useBinned=flag;};
   void setPlotOption(TString option){_plotOpt=option;};
+  void dataFileSanityCheck();
   ClassDef(xmlAnaWSBuilder,3);
 };
 
