@@ -10,7 +10,7 @@
 
 #include "FlexibleInterpVarMkII.hh"
 // Additional custom classes
-#include "HggTwoSidedCBPdf.hh"
+#include "RooTwoSidedCBShape.hh"
 #include "HggMG5aMCNLOLineShapePdf.hh"
 
 using namespace std;
