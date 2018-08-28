@@ -31,7 +31,7 @@
   <Item Name="expr::ScaleFactorBSM('(1-@0*@1)*(2*@2*@3*@4*@5)', srFracYY, kSigFracYY, BRyy, BRbb,cutsEffi,luminosity)"/>
   <Item Name="ScaleFactorBkg[1]"/>
 
-  <Sample Name="ggH" Norm="0.025407" XSection="1" SelectionEff="1" InputFile="None" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonCounting">
+  <Sample Name="ggH" Norm="0.025407" InputFile="None" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonCounting">
     <Systematic Name="BR_gamgam" Constr="logn" CentralValue="1" Mag="0.049" WhereTo="yield"/>
     <Systematic Name="QCDscale_ggH" Constr="asym" CentralValue="1" Mag="+0.072,-0.078" WhereTo="yield"/>
     <Systematic Name="pdf_gg" Constr="asym" CentralValue="1" Mag="+0.075,-0.069" WhereTo="yield"/>    
@@ -45,7 +45,7 @@
     <NormFactor Name="ScaleFactorSM" />
   </Sample>
 
-  <Sample Name="VBF" Norm="0.004608" XSection="1" SelectionEff="1" InputFile="None" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonCounting">
+  <Sample Name="VBF" Norm="0.004608" InputFile="None" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonCounting">
     <Systematic Name="BR_gamgam" Constr="logn" CentralValue="1" Mag="0.049" WhereTo="yield"/>
     <Systematic Name="QCDscale_VBF" Constr="asym" CentralValue="1" Mag="+0.002,-0.002" WhereTo="yield"/>
     <Systematic Name="pdf_qq" Constr="asym" CentralValue="1" Mag="+0.027,-0.027" WhereTo="yield"/>    
@@ -59,7 +59,7 @@
     <NormFactor Name="ScaleFactorSM" />
   </Sample>
 
-  <Sample Name="WH" Norm="0.001303" XSection="1" SelectionEff="1" InputFile="None" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonCounting">
+  <Sample Name="WH" Norm="0.001303" InputFile="None" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonCounting">
     <Systematic Name="BR_gamgam" Constr="logn" CentralValue="1" Mag="0.049" WhereTo="yield"/>
     <Systematic Name="QCDscale_WH" Constr="asym" CentralValue="1" Mag="+0.01,-0.01" WhereTo="yield"/>
     <Systematic Name="pdf_qq" Constr="asym" CentralValue="1" Mag="+0.023,-0.023" WhereTo="yield"/>
@@ -73,7 +73,7 @@
     <NormFactor Name="ScaleFactorSM" />
   </Sample>
 
-  <Sample Name="ZH" Norm="0.027678" XSection="1" SelectionEff="1" InputFile="None" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonCounting">
+  <Sample Name="ZH" Norm="0.027678" InputFile="None" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonCounting">
     <Systematic Name="BR_gamgam" Constr="logn" CentralValue="1" Mag="0.049" WhereTo="yield"/>
     <Systematic Name="QCDscale_ZH" Constr="asym" CentralValue="1" Mag="+0.031,-0.031" WhereTo="yield"/>
     <Systematic Name="pdf_qq" Constr="asym" CentralValue="1" Mag="+0.025,-0.025" WhereTo="yield"/>
@@ -86,7 +86,7 @@
     <NormFactor Name="ScaleFactorSM" />
   </Sample>
 
-  <Sample Name="ttH" Norm="0.138543" XSection="1" SelectionEff="1" InputFile="None" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonCounting">
+  <Sample Name="ttH" Norm="0.138543" InputFile="None" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonCounting">
     <Systematic Name="BR_gamgam" Constr="logn" CentralValue="1" Mag="0.049" WhereTo="yield"/>
     <Systematic Name="QCDscale_ttH" Constr="asym" CentralValue="1" Mag="+0.038,-0.093" WhereTo="yield"/>
     <Systematic Name="pdf_gg" Constr="asym" CentralValue="1" Mag="+0.081,-0.081" WhereTo="yield"/>
@@ -99,7 +99,7 @@
     <NormFactor Name="ScaleFactorSM" />
   </Sample>
 
-  <Sample Name="SMDH" Norm="0.036617" XSection="1" SelectionEff="1" InputFile="None" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonCounting">
+  <Sample Name="SMDH" Norm="0.036617" InputFile="None" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonCounting">
     <Systematic Name="BR_gamgam" Constr="logn" CentralValue="1" Mag="0.049" WhereTo="yield"/>
     <Systematic Name="BR_bb" Constr="logn" CentralValue="1" Mag="0.033" WhereTo="yield"/>
     <Systematic Name="QCDscale_SMDH" Constr="asym" CentralValue="1" Mag="+0.203,-0.167" WhereTo="yield"/>
@@ -113,7 +113,7 @@
     <NormFactor Name="ScaleFactorSM" />
   </Sample>
 
-  <Sample Name="BSM" Norm="1" XSection="1" SelectionEff="1" InputFile="None" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonCounting">
+  <Sample Name="BSM" Norm="1" InputFile="None" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonCounting">
     <Systematic Name="BR_gamgam" Constr="logn" CentralValue="1" Mag="0.049" WhereTo="yield"/>
     <Systematic Name="BR_bb" Constr="logn" CentralValue="1" Mag="0.033" WhereTo="yield"/>
     <Systematic Name="ATLAS_stat_BSM" Constr="logn" CentralValue="1" Mag="0.017" WhereTo="yield"/>
@@ -125,7 +125,7 @@
     <NormFactor Name="ScaleFactorBSM" />
   </Sample>
 
-  <Sample Name="Continuum" Norm="1" XSection="1" SelectionEff="1" InputFile="None" ImportSyst=":self:" MultiplyLumi="0" SharePdf="commonCounting">
+  <Sample Name="Continuum" Norm="1" InputFile="None" ImportSyst=":self:" MultiplyLumi="0" SharePdf="commonCounting">
     <NormFactor Name="nConinuum[9,0,20]" />
   </Sample>
 </Channel>

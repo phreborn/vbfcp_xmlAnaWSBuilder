@@ -1,57 +1,57 @@
 <!DOCTYPE Channel SYSTEM 'AnaWSBuilder.dtd'>
-  <Channel Name="ttH_c29" Type="shape" Lumi="1">
-  <Data InputFile="Input/data/ttHyy/mass_points_data151617_13TeV_TTH_80.0ifb_c29.txt" Observable="atlas_invMass_ttH_c29[105,160]" Binning="500" InjectGhost="1"/>
-  <Systematic Name="ATLAS_lumi_run2" Constr="logn" CentralValue="1" Mag="0.02" WhereTo="yield"/>
-  <Systematic Name="ATLAS_BR_gamgam" Constr="asym" CentralValue="1" Mag="0.0290324336776,0.0284058020686" WhereTo="yield"/>
+<Channel Name="ttH_c29" Type="shape" Lumi="1">
+<Data InputFile="Input/data/ttHyy/mass_points_data151617_13TeV_TTH_80.0ifb_c29.txt" Observable="atlas_invMass_ttH_c29[105,160]" Binning="500" InjectGhost="1"/>
+<Systematic Name="ATLAS_lumi_run2" Constr="logn" CentralValue="1" Mag="0.02" WhereTo="yield"/>
+<Systematic Name="ATLAS_BR_gamgam" Constr="asym" CentralValue="1" Mag="0.0290324336776,0.0284058020686" WhereTo="yield"/>
 
-  <Systematic Name="ATLAS_EG_RESOLUTION_MATERIALCRYO" Constr="logn" CentralValue="1" Mag="0.0243565759766" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_RESOLUTION_MATERIALID" Constr="logn" CentralValue="1" Mag="0.0615730384902" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_RESOLUTION_MATERIALCALO" Constr="logn" CentralValue="1" Mag="0.0111467544438" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_RESOLUTION_MATERIALPP0" Constr="logn" CentralValue="1" Mag="0.0164141825514" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_RESOLUTION_PILEUP" Constr="logn" CentralValue="1" Mag="-0.0654260190508" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_RESOLUTION_SAMPLINGTERM" Constr="logn" CentralValue="1" Mag="-0.0610553547135" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_RESOLUTION_MATERIALGAP" Constr="logn" CentralValue="1" Mag="0.00746436525658" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_RESOLUTION_ZSMEARING" Constr="logn" CentralValue="1" Mag="0.0493046836646" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_RESOLUTION_MATERIALIBL" Constr="logn" CentralValue="1" Mag="0.0319008689759" WhereTo="shape"/>
-  <Item Name="prod::resp_RES(response::ATLAS_EG_RESOLUTION_MATERIALCRYO,response::ATLAS_EG_RESOLUTION_MATERIALID,response::ATLAS_EG_RESOLUTION_MATERIALCALO,response::ATLAS_EG_RESOLUTION_MATERIALPP0,response::ATLAS_EG_RESOLUTION_PILEUP,response::ATLAS_EG_RESOLUTION_SAMPLINGTERM,response::ATLAS_EG_RESOLUTION_MATERIALGAP,response::ATLAS_EG_RESOLUTION_ZSMEARING,response::ATLAS_EG_RESOLUTION_MATERIALIBL,)"/>
+<Systematic Name="ATLAS_EG_RESOLUTION_MATERIALCRYO" Constr="logn" CentralValue="1" Mag="0.0243565759766" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_RESOLUTION_MATERIALID" Constr="logn" CentralValue="1" Mag="0.0615730384902" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_RESOLUTION_MATERIALCALO" Constr="logn" CentralValue="1" Mag="0.0111467544438" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_RESOLUTION_MATERIALPP0" Constr="logn" CentralValue="1" Mag="0.0164141825514" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_RESOLUTION_PILEUP" Constr="logn" CentralValue="1" Mag="-0.0654260190508" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_RESOLUTION_SAMPLINGTERM" Constr="logn" CentralValue="1" Mag="-0.0610553547135" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_RESOLUTION_MATERIALGAP" Constr="logn" CentralValue="1" Mag="0.00746436525658" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_RESOLUTION_ZSMEARING" Constr="logn" CentralValue="1" Mag="0.0493046836646" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_RESOLUTION_MATERIALIBL" Constr="logn" CentralValue="1" Mag="0.0319008689759" WhereTo="shape"/>
+<Item Name="prod::resp_RES(response::ATLAS_EG_RESOLUTION_MATERIALCRYO,response::ATLAS_EG_RESOLUTION_MATERIALID,response::ATLAS_EG_RESOLUTION_MATERIALCALO,response::ATLAS_EG_RESOLUTION_MATERIALPP0,response::ATLAS_EG_RESOLUTION_PILEUP,response::ATLAS_EG_RESOLUTION_SAMPLINGTERM,response::ATLAS_EG_RESOLUTION_MATERIALGAP,response::ATLAS_EG_RESOLUTION_ZSMEARING,response::ATLAS_EG_RESOLUTION_MATERIALIBL,)"/>
 
-  <Systematic Name="ATLAS_EG_SCALE_PS__ETABIN6" Constr="gaus" CentralValue="1" Mag="-0.000559791157178" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_PS__ETABIN3" Constr="gaus" CentralValue="1" Mag="-0.000129419151089" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_PS__ETABIN0" Constr="gaus" CentralValue="1" Mag="-0.00014204869254" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_LARCALIB__ETABIN0" Constr="gaus" CentralValue="1" Mag="-0.00124233439126" WhereTo="shape"/>
-  <Systematic Name="ATLAS_PH_SCALE_LEAKAGECONV" Constr="gaus" CentralValue="1" Mag="0.000497343794204" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_PS__ETABIN8" Constr="gaus" CentralValue="1" Mag="-0.000103665109904" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_MATCALO__ETABIN0" Constr="gaus" CentralValue="1" Mag="0.000101730891552" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_L2GAIN" Constr="gaus" CentralValue="1" Mag="0.00257371900763" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_WTOTS1" Constr="gaus" CentralValue="1" Mag="0.000199864923829" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_ZEESYST" Constr="gaus" CentralValue="1" Mag="0.000571926855117" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_G4" Constr="gaus" CentralValue="1" Mag="0.000127759415699" WhereTo="shape"/>
-  <Systematic Name="ATLAS_PH_SCALE_LEAKAGEUNCONV" Constr="gaus" CentralValue="1" Mag="0.000660040029495" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_LARUNCONVCALIB__ETABIN0" Constr="gaus" CentralValue="1" Mag="0.000281317443334" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_TOPOCLUSTER_THRES" Constr="gaus" CentralValue="1" Mag="0.000149670213575" WhereTo="shape"/>
-  <Systematic Name="ATLAS_PH_SCALE_CONVEFFICIENCY" Constr="gaus" CentralValue="1" Mag="-0.000324261401176" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_MATID__ETABIN2" Constr="gaus" CentralValue="1" Mag="0.000102586789982" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_MATID__ETABIN1" Constr="gaus" CentralValue="1" Mag="0.000205115869331" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_MATID__ETABIN0" Constr="gaus" CentralValue="1" Mag="0.000605027615501" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_S12__ETABIN0" Constr="gaus" CentralValue="1" Mag="-0.000550462565031" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_S12__ETABIN1" Constr="gaus" CentralValue="1" Mag="-0.000465921609969" WhereTo="shape"/>
-  <Systematic Name="ATLAS_PH_SCALE_CONVFAKERATE" Constr="gaus" CentralValue="1" Mag="0.000171737921544" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_S12__ETABIN3" Constr="gaus" CentralValue="1" Mag="-0.000182317040872" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_LARCALIB__ETABIN1" Constr="gaus" CentralValue="1" Mag="-0.000138338515546" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_MATCRYO__ETABIN8" Constr="gaus" CentralValue="1" Mag="0.000196614228216" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_PS_BARREL_B12" Constr="gaus" CentralValue="1" Mag="-0.000809806143265" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_MATCRYO__ETABIN3" Constr="gaus" CentralValue="1" Mag="0.000104856100658" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_LARELECUNCONV__ETABIN1" Constr="gaus" CentralValue="1" Mag="-0.000368460299405" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_LARELECUNCONV__ETABIN0" Constr="gaus" CentralValue="1" Mag="-0.000900780156124" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_L1GAIN" Constr="gaus" CentralValue="1" Mag="0.000171720929721" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_MATPP0__ETABIN1" Constr="gaus" CentralValue="1" Mag="0.000312059278362" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_MATPP0__ETABIN0" Constr="gaus" CentralValue="1" Mag="0.000240940693562" WhereTo="shape"/>
-  <Systematic Name="ATLAS_EG_SCALE_PEDESTAL" Constr="gaus" CentralValue="1" Mag="-0.000149365833965" WhereTo="shape"/>
-  <Item Name="prod::resp_SCALE(response::ATLAS_EG_SCALE_PS__ETABIN6,response::ATLAS_EG_SCALE_PS__ETABIN3,response::ATLAS_EG_SCALE_PS__ETABIN0,response::ATLAS_EG_SCALE_LARCALIB__ETABIN0,response::ATLAS_PH_SCALE_LEAKAGECONV,response::ATLAS_EG_SCALE_PS__ETABIN8,response::ATLAS_EG_SCALE_MATCALO__ETABIN0,response::ATLAS_EG_SCALE_L2GAIN,response::ATLAS_EG_SCALE_WTOTS1,response::ATLAS_EG_SCALE_ZEESYST,response::ATLAS_EG_SCALE_G4,response::ATLAS_PH_SCALE_LEAKAGEUNCONV,response::ATLAS_EG_SCALE_LARUNCONVCALIB__ETABIN0,response::ATLAS_EG_SCALE_TOPOCLUSTER_THRES,response::ATLAS_PH_SCALE_CONVEFFICIENCY,response::ATLAS_EG_SCALE_MATID__ETABIN2,response::ATLAS_EG_SCALE_MATID__ETABIN1,response::ATLAS_EG_SCALE_MATID__ETABIN0,response::ATLAS_EG_SCALE_S12__ETABIN0,response::ATLAS_EG_SCALE_S12__ETABIN1,response::ATLAS_PH_SCALE_CONVFAKERATE,response::ATLAS_EG_SCALE_S12__ETABIN3,response::ATLAS_EG_SCALE_LARCALIB__ETABIN1,response::ATLAS_EG_SCALE_MATCRYO__ETABIN8,response::ATLAS_EG_SCALE_PS_BARREL_B12,response::ATLAS_EG_SCALE_MATCRYO__ETABIN3,response::ATLAS_EG_SCALE_LARELECUNCONV__ETABIN1,response::ATLAS_EG_SCALE_LARELECUNCONV__ETABIN0,response::ATLAS_EG_SCALE_L1GAIN,response::ATLAS_EG_SCALE_MATPP0__ETABIN1,response::ATLAS_EG_SCALE_MATPP0__ETABIN0,response::ATLAS_EG_SCALE_PEDESTAL,)"/>
+<Systematic Name="ATLAS_EG_SCALE_PS__ETABIN6" Constr="gaus" CentralValue="1" Mag="-0.000559791157178" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_PS__ETABIN3" Constr="gaus" CentralValue="1" Mag="-0.000129419151089" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_PS__ETABIN0" Constr="gaus" CentralValue="1" Mag="-0.00014204869254" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_LARCALIB__ETABIN0" Constr="gaus" CentralValue="1" Mag="-0.00124233439126" WhereTo="shape"/>
+<Systematic Name="ATLAS_PH_SCALE_LEAKAGECONV" Constr="gaus" CentralValue="1" Mag="0.000497343794204" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_PS__ETABIN8" Constr="gaus" CentralValue="1" Mag="-0.000103665109904" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_MATCALO__ETABIN0" Constr="gaus" CentralValue="1" Mag="0.000101730891552" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_L2GAIN" Constr="gaus" CentralValue="1" Mag="0.00257371900763" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_WTOTS1" Constr="gaus" CentralValue="1" Mag="0.000199864923829" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_ZEESYST" Constr="gaus" CentralValue="1" Mag="0.000571926855117" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_G4" Constr="gaus" CentralValue="1" Mag="0.000127759415699" WhereTo="shape"/>
+<Systematic Name="ATLAS_PH_SCALE_LEAKAGEUNCONV" Constr="gaus" CentralValue="1" Mag="0.000660040029495" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_LARUNCONVCALIB__ETABIN0" Constr="gaus" CentralValue="1" Mag="0.000281317443334" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_TOPOCLUSTER_THRES" Constr="gaus" CentralValue="1" Mag="0.000149670213575" WhereTo="shape"/>
+<Systematic Name="ATLAS_PH_SCALE_CONVEFFICIENCY" Constr="gaus" CentralValue="1" Mag="-0.000324261401176" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_MATID__ETABIN2" Constr="gaus" CentralValue="1" Mag="0.000102586789982" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_MATID__ETABIN1" Constr="gaus" CentralValue="1" Mag="0.000205115869331" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_MATID__ETABIN0" Constr="gaus" CentralValue="1" Mag="0.000605027615501" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_S12__ETABIN0" Constr="gaus" CentralValue="1" Mag="-0.000550462565031" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_S12__ETABIN1" Constr="gaus" CentralValue="1" Mag="-0.000465921609969" WhereTo="shape"/>
+<Systematic Name="ATLAS_PH_SCALE_CONVFAKERATE" Constr="gaus" CentralValue="1" Mag="0.000171737921544" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_S12__ETABIN3" Constr="gaus" CentralValue="1" Mag="-0.000182317040872" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_LARCALIB__ETABIN1" Constr="gaus" CentralValue="1" Mag="-0.000138338515546" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_MATCRYO__ETABIN8" Constr="gaus" CentralValue="1" Mag="0.000196614228216" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_PS_BARREL_B12" Constr="gaus" CentralValue="1" Mag="-0.000809806143265" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_MATCRYO__ETABIN3" Constr="gaus" CentralValue="1" Mag="0.000104856100658" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_LARELECUNCONV__ETABIN1" Constr="gaus" CentralValue="1" Mag="-0.000368460299405" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_LARELECUNCONV__ETABIN0" Constr="gaus" CentralValue="1" Mag="-0.000900780156124" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_L1GAIN" Constr="gaus" CentralValue="1" Mag="0.000171720929721" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_MATPP0__ETABIN1" Constr="gaus" CentralValue="1" Mag="0.000312059278362" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_MATPP0__ETABIN0" Constr="gaus" CentralValue="1" Mag="0.000240940693562" WhereTo="shape"/>
+<Systematic Name="ATLAS_EG_SCALE_PEDESTAL" Constr="gaus" CentralValue="1" Mag="-0.000149365833965" WhereTo="shape"/>
+<Item Name="prod::resp_SCALE(response::ATLAS_EG_SCALE_PS__ETABIN6,response::ATLAS_EG_SCALE_PS__ETABIN3,response::ATLAS_EG_SCALE_PS__ETABIN0,response::ATLAS_EG_SCALE_LARCALIB__ETABIN0,response::ATLAS_PH_SCALE_LEAKAGECONV,response::ATLAS_EG_SCALE_PS__ETABIN8,response::ATLAS_EG_SCALE_MATCALO__ETABIN0,response::ATLAS_EG_SCALE_L2GAIN,response::ATLAS_EG_SCALE_WTOTS1,response::ATLAS_EG_SCALE_ZEESYST,response::ATLAS_EG_SCALE_G4,response::ATLAS_PH_SCALE_LEAKAGEUNCONV,response::ATLAS_EG_SCALE_LARUNCONVCALIB__ETABIN0,response::ATLAS_EG_SCALE_TOPOCLUSTER_THRES,response::ATLAS_PH_SCALE_CONVEFFICIENCY,response::ATLAS_EG_SCALE_MATID__ETABIN2,response::ATLAS_EG_SCALE_MATID__ETABIN1,response::ATLAS_EG_SCALE_MATID__ETABIN0,response::ATLAS_EG_SCALE_S12__ETABIN0,response::ATLAS_EG_SCALE_S12__ETABIN1,response::ATLAS_PH_SCALE_CONVFAKERATE,response::ATLAS_EG_SCALE_S12__ETABIN3,response::ATLAS_EG_SCALE_LARCALIB__ETABIN1,response::ATLAS_EG_SCALE_MATCRYO__ETABIN8,response::ATLAS_EG_SCALE_PS_BARREL_B12,response::ATLAS_EG_SCALE_MATCRYO__ETABIN3,response::ATLAS_EG_SCALE_LARELECUNCONV__ETABIN1,response::ATLAS_EG_SCALE_LARELECUNCONV__ETABIN0,response::ATLAS_EG_SCALE_L1GAIN,response::ATLAS_EG_SCALE_MATPP0__ETABIN1,response::ATLAS_EG_SCALE_MATPP0__ETABIN0,response::ATLAS_EG_SCALE_PEDESTAL,)"/>
 
-  <Systematic Name="ATLAS_LHCmass" Constr="gaus" CentralValue="1" Mag="0.00191861859461" WhereTo="shape"/>
+<Systematic Name="ATLAS_LHCmass" Constr="gaus" CentralValue="1" Mag="0.00191861859461" WhereTo="shape"/>
 
-<Sample Name="ttH" XSection="1" SelectionEff="1" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
+<Sample Name="ttH" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
   <Systematic Name="ATLAS_JET_Flavor_Composition_ttH" Constr="asym" CentralValue="1" Mag="0.0222264325999,-0.0208858598329" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_8restTerm" Constr="asym" CentralValue="1" Mag="0.000527228719854,-0.000473792839351" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.00085719037373,-0.00232964289841" WhereTo="yield"/>
@@ -127,7 +127,7 @@
   <NormFactor Name="mu_ttH[1]" />
 </Sample>
 
-<Sample Name="ggH" XSection="1" SelectionEff="1" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
+<Sample Name="ggH" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
   <Systematic Name="ATLAS_JET_EffectiveNP_8restTerm" Constr="asym" CentralValue="1" Mag="-0.0140428895212,0.00175303621374" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_Flavor_Response_ggH" Constr="asym" CentralValue="1" Mag="0.0134399537017,0.0541783759862" WhereTo="yield"/>
   <Systematic Name="ATLAS_MET_SoftTrk" Constr="asym" CentralValue="1" Mag="-0.018381496923,0.0101094514068" WhereTo="yield"/>
@@ -159,7 +159,7 @@
   <NormFactor Name="mu_ggH[1]" />
 </Sample>
 
-<Sample Name="VBF" XSection="1" SelectionEff="1" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
+<Sample Name="VBF" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
   <Systematic Name="ATLAS_JET_Flavor_Composition_VBF" Constr="asym" CentralValue="1" Mag="0.0285732572234,-0.0870684568701" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_8restTerm" Constr="asym" CentralValue="1" Mag="8.52235092906e-05,-0.00768831158891" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.00334701416127,0.058736802043" WhereTo="yield"/>
@@ -193,7 +193,7 @@
   <NormFactor Name="mu_VBF[1]" />
 </Sample>
 
-<Sample Name="WH" XSection="1" SelectionEff="1" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
+<Sample Name="WH" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
   <Systematic Name="ATLAS_JET_EffectiveNP_8restTerm" Constr="asym" CentralValue="1" Mag="0.0,0.00562176018938" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="-0.052087746819,-0.0523685383471" WhereTo="yield"/>
   <Systematic Name="ATLAS_MET_SoftTrk" Constr="asym" CentralValue="1" Mag="-0.014865995927,0.0142375671841" WhereTo="yield"/>
@@ -226,7 +226,7 @@
   <NormFactor Name="mu_WH[1]" />
 </Sample>
 
-<Sample Name="ZH" XSection="1" SelectionEff="1" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
+<Sample Name="ZH" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
   <Systematic Name="ATLAS_JET_EffectiveNP_8restTerm" Constr="asym" CentralValue="1" Mag="0.000506328108615,0.00251753471968" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.00144452115001,-0.0245084776258" WhereTo="yield"/>
   <Systematic Name="ATLAS_MET_SoftTrk" Constr="asym" CentralValue="1" Mag="0.00279655062314,0.0269152112392" WhereTo="yield"/>
@@ -261,7 +261,7 @@
   <NormFactor Name="mu_ZH[1]" />
 </Sample>
 
-<Sample Name="bbH" XSection="1" SelectionEff="1" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
+<Sample Name="bbH" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
   <Systematic Name="ATLAS_JET_Flavor_Composition_bbH" Constr="asym" CentralValue="1" Mag="-0.0423443464105,-0.162068696865" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.0271926636202,-0.0256083941271" WhereTo="yield"/>
   <Systematic Name="ATLAS_MET_SoftTrk" Constr="asym" CentralValue="1" Mag="-0.0545743579772,0.0" WhereTo="yield"/>
@@ -291,7 +291,7 @@
   <NormFactor Name="mu_bbH[1]" />
 </Sample>
 
-<Sample Name="tHjb" XSection="1" SelectionEff="1" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
+<Sample Name="tHjb" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
   <Systematic Name="ATLAS_MUON_SAGITTA_RHO" Constr="asym" CentralValue="1" Mag="0.000212886002069,0.000212886002069" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_8restTerm" Constr="asym" CentralValue="1" Mag="-0.00604783278188,0.00267446488766" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_Flavor_Composition_tHjb" Constr="asym" CentralValue="1" Mag="0.0267148146143,-0.0554990949188" WhereTo="yield"/>
@@ -341,7 +341,7 @@
   <NormFactor Name="mu_tHjb[1]" />
 </Sample>
 
-<Sample Name="tWH" XSection="1" SelectionEff="1" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
+<Sample Name="tWH" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
   <Systematic Name="ATLAS_JET_EffectiveNP_8restTerm" Constr="asym" CentralValue="1" Mag="0.00147427541992,-0.00148173062981" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.00578338059904,-0.00440201185063" WhereTo="yield"/>
   <Systematic Name="ATLAS_MET_SoftTrk" Constr="asym" CentralValue="1" Mag="-0.00834819299008,-0.00642897497926" WhereTo="yield"/>
@@ -378,7 +378,7 @@
   <NormFactor Name="mu_tWH[1]" />
 </Sample>
 
-<Sample Name="ggZH" XSection="1" SelectionEff="1" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
+<Sample Name="ggZH" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
   <Systematic Name="ATLAS_JET_EffectiveNP_8restTerm" Constr="asym" CentralValue="1" Mag="-0.0040342668657,0.0041956128308" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.0172722546561,-0.00472326835949" WhereTo="yield"/>
   <Systematic Name="ATLAS_MET_SoftTrk" Constr="asym" CentralValue="1" Mag="-0.0318469462211,0.000556839160687" WhereTo="yield"/>
@@ -412,11 +412,11 @@
   <NormFactor Name="mu_ggZH[1]" />
 </Sample>
 
-<Sample Name="spurious" XSection="1" SelectionEff="1" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":self:" MultiplyLumi="0" SharePdf="commonSig">
+<Sample Name="spurious" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":self:" MultiplyLumi="0" SharePdf="commonSig">
   <Systematic Name="ATLAS_Hgg_BIAS_ttH_c29" Constr="gaus" CentralValue="0" Mag="0.359" WhereTo="yield"/>
 </Sample>
 
-<Sample Name="background" XSection="1" SelectionEff="1" InputFile="config/ttHyy/model/background_ttH_c29.xml" ImportSyst=":self:" MultiplyLumi="0">
-<NormFactor Name="nbkg_ttH_c29[15.000000,0,100000]"/>
+<Sample Name="background" InputFile="config/ttHyy/model/background_ttH_c29.xml" ImportSyst=":self:" MultiplyLumi="0">
+  <NormFactor Name="nbkg_ttH_c29[15.000000,0,100000]"/>
 </Sample>
 </Channel>

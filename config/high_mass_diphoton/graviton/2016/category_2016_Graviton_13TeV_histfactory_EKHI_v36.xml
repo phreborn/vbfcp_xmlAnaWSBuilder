@@ -19,7 +19,7 @@
   <Item Name="expr::uncert_mres_hi('(@1 - @0)/@0', cbSigmaSignal0, cbSigmaSignalUp)"/>
   <Item Name="expr::uncert_mres_lo('(@0 - @1)/@0', cbSigmaSignal0, cbSigmaSignalDn)"/>
 
-  <Sample Name="signal" XSection="1" SelectionEff="1" InputFile="config/high_mass_diphoton/graviton/2016/signal_2016_Graviton_13TeV_2D_EKHI_v36.xml" MultiplyLumi="1">
+  <Sample Name="signal" InputFile="config/high_mass_diphoton/graviton/2016/signal_2016_Graviton_13TeV_2D_EKHI_v36.xml" MultiplyLumi="1">
     <Systematic Name="ATLAS_lumi"      Constr="logn" CentralValue="1" Mag="0.0114" WhereTo="yield"/>
     <Systematic Name="ATLAS_lumi_2016" Constr="logn" CentralValue="1" Mag="0.0323" WhereTo="yield"/>
     <Systematic Name="ATLAS_PH_EFF"    Constr="logn" CentralValue="1" Mag="uncert_ph_eff" WhereTo="yield"/>
@@ -32,7 +32,7 @@
     <NormFactor Name="xs_2016[1]" />
   </Sample>
   
-  <Sample Name="background" XSection="1" SelectionEff="1" InputFile="config/high_mass_diphoton/graviton/2016/background_2016_Graviton_13TeV_histfactory_EKHI_v36.xml" MultiplyLumi="0">
+  <Sample Name="background" InputFile="config/high_mass_diphoton/graviton/2016/background_2016_Graviton_13TeV_histfactory_EKHI_v36.xml" MultiplyLumi="0">
     <NormFactor Name="nbkg_inclusive_13TeV_2016_EKHI[7000,0,100000]" />
   </Sample>
 </Channel>

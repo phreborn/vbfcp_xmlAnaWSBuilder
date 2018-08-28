@@ -9,7 +9,7 @@
   <Item Name="nCBHi[3.61315]"/>
   <Item Name="alpha[1.5]"/>
   <Item Name="expr::wG('1.44*@0*@0*@1',GkM,mG)"/>
-  <Item Name="HggTwoSidedCBPdf::detector(:observable:, muCB, sigmaCB, alphaCBLo, nCBLo, alphaCBHi, nCBHi)"/>
+  <Item Name="RooTwoSidedCBShape::detector(:observable:, muCB, sigmaCB, alphaCBLo, nCBLo, alphaCBHi, nCBHi)"/>
   <Item Name="HggMG5aMCNLOLineShapePdf::truth(:observable:, mG, wG, alpha, 13)"/>
   <ModelItem Name="RooFFTConvPdf::signal(:observable:, truth, detector)"/>
 </Model>
