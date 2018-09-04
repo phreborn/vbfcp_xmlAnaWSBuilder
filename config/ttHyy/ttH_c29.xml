@@ -52,41 +52,41 @@
 <Systematic Name="ATLAS_LHCmass" Constr="gaus" CentralValue="1" Mag="0.00191861859461" WhereTo="shape"/>
 
 <Sample Name="ttH" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
-  <Systematic Name="ATLAS_JET_Flavor_Composition_ttH" Constr="asym" CentralValue="1" Mag="0.0222264325999,-0.0208858598329" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_8restTerm" Constr="asym" CentralValue="1" Mag="0.000527228719854,-0.000473792839351" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.00085719037373,-0.00232964289841" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Flavor_Composition_ttH" Constr="asym" CentralValue="1" Mag="0.0222264325999,0.0208858598329" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_8restTerm" Constr="asym" CentralValue="1" Mag="0.000527228719854,0.000473792839351" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.00085719037373,0.00232964289841" WhereTo="yield"/>
   <Systematic Name="ATLAS_MET_SoftTrk" Constr="asym" CentralValue="1" Mag="-0.00203269357473,0.000442843493814" WhereTo="yield"/>
   <Systematic Name="ATLAS_FT_EFF_Eigen_B_1" Constr="asym" CentralValue="1" Mag="-0.00193432574261,0.00192355229502" WhereTo="yield"/>
   <Systematic Name="ATLAS_FT_EFF_Eigen_B_0" Constr="asym" CentralValue="1" Mag="-0.0147600672952,0.0143179700906" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_SingleParticle_HighPt" Constr="asym" CentralValue="1" Mag="0.000201707797003,-1.10468785777e-05" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_SingleParticle_HighPt" Constr="asym" CentralValue="1" Mag="0.000201707797003,1.10468785777e-05" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_Flavor_Response_ttH" Constr="asym" CentralValue="1" Mag="-0.00949382030673,0.0107766062975" WhereTo="yield"/>
-  <Systematic Name="ATLAS_FT_EFF_extrapolation" Constr="asym" CentralValue="1" Mag="0.000231039412191,-0.000230882547463" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_PtTerm" Constr="asym" CentralValue="1" Mag="-0.000299847837425,-0.00245444116299" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_OffsetNPV" Constr="asym" CentralValue="1" Mag="0.00461347714481,-0.0054578010029" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_TotalStat" Constr="asym" CentralValue="1" Mag="0.00239744188753,-0.00239139763294" WhereTo="yield"/>
+  <Systematic Name="ATLAS_FT_EFF_extrapolation" Constr="asym" CentralValue="1" Mag="0.000231039412191,0.000230882547463" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_PtTerm" Constr="asym" CentralValue="1" Mag="-0.000299847837425,0.00245444116299" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_OffsetNPV" Constr="asym" CentralValue="1" Mag="0.00461347714481,0.0054578010029" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_TotalStat" Constr="asym" CentralValue="1" Mag="0.00239744188753,0.00239139763294" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_JER_SINGLE_NP" Constr="asym" CentralValue="1" Mag="0.0056696130322,0.0056696130322" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_3" Constr="asym" CentralValue="1" Mag="-0.00309377901955,0.00282605354379" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_2" Constr="asym" CentralValue="1" Mag="-0.000192936625555,-0.000336347309371" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_1" Constr="asym" CentralValue="1" Mag="0.0259635284099,-0.0244587705156" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_7" Constr="asym" CentralValue="1" Mag="-6.01273500572e-06,-0.000224557488455" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_6" Constr="asym" CentralValue="1" Mag="1.0701788787e-05,-0.000719972576387" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_2" Constr="asym" CentralValue="1" Mag="-0.000192936625555,0.000336347309371" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_1" Constr="asym" CentralValue="1" Mag="0.0259635284099,0.0244587705156" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_7" Constr="asym" CentralValue="1" Mag="-6.01273500572e-06,0.000224557488455" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_6" Constr="asym" CentralValue="1" Mag="1.0701788787e-05,0.000719972576387" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_5" Constr="asym" CentralValue="1" Mag="-0.000214751678445,0.000552093671566" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_4" Constr="asym" CentralValue="1" Mag="0.00108861111388,-0.00258866982826" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_4" Constr="asym" CentralValue="1" Mag="0.00108861111388,0.00258866982826" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EtaIntercalibration_NonClosure_negEta" Constr="asym" CentralValue="1" Mag="0.000545693637528,0.000298532291445" WhereTo="yield"/>
-  <Systematic Name="ATLAS_MUON_SCALE" Constr="asym" CentralValue="1" Mag="3.13902099461e-05,-0.000108523795524" WhereTo="yield"/>
+  <Systematic Name="ATLAS_MUON_SCALE" Constr="asym" CentralValue="1" Mag="3.13902099461e-05,0.000108523795524" WhereTo="yield"/>
   <Systematic Name="ATLAS_PRW_DATASF" Constr="asym" CentralValue="1" Mag="-0.0172030441175,0.00260555322421" WhereTo="yield"/>
-  <Systematic Name="ATLAS_MET_SoftTrk_ResoPara" Constr="asym" CentralValue="1" Mag="-0.00143517942577,-0.00143517942577" WhereTo="yield"/>
-  <Systematic Name="ATLAS_MET_SoftTrk_ResoPerp" Constr="asym" CentralValue="1" Mag="-0.00110616233818,-0.00110616233818" WhereTo="yield"/>
-  <Systematic Name="ATLAS_FT_EFF_Eigen_B_2" Constr="asym" CentralValue="1" Mag="0.00354810319456,-0.00357341664213" WhereTo="yield"/>
+  <Systematic Name="ATLAS_MET_SoftTrk_ResoPara" Constr="asym" CentralValue="1" Mag="-0.00143517942577,0.00143517942577" WhereTo="yield"/>
+  <Systematic Name="ATLAS_MET_SoftTrk_ResoPerp" Constr="asym" CentralValue="1" Mag="-0.00110616233818,0.00110616233818" WhereTo="yield"/>
+  <Systematic Name="ATLAS_FT_EFF_Eigen_B_2" Constr="asym" CentralValue="1" Mag="0.00354810319456,0.00357341664213" WhereTo="yield"/>
   <Systematic Name="ATLAS_PH_EFF_ISO_Uncertainty" Constr="logn" CentralValue="1" Mag="0.0496035398266" WhereTo="yield"/>
-  <Systematic Name="ATLAS_FT_EFF_extrapolation_from_charm" Constr="asym" CentralValue="1" Mag="0.000788757334317,-0.000783825101587" WhereTo="yield"/>
+  <Systematic Name="ATLAS_FT_EFF_extrapolation_from_charm" Constr="asym" CentralValue="1" Mag="0.000788757334317,0.000783825101587" WhereTo="yield"/>
   <Systematic Name="ATLAS_PH_EFF_ID_Uncertainty" Constr="logn" CentralValue="1" Mag="0.0125635557904" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_Modelling" Constr="asym" CentralValue="1" Mag="0.0041133103647,-0.00547233160543" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_RhoTopology" Constr="asym" CentralValue="1" Mag="0.0448110957657,-0.0409050305289" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_BJES_Response" Constr="asym" CentralValue="1" Mag="0.00448945452995,-0.00534857320352" WhereTo="yield"/>
-  <Systematic Name="ATLAS_FT_EFF_Eigen_Light_1" Constr="asym" CentralValue="1" Mag="0.000235422501119,-0.000235417210129" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_Modelling" Constr="asym" CentralValue="1" Mag="0.0041133103647,0.00547233160543" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_RhoTopology" Constr="asym" CentralValue="1" Mag="0.0448110957657,0.0409050305289" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_BJES_Response" Constr="asym" CentralValue="1" Mag="0.00448945452995,0.00534857320352" WhereTo="yield"/>
+  <Systematic Name="ATLAS_FT_EFF_Eigen_Light_1" Constr="asym" CentralValue="1" Mag="0.000235422501119,0.000235417210129" WhereTo="yield"/>
   <Systematic Name="ATLAS_FT_EFF_Eigen_Light_0" Constr="asym" CentralValue="1" Mag="-0.00171266485488,0.00164758493766" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_JvtEfficiency" Constr="asym" CentralValue="1" Mag="0.00282089954525,-0.00342186493462" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_JvtEfficiency" Constr="asym" CentralValue="1" Mag="0.00282089954525,0.00342186493462" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EtaIntercalibration_NonClosure_posEta" Constr="asym" CentralValue="1" Mag="-0.000498306239436,4.5135329552e-05" WhereTo="yield"/>
   <Systematic Name="ATLAS_FT_EFF_Eigen_C_1" Constr="asym" CentralValue="1" Mag="-0.0013839829433,0.0013766538618" WhereTo="yield"/>
   <Systematic Name="UEPS_ttH" Constr="logn" CentralValue="1" Mag="-0.094" WhereTo="yield"/>
@@ -133,26 +133,26 @@
   <Systematic Name="ATLAS_MET_SoftTrk" Constr="asym" CentralValue="1" Mag="-0.018381496923,0.0101094514068" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_Pileup_PtTerm" Constr="asym" CentralValue="1" Mag="0.0245317764124,0.0127753843871" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_JER_SINGLE_NP" Constr="asym" CentralValue="1" Mag="0.102335521015,0.102335521015" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_OffsetNPV" Constr="asym" CentralValue="1" Mag="0.0485338323158,-0.00814457900992" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_OffsetNPV" Constr="asym" CentralValue="1" Mag="0.0485338323158,0.00814457900992" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EtaIntercalibration_TotalStat" Constr="asym" CentralValue="1" Mag="-0.00954577491039,0.0220851808478" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Flavor_Composition_ggH" Constr="asym" CentralValue="1" Mag="0.0890815492871,-0.0253009943623" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Flavor_Composition_ggH" Constr="asym" CentralValue="1" Mag="0.0890815492871,0.0253009943623" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_3" Constr="asym" CentralValue="1" Mag="0.0184342271453,0.0149850904084" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_2" Constr="asym" CentralValue="1" Mag="-0.00626175407463,0.018330592864" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_1" Constr="asym" CentralValue="1" Mag="0.0543098544448,-0.0360621609028" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_7" Constr="asym" CentralValue="1" Mag="-0.00492598458073,-6.18903273426e-06" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_1" Constr="asym" CentralValue="1" Mag="0.0543098544448,0.0360621609028" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_7" Constr="asym" CentralValue="1" Mag="-0.00492598458073,6.18903273426e-06" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_6" Constr="asym" CentralValue="1" Mag="-6.18903273426e-06,0.000443223695458" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_5" Constr="asym" CentralValue="1" Mag="-0.00965713643427,0.0114604498387" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_4" Constr="asym" CentralValue="1" Mag="0.00167036334834,0.00729800306646" WhereTo="yield"/>
-  <Systematic Name="ATLAS_PRW_DATASF" Constr="asym" CentralValue="1" Mag="0.0240238788717,-0.0335061351628" WhereTo="yield"/>
-  <Systematic Name="ATLAS_MET_SoftTrk_ResoPara" Constr="asym" CentralValue="1" Mag="-0.0144040937267,-0.0144040937267" WhereTo="yield"/>
-  <Systematic Name="ATLAS_MET_SoftTrk_ResoPerp" Constr="asym" CentralValue="1" Mag="-0.00661262062485,-0.00661262062485" WhereTo="yield"/>
+  <Systematic Name="ATLAS_PRW_DATASF" Constr="asym" CentralValue="1" Mag="0.0240238788717,0.0335061351628" WhereTo="yield"/>
+  <Systematic Name="ATLAS_MET_SoftTrk_ResoPara" Constr="asym" CentralValue="1" Mag="-0.0144040937267,0.0144040937267" WhereTo="yield"/>
+  <Systematic Name="ATLAS_MET_SoftTrk_ResoPerp" Constr="asym" CentralValue="1" Mag="-0.00661262062485,0.00661262062485" WhereTo="yield"/>
   <Systematic Name="ATLAS_PH_EFF_ISO_Uncertainty" Constr="logn" CentralValue="1" Mag="0.0502143131542" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.022115587986,-0.0119178713506" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.022115587986,0.0119178713506" WhereTo="yield"/>
   <Systematic Name="ATLAS_PH_EFF_ID_Uncertainty" Constr="logn" CentralValue="1" Mag="0.0116787361275" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EtaIntercalibration_Modelling" Constr="asym" CentralValue="1" Mag="0.0138422241248,0.0223090293641" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_RhoTopology" Constr="asym" CentralValue="1" Mag="0.127772905471,-0.0939338313848" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_RhoTopology" Constr="asym" CentralValue="1" Mag="0.127772905471,0.0939338313848" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_BJES_Response" Constr="asym" CentralValue="1" Mag="-0.00455688346135,0.00199017528108" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_JvtEfficiency" Constr="asym" CentralValue="1" Mag="0.00494563042692,-0.00521774467213" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_JvtEfficiency" Constr="asym" CentralValue="1" Mag="0.00494563042692,0.00521774467213" WhereTo="yield"/>
   <Systematic Name="ATLAS_HeavyFlavor" Constr="gaus" CentralValue="1" Mag="1.0" WhereTo="yield"/>
   <NormFactor Name="yield_ggH[0.154713807863]"/>
   <NormFactor Name="mu[1,0,5]" />
@@ -160,33 +160,33 @@
 </Sample>
 
 <Sample Name="VBF" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
-  <Systematic Name="ATLAS_JET_Flavor_Composition_VBF" Constr="asym" CentralValue="1" Mag="0.0285732572234,-0.0870684568701" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_8restTerm" Constr="asym" CentralValue="1" Mag="8.52235092906e-05,-0.00768831158891" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Flavor_Composition_VBF" Constr="asym" CentralValue="1" Mag="0.0285732572234,0.0870684568701" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_8restTerm" Constr="asym" CentralValue="1" Mag="8.52235092906e-05,0.00768831158891" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.00334701416127,0.058736802043" WhereTo="yield"/>
   <Systematic Name="ATLAS_MET_SoftTrk" Constr="asym" CentralValue="1" Mag="-0.0170194667313,0.00125262069459" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Flavor_Response_VBF" Constr="asym" CentralValue="1" Mag="-0.0549429490121,-0.00106859372914" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Flavor_Response_VBF" Constr="asym" CentralValue="1" Mag="-0.0549429490121,0.00106859372914" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_Pileup_PtTerm" Constr="asym" CentralValue="1" Mag="-0.0105700399711,0.0130975365464" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_OffsetNPV" Constr="asym" CentralValue="1" Mag="0.0173933469022,-0.0122918026965" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_TotalStat" Constr="asym" CentralValue="1" Mag="0.00624989182222,-0.0149101497105" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_OffsetNPV" Constr="asym" CentralValue="1" Mag="0.0173933469022,0.0122918026965" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_TotalStat" Constr="asym" CentralValue="1" Mag="0.00624989182222,0.0149101497105" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_JER_SINGLE_NP" Constr="asym" CentralValue="1" Mag="0.0874076874478,0.0874076874478" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_3" Constr="asym" CentralValue="1" Mag="-0.0149245671693,0.000618272239123" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_2" Constr="asym" CentralValue="1" Mag="-0.0345089649611,-0.0137694453742" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_1" Constr="asym" CentralValue="1" Mag="-0.00153709668437,-0.0435908571249" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_2" Constr="asym" CentralValue="1" Mag="-0.0345089649611,0.0137694453742" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_1" Constr="asym" CentralValue="1" Mag="-0.00153709668437,0.0435908571249" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_7" Constr="asym" CentralValue="1" Mag="0.00349980369694,0.0017049655834" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_6" Constr="asym" CentralValue="1" Mag="-0.00271797123734,0.00179107031394" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_5" Constr="asym" CentralValue="1" Mag="-0.00157457909905,-0.00267690540096" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_4" Constr="asym" CentralValue="1" Mag="-0.00562277835662,-0.0123990555796" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_5" Constr="asym" CentralValue="1" Mag="-0.00157457909905,0.00267690540096" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_4" Constr="asym" CentralValue="1" Mag="-0.00562277835662,0.0123990555796" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EtaIntercalibration_NonClosure_negEta" Constr="asym" CentralValue="1" Mag="0.00623513144339,0.0" WhereTo="yield"/>
   <Systematic Name="ATLAS_PRW_DATASF" Constr="asym" CentralValue="1" Mag="-0.0200640343993,0.00735821059491" WhereTo="yield"/>
-  <Systematic Name="ATLAS_MET_SoftTrk_ResoPara" Constr="asym" CentralValue="1" Mag="-0.0204723207901,-0.0204723207901" WhereTo="yield"/>
-  <Systematic Name="ATLAS_MET_SoftTrk_ResoPerp" Constr="asym" CentralValue="1" Mag="-0.0253655360197,-0.0253655360197" WhereTo="yield"/>
+  <Systematic Name="ATLAS_MET_SoftTrk_ResoPara" Constr="asym" CentralValue="1" Mag="-0.0204723207901,0.0204723207901" WhereTo="yield"/>
+  <Systematic Name="ATLAS_MET_SoftTrk_ResoPerp" Constr="asym" CentralValue="1" Mag="-0.0253655360197,0.0253655360197" WhereTo="yield"/>
   <Systematic Name="ATLAS_PH_EFF_ISO_Uncertainty" Constr="logn" CentralValue="1" Mag="0.0439303053533" WhereTo="yield"/>
   <Systematic Name="ATLAS_PH_EFF_ID_Uncertainty" Constr="logn" CentralValue="1" Mag="0.0109849451581" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EtaIntercalibration_Modelling" Constr="asym" CentralValue="1" Mag="0.011265105388,0.008232185682" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_RhoTopology" Constr="asym" CentralValue="1" Mag="0.0609820019386,-0.101832450711" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_BJES_Response" Constr="asym" CentralValue="1" Mag="-0.0152279980371,-0.00477293691374" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_RhoTopology" Constr="asym" CentralValue="1" Mag="0.0609820019386,0.101832450711" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_BJES_Response" Constr="asym" CentralValue="1" Mag="-0.0152279980371,0.00477293691374" WhereTo="yield"/>
   <Systematic Name="ATLAS_FT_EFF_Eigen_Light_3" Constr="asym" CentralValue="1" Mag="-0.00111968632868,0.0011190588831" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_JvtEfficiency" Constr="asym" CentralValue="1" Mag="0.00358376844687,-0.00390275686311" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_JvtEfficiency" Constr="asym" CentralValue="1" Mag="0.00358376844687,0.00390275686311" WhereTo="yield"/>
   <Systematic Name="ATLAS_HeavyFlavor" Constr="gaus" CentralValue="1" Mag="1.0" WhereTo="yield"/>
   <NormFactor Name="yield_VBF[0.0306214500478]"/>
   <NormFactor Name="mu[1,0,5]" />
@@ -195,31 +195,31 @@
 
 <Sample Name="WH" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
   <Systematic Name="ATLAS_JET_EffectiveNP_8restTerm" Constr="asym" CentralValue="1" Mag="0.0,0.00562176018938" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="-0.052087746819,-0.0523685383471" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="-0.052087746819,0.0523685383471" WhereTo="yield"/>
   <Systematic Name="ATLAS_MET_SoftTrk" Constr="asym" CentralValue="1" Mag="-0.014865995927,0.0142375671841" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_PtTerm" Constr="asym" CentralValue="1" Mag="-0.0275713576179,-0.0211851092622" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_OffsetNPV" Constr="asym" CentralValue="1" Mag="0.0227633889558,-0.0566059636674" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_TotalStat" Constr="asym" CentralValue="1" Mag="-0.00355013297819,-0.00930994796049" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_JER_SINGLE_NP" Constr="asym" CentralValue="1" Mag="-0.00597215989187,-0.00597215989187" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_3" Constr="asym" CentralValue="1" Mag="-0.00500986447785,-0.00138300139957" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_2" Constr="asym" CentralValue="1" Mag="-0.0309035925161,-0.0183890004859" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_1" Constr="asym" CentralValue="1" Mag="0.0966807939782,-0.118894704439" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_PtTerm" Constr="asym" CentralValue="1" Mag="-0.0275713576179,0.0211851092622" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_OffsetNPV" Constr="asym" CentralValue="1" Mag="0.0227633889558,0.0566059636674" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_TotalStat" Constr="asym" CentralValue="1" Mag="-0.00355013297819,0.00930994796049" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_JER_SINGLE_NP" Constr="asym" CentralValue="1" Mag="-0.00597215989187,0.00597215989187" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_3" Constr="asym" CentralValue="1" Mag="-0.00500986447785,0.00138300139957" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_2" Constr="asym" CentralValue="1" Mag="-0.0309035925161,0.0183890004859" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_1" Constr="asym" CentralValue="1" Mag="0.0966807939782,0.118894704439" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_7" Constr="asym" CentralValue="1" Mag="-0.0140871627379,0.0" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_6" Constr="asym" CentralValue="1" Mag="0.0,-0.003224181868" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_5" Constr="asym" CentralValue="1" Mag="0.0055114589681,-0.00699173032679" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_4" Constr="asym" CentralValue="1" Mag="-0.00456856258038,-0.0136083926672" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_NonClosure_negEta" Constr="asym" CentralValue="1" Mag="0.0,-0.00551342088256" WhereTo="yield"/>
-  <Systematic Name="ATLAS_PRW_DATASF" Constr="asym" CentralValue="1" Mag="0.0609605819722,-0.0598678572744" WhereTo="yield"/>
-  <Systematic Name="ATLAS_MET_SoftTrk_ResoPara" Constr="asym" CentralValue="1" Mag="-0.013570835988,-0.013570835988" WhereTo="yield"/>
-  <Systematic Name="ATLAS_MET_SoftTrk_ResoPerp" Constr="asym" CentralValue="1" Mag="-0.0203456340189,-0.0203456340189" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_6" Constr="asym" CentralValue="1" Mag="0.0,0.003224181868" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_5" Constr="asym" CentralValue="1" Mag="0.0055114589681,0.00699173032679" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_4" Constr="asym" CentralValue="1" Mag="-0.00456856258038,0.0136083926672" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_NonClosure_negEta" Constr="asym" CentralValue="1" Mag="0.0,0.00551342088256" WhereTo="yield"/>
+  <Systematic Name="ATLAS_PRW_DATASF" Constr="asym" CentralValue="1" Mag="0.0609605819722,0.0598678572744" WhereTo="yield"/>
+  <Systematic Name="ATLAS_MET_SoftTrk_ResoPara" Constr="asym" CentralValue="1" Mag="-0.013570835988,0.013570835988" WhereTo="yield"/>
+  <Systematic Name="ATLAS_MET_SoftTrk_ResoPerp" Constr="asym" CentralValue="1" Mag="-0.0203456340189,0.0203456340189" WhereTo="yield"/>
   <Systematic Name="ATLAS_PH_EFF_ISO_Uncertainty" Constr="logn" CentralValue="1" Mag="0.0434927062496" WhereTo="yield"/>
   <Systematic Name="ATLAS_PH_EFF_ID_Uncertainty" Constr="logn" CentralValue="1" Mag="0.0120325173584" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_Modelling" Constr="asym" CentralValue="1" Mag="-0.0318637093322,-0.0211774620155" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_RhoTopology" Constr="asym" CentralValue="1" Mag="0.130755399363,-0.0918421090585" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_BJES_Response" Constr="asym" CentralValue="1" Mag="9.20071629612e-05,-0.00970721222799" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_Modelling" Constr="asym" CentralValue="1" Mag="-0.0318637093322,0.0211774620155" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_RhoTopology" Constr="asym" CentralValue="1" Mag="0.130755399363,0.0918421090585" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_BJES_Response" Constr="asym" CentralValue="1" Mag="9.20071629612e-05,0.00970721222799" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_Flavor_Response_VH" Constr="asym" CentralValue="1" Mag="-0.0629084793491,0.0595175476656" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Flavor_Composition_VH" Constr="asym" CentralValue="1" Mag="0.0979141151082,-0.0474777695935" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_JvtEfficiency" Constr="asym" CentralValue="1" Mag="0.00416725533777,-0.00451219662518" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Flavor_Composition_VH" Constr="asym" CentralValue="1" Mag="0.0979141151082,0.0474777695935" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_JvtEfficiency" Constr="asym" CentralValue="1" Mag="0.00416725533777,0.00451219662518" WhereTo="yield"/>
   <Systematic Name="ATLAS_HeavyFlavor" Constr="gaus" CentralValue="1" Mag="1.0" WhereTo="yield"/>
   <NormFactor Name="yield_WH[0.0600086658007]"/>
   <NormFactor Name="mu[1,0,5]" />
@@ -228,33 +228,33 @@
 
 <Sample Name="ZH" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
   <Systematic Name="ATLAS_JET_EffectiveNP_8restTerm" Constr="asym" CentralValue="1" Mag="0.000506328108615,0.00251753471968" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.00144452115001,-0.0245084776258" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.00144452115001,0.0245084776258" WhereTo="yield"/>
   <Systematic Name="ATLAS_MET_SoftTrk" Constr="asym" CentralValue="1" Mag="0.00279655062314,0.0269152112392" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_PtTerm" Constr="asym" CentralValue="1" Mag="-0.00284016096778,-0.00730944469926" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_PtTerm" Constr="asym" CentralValue="1" Mag="-0.00284016096778,0.00730944469926" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_Pileup_OffsetNPV" Constr="asym" CentralValue="1" Mag="-0.000891718287475,0.0108914093928" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_TotalStat" Constr="asym" CentralValue="1" Mag="0.00125912325321,-0.00399875068399" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_TotalStat" Constr="asym" CentralValue="1" Mag="0.00125912325321,0.00399875068399" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_JER_SINGLE_NP" Constr="asym" CentralValue="1" Mag="0.0928383285599,0.0928383285599" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_3" Constr="asym" CentralValue="1" Mag="0.00926270480858,0.000768210136515" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_2" Constr="asym" CentralValue="1" Mag="0.00641985630387,0.00101993928028" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_1" Constr="asym" CentralValue="1" Mag="0.0402101879587,-0.059690233447" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_1" Constr="asym" CentralValue="1" Mag="0.0402101879587,0.059690233447" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_7" Constr="asym" CentralValue="1" Mag="0.00747014743907,0.00714811173304" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_6" Constr="asym" CentralValue="1" Mag="0.00321985113286,0.00990799737717" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_5" Constr="asym" CentralValue="1" Mag="0.00635360291676,0.0191213437138" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_4" Constr="asym" CentralValue="1" Mag="-0.00199801128421,-0.0147215792479" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_4" Constr="asym" CentralValue="1" Mag="-0.00199801128421,0.0147215792479" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EtaIntercalibration_NonClosure_negEta" Constr="asym" CentralValue="1" Mag="0.00288699796282,0.0" WhereTo="yield"/>
-  <Systematic Name="ATLAS_PRW_DATASF" Constr="asym" CentralValue="1" Mag="-0.0541798531097,-0.0154638096974" WhereTo="yield"/>
-  <Systematic Name="ATLAS_MET_SoftTrk_ResoPara" Constr="asym" CentralValue="1" Mag="-0.00412381428554,-0.00412381428554" WhereTo="yield"/>
+  <Systematic Name="ATLAS_PRW_DATASF" Constr="asym" CentralValue="1" Mag="-0.0541798531097,0.0154638096974" WhereTo="yield"/>
+  <Systematic Name="ATLAS_MET_SoftTrk_ResoPara" Constr="asym" CentralValue="1" Mag="-0.00412381428554,0.00412381428554" WhereTo="yield"/>
   <Systematic Name="ATLAS_MET_SoftTrk_ResoPerp" Constr="asym" CentralValue="1" Mag="0.00541931697338,0.00541931697338" WhereTo="yield"/>
   <Systematic Name="ATLAS_PH_EFF_ISO_Uncertainty" Constr="logn" CentralValue="1" Mag="0.043508190639" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_PunchThrough_MC16" Constr="asym" CentralValue="1" Mag="2.3247039156e-05,0.00142723452079" WhereTo="yield"/>
   <Systematic Name="ATLAS_PH_EFF_ID_Uncertainty" Constr="logn" CentralValue="1" Mag="0.0122146823848" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_Modelling" Constr="asym" CentralValue="1" Mag="0.0128124767371,-0.0222294940859" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_RhoTopology" Constr="asym" CentralValue="1" Mag="0.081527747198,-0.0870043724459" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_Modelling" Constr="asym" CentralValue="1" Mag="0.0128124767371,0.0222294940859" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_RhoTopology" Constr="asym" CentralValue="1" Mag="0.081527747198,0.0870043724459" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_BJES_Response" Constr="asym" CentralValue="1" Mag="0.0174338510388,0.0116072256135" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_Flavor_Response_VH" Constr="asym" CentralValue="1" Mag="-0.0176974543069,0.00679056093458" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Flavor_Composition_VH" Constr="asym" CentralValue="1" Mag="0.0519647052085,-0.0308129827315" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_JvtEfficiency" Constr="asym" CentralValue="1" Mag="0.00348143671397,-0.00386307870683" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_NonClosure_posEta" Constr="asym" CentralValue="1" Mag="0.00207831768885,-0.00122121194878" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Flavor_Composition_VH" Constr="asym" CentralValue="1" Mag="0.0519647052085,0.0308129827315" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_JvtEfficiency" Constr="asym" CentralValue="1" Mag="0.00348143671397,0.00386307870683" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_NonClosure_posEta" Constr="asym" CentralValue="1" Mag="0.00207831768885,0.00122121194878" WhereTo="yield"/>
   <Systematic Name="ATLAS_HeavyFlavor" Constr="gaus" CentralValue="1" Mag="1.0" WhereTo="yield"/>
   <NormFactor Name="yield_ZH[0.085492046186]"/>
   <NormFactor Name="mu[1,0,5]" />
@@ -262,28 +262,28 @@
 </Sample>
 
 <Sample Name="bbH" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
-  <Systematic Name="ATLAS_JET_Flavor_Composition_bbH" Constr="asym" CentralValue="1" Mag="-0.0423443464105,-0.162068696865" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.0271926636202,-0.0256083941271" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Flavor_Composition_bbH" Constr="asym" CentralValue="1" Mag="-0.0423443464105,0.162068696865" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.0271926636202,0.0256083941271" WhereTo="yield"/>
   <Systematic Name="ATLAS_MET_SoftTrk" Constr="asym" CentralValue="1" Mag="-0.0545743579772,0.0" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_PtTerm" Constr="asym" CentralValue="1" Mag="0.000192520821366,-0.0710140083934" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_OffsetNPV" Constr="asym" CentralValue="1" Mag="-0.0426297123402,-0.0616721184412" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_TotalStat" Constr="asym" CentralValue="1" Mag="0.0418092010712,-0.0285192957497" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_PtTerm" Constr="asym" CentralValue="1" Mag="0.000192520821366,0.0710140083934" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_OffsetNPV" Constr="asym" CentralValue="1" Mag="-0.0426297123402,0.0616721184412" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_TotalStat" Constr="asym" CentralValue="1" Mag="0.0418092010712,0.0285192957497" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_JER_SINGLE_NP" Constr="asym" CentralValue="1" Mag="0.251954561735,0.251954561735" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_3" Constr="asym" CentralValue="1" Mag="-0.0284249427969,-0.0257177209732" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_2" Constr="asym" CentralValue="1" Mag="-0.035815626999,-0.0363986118363" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_3" Constr="asym" CentralValue="1" Mag="-0.0284249427969,0.0257177209732" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_2" Constr="asym" CentralValue="1" Mag="-0.035815626999,0.0363986118363" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_1" Constr="asym" CentralValue="1" Mag="0.0901033153652,0.00875480646183" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_5" Constr="asym" CentralValue="1" Mag="-9.4352952748e-05,0.0107224530008" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_4" Constr="asym" CentralValue="1" Mag="0.0498743490982,-0.0524383280333" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_4" Constr="asym" CentralValue="1" Mag="0.0498743490982,0.0524383280333" WhereTo="yield"/>
   <Systematic Name="ATLAS_PRW_DATASF" Constr="asym" CentralValue="1" Mag="-0.204369164773,0.0790984708114" WhereTo="yield"/>
-  <Systematic Name="ATLAS_MET_SoftTrk_ResoPara" Constr="asym" CentralValue="1" Mag="-0.17989487404,-0.17989487404" WhereTo="yield"/>
-  <Systematic Name="ATLAS_MET_SoftTrk_ResoPerp" Constr="asym" CentralValue="1" Mag="-0.0326481452755,-0.0326481452755" WhereTo="yield"/>
+  <Systematic Name="ATLAS_MET_SoftTrk_ResoPara" Constr="asym" CentralValue="1" Mag="-0.17989487404,0.17989487404" WhereTo="yield"/>
+  <Systematic Name="ATLAS_MET_SoftTrk_ResoPerp" Constr="asym" CentralValue="1" Mag="-0.0326481452755,0.0326481452755" WhereTo="yield"/>
   <Systematic Name="ATLAS_PH_EFF_ISO_Uncertainty" Constr="logn" CentralValue="1" Mag="0.0444448048132" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Flavor_Response_bbH" Constr="asym" CentralValue="1" Mag="-0.0812464979484,-0.179325406074" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Flavor_Response_bbH" Constr="asym" CentralValue="1" Mag="-0.0812464979484,0.179325406074" WhereTo="yield"/>
   <Systematic Name="ATLAS_PH_EFF_ID_Uncertainty" Constr="logn" CentralValue="1" Mag="0.0110368788039" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_Modelling" Constr="asym" CentralValue="1" Mag="-0.00724798468349,-0.0497339200585" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_RhoTopology" Constr="asym" CentralValue="1" Mag="0.0559273079003,-0.122662256198" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_Modelling" Constr="asym" CentralValue="1" Mag="-0.00724798468349,0.0497339200585" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_RhoTopology" Constr="asym" CentralValue="1" Mag="0.0559273079003,0.122662256198" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_BJES_Response" Constr="asym" CentralValue="1" Mag="0.027361433933,0.0382904755478" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_JvtEfficiency" Constr="asym" CentralValue="1" Mag="0.00260669112354,-0.00266854526801" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_JvtEfficiency" Constr="asym" CentralValue="1" Mag="0.00260669112354,0.00266854526801" WhereTo="yield"/>
   <Systematic Name="QCDscale_bbH" Constr="asym" CentralValue="1" Mag="0.201,0.239" WhereTo="yield"/>
   <Systematic Name="PDFaS_bbH" Constr="asym" CentralValue="1" Mag="0,0" WhereTo="yield"/>
   <NormFactor Name="yield_bbH[0.0162117388497]"/>
@@ -294,45 +294,45 @@
 <Sample Name="tHjb" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
   <Systematic Name="ATLAS_MUON_SAGITTA_RHO" Constr="asym" CentralValue="1" Mag="0.000212886002069,0.000212886002069" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_8restTerm" Constr="asym" CentralValue="1" Mag="-0.00604783278188,0.00267446488766" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Flavor_Composition_tHjb" Constr="asym" CentralValue="1" Mag="0.0267148146143,-0.0554990949188" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.00678076900747,-0.00825245859878" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Flavor_Composition_tHjb" Constr="asym" CentralValue="1" Mag="0.0267148146143,0.0554990949188" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.00678076900747,0.00825245859878" WhereTo="yield"/>
   <Systematic Name="ATLAS_MET_SoftTrk" Constr="asym" CentralValue="1" Mag="-0.00659076696784,0.00290536967011" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_fJvtEfficiency" Constr="asym" CentralValue="1" Mag="0.000212886002069,0.000212886002069" WhereTo="yield"/>
   <Systematic Name="ATLAS_FT_EFF_Eigen_B_1" Constr="asym" CentralValue="1" Mag="-0.0023043025742,0.00229607582186" WhereTo="yield"/>
   <Systematic Name="ATLAS_FT_EFF_Eigen_B_0" Constr="asym" CentralValue="1" Mag="-0.00938714584166,0.00934938139515" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_SingleParticle_HighPt" Constr="asym" CentralValue="1" Mag="-0.000294750998836,-0.00118579464057" WhereTo="yield"/>
-  <Systematic Name="ATLAS_FT_EFF_extrapolation" Constr="asym" CentralValue="1" Mag="0.000381152877398,-0.000381502796919" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_PtTerm" Constr="asym" CentralValue="1" Mag="-0.00102220341981,-0.00827881960888" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_OffsetNPV" Constr="asym" CentralValue="1" Mag="0.00680684524445,-0.0213798567317" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_TotalStat" Constr="asym" CentralValue="1" Mag="-0.0048766530245,-0.00345242637831" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_SingleParticle_HighPt" Constr="asym" CentralValue="1" Mag="-0.000294750998836,0.00118579464057" WhereTo="yield"/>
+  <Systematic Name="ATLAS_FT_EFF_extrapolation" Constr="asym" CentralValue="1" Mag="0.000381152877398,0.000381502796919" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_PtTerm" Constr="asym" CentralValue="1" Mag="-0.00102220341981,0.00827881960888" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_OffsetNPV" Constr="asym" CentralValue="1" Mag="0.00680684524445,0.0213798567317" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_TotalStat" Constr="asym" CentralValue="1" Mag="-0.0048766530245,0.00345242637831" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_JER_SINGLE_NP" Constr="asym" CentralValue="1" Mag="0.0114482891252,0.0114482891252" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_3" Constr="asym" CentralValue="1" Mag="0.000993982842436,-0.011770014679" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_3" Constr="asym" CentralValue="1" Mag="0.000993982842436,0.011770014679" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_2" Constr="asym" CentralValue="1" Mag="-0.0168750332637,0.00382302337734" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_1" Constr="asym" CentralValue="1" Mag="0.0234809108657,-0.0385695108829" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_7" Constr="asym" CentralValue="1" Mag="-0.00298901652911,-0.00495606490589" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_6" Constr="asym" CentralValue="1" Mag="-0.00388198795114,-0.00414079922499" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_5" Constr="asym" CentralValue="1" Mag="-0.000379025939832,-0.0041463356404" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_4" Constr="asym" CentralValue="1" Mag="0.00227221558995,-0.0103669673001" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_NonClosure_negEta" Constr="asym" CentralValue="1" Mag="0.00145000684311,-0.000976966796028" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_1" Constr="asym" CentralValue="1" Mag="0.0234809108657,0.0385695108829" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_7" Constr="asym" CentralValue="1" Mag="-0.00298901652911,0.00495606490589" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_6" Constr="asym" CentralValue="1" Mag="-0.00388198795114,0.00414079922499" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_5" Constr="asym" CentralValue="1" Mag="-0.000379025939832,0.0041463356404" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_4" Constr="asym" CentralValue="1" Mag="0.00227221558995,0.0103669673001" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_NonClosure_negEta" Constr="asym" CentralValue="1" Mag="0.00145000684311,0.000976966796028" WhereTo="yield"/>
   <Systematic Name="ATLAS_MUON_SCALE" Constr="asym" CentralValue="1" Mag="0.000212886002069,0.000917538261819" WhereTo="yield"/>
   <Systematic Name="ATLAS_PRW_DATASF" Constr="asym" CentralValue="1" Mag="0.0126118194977,0.00771122101718" WhereTo="yield"/>
-  <Systematic Name="ATLAS_MET_SoftTrk_ResoPara" Constr="asym" CentralValue="1" Mag="-0.000962857851569,-0.000962857851569" WhereTo="yield"/>
-  <Systematic Name="ATLAS_MET_SoftTrk_ResoPerp" Constr="asym" CentralValue="1" Mag="-0.00665453330247,-0.00665453330247" WhereTo="yield"/>
-  <Systematic Name="ATLAS_FT_EFF_Eigen_B_2" Constr="asym" CentralValue="1" Mag="0.00244530102301,-0.00244774500748" WhereTo="yield"/>
+  <Systematic Name="ATLAS_MET_SoftTrk_ResoPara" Constr="asym" CentralValue="1" Mag="-0.000962857851569,0.000962857851569" WhereTo="yield"/>
+  <Systematic Name="ATLAS_MET_SoftTrk_ResoPerp" Constr="asym" CentralValue="1" Mag="-0.00665453330247,0.00665453330247" WhereTo="yield"/>
+  <Systematic Name="ATLAS_FT_EFF_Eigen_B_2" Constr="asym" CentralValue="1" Mag="0.00244530102301,0.00244774500748" WhereTo="yield"/>
   <Systematic Name="ATLAS_MUON_MS" Constr="asym" CentralValue="1" Mag="0.0,0.000407997650404" WhereTo="yield"/>
   <Systematic Name="ATLAS_PH_EFF_ISO_Uncertainty" Constr="logn" CentralValue="1" Mag="0.0781329028676" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_Flavor_Response_tHjb" Constr="asym" CentralValue="1" Mag="-0.0277317806874,0.00255638342358" WhereTo="yield"/>
   <Systematic Name="ATLAS_MUON_ID" Constr="asym" CentralValue="1" Mag="-0.000296654609345,0.00070465225975" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_PunchThrough_MC16" Constr="asym" CentralValue="1" Mag="-0.000533512047537,-0.000203324097602" WhereTo="yield"/>
-  <Systematic Name="ATLAS_FT_EFF_extrapolation_from_charm" Constr="asym" CentralValue="1" Mag="0.000349705010991,-0.000349704370568" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_PunchThrough_MC16" Constr="asym" CentralValue="1" Mag="-0.000533512047537,0.000203324097602" WhereTo="yield"/>
+  <Systematic Name="ATLAS_FT_EFF_extrapolation_from_charm" Constr="asym" CentralValue="1" Mag="0.000349705010991,0.000349704370568" WhereTo="yield"/>
   <Systematic Name="ATLAS_PH_EFF_ID_Uncertainty" Constr="logn" CentralValue="1" Mag="0.0121536320556" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_Modelling" Constr="asym" CentralValue="1" Mag="0.00556188889265,-0.0126774310975" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_RhoTopology" Constr="asym" CentralValue="1" Mag="0.0533831433011,-0.0680300559402" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_Modelling" Constr="asym" CentralValue="1" Mag="0.00556188889265,0.0126774310975" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_RhoTopology" Constr="asym" CentralValue="1" Mag="0.0533831433011,0.0680300559402" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_BJES_Response" Constr="asym" CentralValue="1" Mag="-0.00157190739775,0.00110148102083" WhereTo="yield"/>
   <Systematic Name="ATLAS_FT_EFF_Eigen_Light_0" Constr="asym" CentralValue="1" Mag="-0.00298683031202,0.00314915323669" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_JvtEfficiency" Constr="asym" CentralValue="1" Mag="0.00367637716858,-0.00361906327134" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_JvtEfficiency" Constr="asym" CentralValue="1" Mag="0.00367637716858,0.00361906327134" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EtaIntercalibration_NonClosure_posEta" Constr="asym" CentralValue="1" Mag="-0.00112661329064,0.000474062668106" WhereTo="yield"/>
-  <Systematic Name="ATLAS_FT_EFF_Eigen_C_0" Constr="asym" CentralValue="1" Mag="0.000133662065573,-0.000135419410248" WhereTo="yield"/>
+  <Systematic Name="ATLAS_FT_EFF_Eigen_C_0" Constr="asym" CentralValue="1" Mag="0.000133662065573,0.000135419410248" WhereTo="yield"/>
   <Systematic Name="ATLAS_FT_EFF_Eigen_C_1" Constr="asym" CentralValue="1" Mag="-0.00145664066089,0.00145344023497" WhereTo="yield"/>
   <Systematic Name="QCDscale_tHjb" Constr="asym" CentralValue="1" Mag="0.065,0.147" WhereTo="yield"/>
   <Systematic Name="PDFaS_tHjb" Constr="asym" CentralValue="1" Mag="0.037,0.037" WhereTo="yield"/>
@@ -342,35 +342,35 @@
 </Sample>
 
 <Sample Name="tWH" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
-  <Systematic Name="ATLAS_JET_EffectiveNP_8restTerm" Constr="asym" CentralValue="1" Mag="0.00147427541992,-0.00148173062981" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.00578338059904,-0.00440201185063" WhereTo="yield"/>
-  <Systematic Name="ATLAS_MET_SoftTrk" Constr="asym" CentralValue="1" Mag="-0.00834819299008,-0.00642897497926" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_8restTerm" Constr="asym" CentralValue="1" Mag="0.00147427541992,0.00148173062981" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.00578338059904,0.00440201185063" WhereTo="yield"/>
+  <Systematic Name="ATLAS_MET_SoftTrk" Constr="asym" CentralValue="1" Mag="-0.00834819299008,0.00642897497926" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_SingleParticle_HighPt" Constr="asym" CentralValue="1" Mag="-0.00107760351454,0.000976034500467" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_PtTerm" Constr="asym" CentralValue="1" Mag="-0.00171560907096,-0.00740480350418" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_OffsetNPV" Constr="asym" CentralValue="1" Mag="0.0071634955279,-0.00202588231" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_TotalStat" Constr="asym" CentralValue="1" Mag="0.00573584917553,-0.00314939320798" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_JER_SINGLE_NP" Constr="asym" CentralValue="1" Mag="-0.0072768155643,-0.0072768155643" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_PtTerm" Constr="asym" CentralValue="1" Mag="-0.00171560907096,0.00740480350418" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_OffsetNPV" Constr="asym" CentralValue="1" Mag="0.0071634955279,0.00202588231" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_TotalStat" Constr="asym" CentralValue="1" Mag="0.00573584917553,0.00314939320798" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_JER_SINGLE_NP" Constr="asym" CentralValue="1" Mag="-0.0072768155643,0.0072768155643" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_3" Constr="asym" CentralValue="1" Mag="-0.00201796936092,0.00109214607067" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_2" Constr="asym" CentralValue="1" Mag="-0.00984834573932,-0.00459431081744" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_1" Constr="asym" CentralValue="1" Mag="0.0187858903023,-0.034221080629" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_7" Constr="asym" CentralValue="1" Mag="0.00171557672149,-0.00247340887903" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_6" Constr="asym" CentralValue="1" Mag="-0.00152582658083,-0.00254778465811" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_2" Constr="asym" CentralValue="1" Mag="-0.00984834573932,0.00459431081744" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_1" Constr="asym" CentralValue="1" Mag="0.0187858903023,0.034221080629" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_7" Constr="asym" CentralValue="1" Mag="0.00171557672149,0.00247340887903" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_6" Constr="asym" CentralValue="1" Mag="-0.00152582658083,0.00254778465811" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_5" Constr="asym" CentralValue="1" Mag="-0.0018455636213,0.00091151430721" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_4" Constr="asym" CentralValue="1" Mag="-0.00141236458028,-0.0144431251607" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_NonClosure_negEta" Constr="asym" CentralValue="1" Mag="-0.000579498858125,-0.00118664061016" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_4" Constr="asym" CentralValue="1" Mag="-0.00141236458028,0.0144431251607" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_NonClosure_negEta" Constr="asym" CentralValue="1" Mag="-0.000579498858125,0.00118664061016" WhereTo="yield"/>
   <Systematic Name="ATLAS_PRW_DATASF" Constr="asym" CentralValue="1" Mag="-0.0156924261141,0.0151706306207" WhereTo="yield"/>
-  <Systematic Name="ATLAS_MET_SoftTrk_ResoPara" Constr="asym" CentralValue="1" Mag="-0.0093603728852,-0.0093603728852" WhereTo="yield"/>
-  <Systematic Name="ATLAS_MET_SoftTrk_ResoPerp" Constr="asym" CentralValue="1" Mag="-0.000639326318161,-0.000639326318161" WhereTo="yield"/>
+  <Systematic Name="ATLAS_MET_SoftTrk_ResoPara" Constr="asym" CentralValue="1" Mag="-0.0093603728852,0.0093603728852" WhereTo="yield"/>
+  <Systematic Name="ATLAS_MET_SoftTrk_ResoPerp" Constr="asym" CentralValue="1" Mag="-0.000639326318161,0.000639326318161" WhereTo="yield"/>
   <Systematic Name="ATLAS_PH_EFF_ISO_Uncertainty" Constr="logn" CentralValue="1" Mag="0.156161321696" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Flavor_Composition_tWH" Constr="asym" CentralValue="1" Mag="0.013472653375,-0.0239829828202" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_PunchThrough_MC16" Constr="asym" CentralValue="1" Mag="-0.000466462433143,-0.000198701903247" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Flavor_Response_tWH" Constr="asym" CentralValue="1" Mag="-0.00511945287145,-0.00567205337085" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Flavor_Composition_tWH" Constr="asym" CentralValue="1" Mag="0.013472653375,0.0239829828202" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_PunchThrough_MC16" Constr="asym" CentralValue="1" Mag="-0.000466462433143,0.000198701903247" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Flavor_Response_tWH" Constr="asym" CentralValue="1" Mag="-0.00511945287145,0.00567205337085" WhereTo="yield"/>
   <Systematic Name="ATLAS_PH_EFF_ID_Uncertainty" Constr="logn" CentralValue="1" Mag="0.0135709953695" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_Modelling" Constr="asym" CentralValue="1" Mag="-0.00124761725227,-0.00438254495654" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_RhoTopology" Constr="asym" CentralValue="1" Mag="0.0415158624368,-0.0353509178524" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_BJES_Response" Constr="asym" CentralValue="1" Mag="-0.00704606786824,-0.00696494346773" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_JvtEfficiency" Constr="asym" CentralValue="1" Mag="0.000498473359771,-0.00108972901868" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_NonClosure_posEta" Constr="asym" CentralValue="1" Mag="-0.0013770989164,-0.000603805883484" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_Modelling" Constr="asym" CentralValue="1" Mag="-0.00124761725227,0.00438254495654" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_RhoTopology" Constr="asym" CentralValue="1" Mag="0.0415158624368,0.0353509178524" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_BJES_Response" Constr="asym" CentralValue="1" Mag="-0.00704606786824,0.00696494346773" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_JvtEfficiency" Constr="asym" CentralValue="1" Mag="0.000498473359771,0.00108972901868" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_NonClosure_posEta" Constr="asym" CentralValue="1" Mag="-0.0013770989164,0.000603805883484" WhereTo="yield"/>
   <Systematic Name="QCDscale_tWH" Constr="asym" CentralValue="1" Mag="0.049,0.067" WhereTo="yield"/>
   <Systematic Name="PDFaS_tWH" Constr="asym" CentralValue="1" Mag="0.063,0.063" WhereTo="yield"/>
   <NormFactor Name="yield_tWH[0.10220206019]"/>
@@ -380,31 +380,31 @@
 
 <Sample Name="ggZH" InputFile="config/ttHyy/model/signal_ttH_c29.xml" ImportSyst=":common:" MultiplyLumi="0" SharePdf="commonSig">
   <Systematic Name="ATLAS_JET_EffectiveNP_8restTerm" Constr="asym" CentralValue="1" Mag="-0.0040342668657,0.0041956128308" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.0172722546561,-0.00472326835949" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_OffsetMu" Constr="asym" CentralValue="1" Mag="0.0172722546561,0.00472326835949" WhereTo="yield"/>
   <Systematic Name="ATLAS_MET_SoftTrk" Constr="asym" CentralValue="1" Mag="-0.0318469462211,0.000556839160687" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_Pileup_PtTerm" Constr="asym" CentralValue="1" Mag="-0.0010556294592,0.00978973831853" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_OffsetNPV" Constr="asym" CentralValue="1" Mag="0.0241137595528,-0.00947320809757" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_TotalStat" Constr="asym" CentralValue="1" Mag="-0.0141166884331,-0.00532591134937" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_OffsetNPV" Constr="asym" CentralValue="1" Mag="0.0241137595528,0.00947320809757" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_TotalStat" Constr="asym" CentralValue="1" Mag="-0.0141166884331,0.00532591134937" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_JER_SINGLE_NP" Constr="asym" CentralValue="1" Mag="0.0362331170061,0.0362331170061" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_3" Constr="asym" CentralValue="1" Mag="-0.00422224680792,-0.00237023542671" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_2" Constr="asym" CentralValue="1" Mag="-0.0232626536232,-0.00846341355021" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_1" Constr="asym" CentralValue="1" Mag="0.0362955005413,-0.0290749501623" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_7" Constr="asym" CentralValue="1" Mag="0.00984885961395,-0.00477995060266" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_3" Constr="asym" CentralValue="1" Mag="-0.00422224680792,0.00237023542671" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_2" Constr="asym" CentralValue="1" Mag="-0.0232626536232,0.00846341355021" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_1" Constr="asym" CentralValue="1" Mag="0.0362955005413,0.0290749501623" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_7" Constr="asym" CentralValue="1" Mag="0.00984885961395,0.00477995060266" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_6" Constr="asym" CentralValue="1" Mag="-0.000681497617852,0.00404067353157" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EffectiveNP_5" Constr="asym" CentralValue="1" Mag="0.0117940484819,0.00504372662749" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EffectiveNP_4" Constr="asym" CentralValue="1" Mag="-0.0216576208312,-0.021207679657" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EffectiveNP_4" Constr="asym" CentralValue="1" Mag="-0.0216576208312,0.021207679657" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EtaIntercalibration_NonClosure_negEta" Constr="asym" CentralValue="1" Mag="0.0100782071202,0.0" WhereTo="yield"/>
   <Systematic Name="ATLAS_PRW_DATASF" Constr="asym" CentralValue="1" Mag="0.091597723036,0.137104809317" WhereTo="yield"/>
-  <Systematic Name="ATLAS_MET_SoftTrk_ResoPara" Constr="asym" CentralValue="1" Mag="-0.0390484730958,-0.0390484730958" WhereTo="yield"/>
-  <Systematic Name="ATLAS_MET_SoftTrk_ResoPerp" Constr="asym" CentralValue="1" Mag="-0.0431926879263,-0.0431926879263" WhereTo="yield"/>
+  <Systematic Name="ATLAS_MET_SoftTrk_ResoPara" Constr="asym" CentralValue="1" Mag="-0.0390484730958,0.0390484730958" WhereTo="yield"/>
+  <Systematic Name="ATLAS_MET_SoftTrk_ResoPerp" Constr="asym" CentralValue="1" Mag="-0.0431926879263,0.0431926879263" WhereTo="yield"/>
   <Systematic Name="ATLAS_PH_EFF_ISO_Uncertainty" Constr="logn" CentralValue="1" Mag="0.0479986290876" WhereTo="yield"/>
   <Systematic Name="ATLAS_PH_EFF_ID_Uncertainty" Constr="logn" CentralValue="1" Mag="0.0113020784685" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_EtaIntercalibration_Modelling" Constr="asym" CentralValue="1" Mag="0.0125614325669,-0.04116370428" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Pileup_RhoTopology" Constr="asym" CentralValue="1" Mag="0.102786298416,-0.0602524835591" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_BJES_Response" Constr="asym" CentralValue="1" Mag="-0.000628026880023,-0.0319543560678" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_JvtEfficiency" Constr="asym" CentralValue="1" Mag="0.00215411670907,-0.00258066006539" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_EtaIntercalibration_Modelling" Constr="asym" CentralValue="1" Mag="0.0125614325669,0.04116370428" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Pileup_RhoTopology" Constr="asym" CentralValue="1" Mag="0.102786298416,0.0602524835591" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_BJES_Response" Constr="asym" CentralValue="1" Mag="-0.000628026880023,0.0319543560678" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_JvtEfficiency" Constr="asym" CentralValue="1" Mag="0.00215411670907,0.00258066006539" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_EtaIntercalibration_NonClosure_posEta" Constr="asym" CentralValue="1" Mag="-0.000110503927056,0.0" WhereTo="yield"/>
-  <Systematic Name="ATLAS_JET_Flavor_Composition_ggZH" Constr="asym" CentralValue="1" Mag="0.0581285987577,-0.0143321016358" WhereTo="yield"/>
+  <Systematic Name="ATLAS_JET_Flavor_Composition_ggZH" Constr="asym" CentralValue="1" Mag="0.0581285987577,0.0143321016358" WhereTo="yield"/>
   <Systematic Name="ATLAS_JET_Flavor_Response_ggZH" Constr="asym" CentralValue="1" Mag="-0.0149106339093,0.0119098177213" WhereTo="yield"/>
   <Systematic Name="ATLAS_HeavyFlavor" Constr="gaus" CentralValue="1" Mag="1.0" WhereTo="yield"/>
   <NormFactor Name="yield_ggZH[0.0565396237578]"/>
