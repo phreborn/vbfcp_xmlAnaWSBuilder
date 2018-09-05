@@ -141,7 +141,6 @@ private:
   
   TStopwatch _timer;
 
-  int CN2IDX(TString channelname);
   void NPMaker(RooWorkspace *w, Systematic *syst, RooArgSet *nuispara, RooArgSet *constraints , RooArgSet *globobs, RooArgSet *expected);
   void generateSingleChannel(TString xmlName, RooWorkspace *wchannel);
   void readSyst(TXMLNode* systNode, TString process="allproc");

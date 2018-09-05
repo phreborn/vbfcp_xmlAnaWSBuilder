@@ -574,16 +574,6 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   clearUp();			// Remove content in the vectors and maps
 }
 
-int xmlAnaWSBuilder::CN2IDX(TString channelname){
-  int cate=-1;
-
-  for(int ich=0;ich<_Nch;ich++){
-    if(_CN[ich]==channelname) cate=ich;
-  }
-
-  return cate;
-}
-
 void xmlAnaWSBuilder::NPMaker(RooWorkspace *w, Systematic *syst, RooArgSet *nuispara, RooArgSet *constraints , RooArgSet *globobs, RooArgSet *expected){
   
   TString varName=syst->whereTo+"_"+syst->NPName;
