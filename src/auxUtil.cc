@@ -230,7 +230,7 @@ TString auxUtil::getAttributeValue( TXMLNode* rootNode, TString attributeKey, bo
 }
 
 void auxUtil::alertAndAbort(TString msg){
-  cerr<<"\tERROR: "<<msg<<". Please intervene..."<<endl;
+  cerr<<"\n\033[91m \tERROR: "<<msg<<". Please intervene... \033[0m\n"<<endl;
   exit(-1);
 }
 

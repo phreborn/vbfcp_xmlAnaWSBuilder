@@ -27,7 +27,7 @@ void asimovUtil::generateAsimov(ModelConfig *mc, TString dataName){
     _asimovSetups[iAsimov].ReplaceAll(" ","");
     // Nothing to be done...
     if(_asimovSetups[iAsimov]==""){
-      cout<<"\tREGTEST: "<<" there is no setup info provided. Proceed with current variable values and ranges..."<<endl;
+      cout<<"\tREGTEST: There is no setup info provided. Proceed with current variable values and ranges..."<<endl;
     }
     // Configuring variables
     else{

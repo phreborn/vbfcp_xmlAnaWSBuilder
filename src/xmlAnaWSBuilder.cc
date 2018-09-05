@@ -171,7 +171,7 @@ void xmlAnaWSBuilder::generateWS(){
   _combWS->import(obsData);
   if(obsDatabinned.numEntries()<obsData.numEntries()) _combWS->import(obsDatabinned);
   else{
-    cout<<"\tREGTEST: No need to keep binned dataset, as the number of data events is smaller than the number of bins in all categories"<<endl;
+    cout<<"\n\033[91m \tREGTEST: No need to keep binned dataset, as the number of data events is smaller than the number of bins in all categories. \033[0m\n"<<endl;
     _useBinned=false;
   }
   w.clear();
