@@ -136,6 +136,8 @@ private:
   static TString LE;
   static TString GT;
   static TString GE;
+
+  static TString OBSDSNAME;
   
   TStopwatch _timer;
 

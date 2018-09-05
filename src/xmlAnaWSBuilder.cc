@@ -51,6 +51,9 @@ TString xmlAnaWSBuilder::LE=":le:";
 TString xmlAnaWSBuilder::GT=":gt:";
 TString xmlAnaWSBuilder::GE=":ge:";
 
+// Observed dataset name
+TString xmlAnaWSBuilder::OBSDSNAME="obsdata";
+
 xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   cout << "Parsing file: " << inputFile << endl;
   TDOMParser xmlparser;
@@ -137,8 +140,8 @@ void xmlAnaWSBuilder::generateWS(){
     Observables.add(*w[ich]->set("Observables"));
     POI.add(*w[ich]->set("POI"), true);
 
-    datasetMap[_CN[ich].Data()] = dynamic_cast<RooDataSet*>(w[ich]->data("obsdata"));
-    datasetMap_binned[_CN[ich].Data()] = dynamic_cast<RooDataSet*>(w[ich]->data("obsdatabinned"));
+    datasetMap[_CN[ich].Data()] = dynamic_cast<RooDataSet*>(w[ich]->data(OBSDSNAME));
+    datasetMap_binned[_CN[ich].Data()] = dynamic_cast<RooDataSet*>(w[ich]->data(OBSDSNAME+"binned"));
     if(_debug) w[ich]->Print();
   }
   Observables.add(channellist);
@@ -546,7 +549,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   if(_injectGhost) auxUtil::releaseTheGhost(obsdata.get(),x, &wt, auxUtil::epsilon/1000.);
 
   // prepare binned data
-  unique_ptr<RooDataSet> obsdatabinned(dynamic_cast<RooDataSet*>(obsdata->Clone("obsdatabinned")));
+  unique_ptr<RooDataSet> obsdatabinned(dynamic_cast<RooDataSet*>(obsdata->Clone(OBSDSNAME+"binned")));
 
   if(channeltype!=COUNTING&&obsdata->sumEntries()>x->numBins()){
     TH1D h_data("h_data","",x->numBins(),x->getMin(),x->getMax());
@@ -557,7 +560,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
       obsdata->get(i) ;
       h_data.Fill( xdata->getVal() ,obsdata->weight());
     }
-    obsdatabinned.reset(new RooDataSet("obsdatabinned","obsdatabinned",obs_plus_wt,WeightVar(wt)));
+    obsdatabinned.reset(new RooDataSet(OBSDSNAME+"binned",OBSDSNAME+"binned",obs_plus_wt,WeightVar(wt)));
     for( int ibin = 1 ; ibin <= h_data.GetNbinsX() ; ibin ++ ) {
       x->setVal(h_data.GetBinCenter(ibin));
       double weight = h_data.GetBinContent(ibin);
@@ -927,7 +930,7 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
   obs_plus_wt.add(*w);
   obs_plus_wt.add(*x);
   
-  RooDataSet* obsdata=new RooDataSet("obsdata","obsdata",obs_plus_wt,WeightVar(*w));
+  RooDataSet* obsdata=new RooDataSet(OBSDSNAME,OBSDSNAME,obs_plus_wt,WeightVar(*w));
 
   unique_ptr<RooDataSet> obsdata_tmp;
   
