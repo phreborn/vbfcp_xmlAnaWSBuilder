@@ -57,7 +57,7 @@
 	  SelectionEff      CDATA            #IMPLIED
 	  Acceptance        CDATA            #IMPLIED
 	  Correction        CDATA            #IMPLIED
-          InputFile         CDATA            #REQUIRED
+          InputFile         CDATA            #IMPLIED
           ImportSyst        CDATA            #IMPLIED
           MultiplyLumi      CDATA            #IMPLIED
 	  SharePdf          CDATA            #IMPLIED

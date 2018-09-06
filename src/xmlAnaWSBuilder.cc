@@ -252,7 +252,7 @@ void xmlAnaWSBuilder::readSample(TXMLNode* sampleNode){
   Sample sample;
   sample.procName=auxUtil::getAttributeValue(sampleNode, "Name");
   // sample.yield=atof(auxUtil::getAttributeValue(sampleNode, "Norm"));
-  sample.inputFile=auxUtil::getAttributeValue(sampleNode, "InputFile");
+  sample.inputFile=auxUtil::getAttributeValue(sampleNode, "InputFile", (_Type.back()==COUNTING), "");
 
   TString importSystGroupList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, COMMON);
   auxUtil::removeWhiteSpace(importSystGroupList);
