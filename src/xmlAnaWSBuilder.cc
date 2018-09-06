@@ -360,7 +360,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   _xMin=wfactory->var(_observableName)->getMin();
   _xMax=wfactory->var(_observableName)->getMax();
       
-  int nbinx=atoi(auxUtil::getAttributeValue(dataNode, "Binning"));
+  int nbinx=(channeltype==COUNTING) ? 1 : atoi(auxUtil::getAttributeValue(dataNode, "Binning"));
   wfactory->var(_observableName)->setBins(nbinx);
   
   _inputDataFileName=auxUtil::getAttributeValue(dataNode, "InputFile", (channeltype==COUNTING), "");
@@ -554,7 +554,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   // prepare binned data
   unique_ptr<RooDataSet> obsdatabinned(dynamic_cast<RooDataSet*>(obsdata->Clone(OBSDSNAME+"binned")));
 
-  if(channeltype!=COUNTING&&obsdata->sumEntries()>x->numBins()){
+  if(obsdata->sumEntries()>x->numBins()){
     TH1D h_data("h_data","",x->numBins(),x->getMin(),x->getMax());
     RooArgSet* obs = const_cast<RooArgSet*>(obsdata->get());
     RooRealVar* xdata = dynamic_cast<RooRealVar*>(obs->find(_observableName));

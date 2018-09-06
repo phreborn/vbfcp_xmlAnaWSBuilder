@@ -38,7 +38,7 @@
 	  TreeName          CDATA            #IMPLIED
 	  VarName           CDATA            #IMPLIED
           Observable        CDATA            #REQUIRED
-          Binning           CDATA            #REQUIRED
+          Binning           CDATA            #IMPLIED
           InjectGhost       CDATA            #IMPLIED
 	  NumData           CDATA            #IMPLIED
 	  >
