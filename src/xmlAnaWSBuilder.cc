@@ -111,7 +111,7 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   _asimovHandler->printSummary();
   // if(_useBinned) cout<<"\tREGTEST: Binned data will be used for fits to be performed"<<endl;
   _useBinned=false;
-  cout<<"======================================="<<endl;
+  cout<<"======================================="<<endl<<endl;
   // Start working...
   _combWS=auto_ptr<RooWorkspace>(new RooWorkspace(_wsName));
   _mConfig=auto_ptr<ModelConfig>(new ModelConfig(_mcName, _combWS.get()));
@@ -165,8 +165,8 @@ void xmlAnaWSBuilder::generateWS(){
   args.add(Observables);
   args.add(wt);
 
-  RooDataSet obsData(_dataName,"Combined data ", args, Index(channellist), Import(datasetMap) ,WeightVar(wt));
-  RooDataSet obsDatabinned(_dataName+"binned","Binned combined data ", args, Index(channellist), Import(datasetMap_binned) ,WeightVar(wt));
+  RooDataSet obsData(_dataName, "Combined data", args, Index(channellist), Import(datasetMap), WeightVar(wt));
+  RooDataSet obsDatabinned(_dataName+"binned", "Binned combined data", args, Index(channellist), Import(datasetMap_binned), WeightVar(wt));
   
   _combWS->import(obsData);
   if(obsDatabinned.numEntries()<obsData.numEntries()) _combWS->import(obsDatabinned);
@@ -179,6 +179,8 @@ void xmlAnaWSBuilder::generateWS(){
   // Save the original snapshot
   // _combWS->saveSnapshot("nominalNuis",*_mConfig->GetNuisanceParameters());
   // _combWS->saveSnapshot("nominalGlobs",*_mConfig->GetGlobalObservables());
+  if(_useBinned) cout<<"\033[91m \tREGTEST: Fitting binned dataset. \033[0m\n"<<endl;
+  
   if(_asimovHandler->genAsimov()) _asimovHandler->generateAsimov(_mConfig.get(), _useBinned?_dataName+"binned":_dataName);
   _combWS->importClassCode();
   _combWS->writeToFile(_outputFileName);
@@ -446,7 +448,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
       else auxUtil::alertAndAbort("Unknown systematic loacation "+syst.whereTo
 				  +". Choose from \""+SHAPE+"\" or \""+YIELD+"\"");
 
-      NPMaker(wfactory.get(), &syst, &nuispara , &constraints , &globobs, respCollection);
+      NPMaker(wfactory.get(), &syst, &nuispara, &constraints, &globobs, respCollection);
     }
   }
 
@@ -491,7 +493,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
     
     cout<<"\tREGTEST: Yield for channel \""<<channelname<<"\" process \""<<sample.procName<<"\": "<<wfactory->function(sample.normName)->getVal()<<endl;
     if(_debug) wfactory->Print();
-    getModel(wfactory.get(), &sample, channeltype, &nuispara , &constraints , &globobs);
+    getModel(wfactory.get(), &sample, channeltype, &nuispara, &constraints, &globobs);
   }
 
   if(_debug) wfactory->Print();
@@ -528,7 +530,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
 
   // Now, import the pdf to a new workspace, where the renaming of objects will happen automatically
   if(_debug) cout<<"\tREGTEST: The following variables will not be renamed: "<<correlated<<endl;
-  wchannel->import( (*wfactory->pdf(SUMPDFNAME)) , RenameAllNodes(channelname), RenameAllVariablesExcept(channelname,correlated), Silence());
+  wchannel->import( (*wfactory->pdf(SUMPDFNAME)), RenameAllNodes(channelname), RenameAllVariablesExcept(channelname,correlated), Silence());
 
   // Import constraint terms. Note we should not rename the constraint term gaussians
   attachConstraints(wchannel, SUMPDFNAME+"_"+channelname, &constraints, FINALPDFNAME+"_"+channelname);
@@ -561,23 +563,24 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
     
     for (int i=0 ; i<obsdata->numEntries() ; i++) {
       obsdata->get(i) ;
-      h_data.Fill( xdata->getVal() ,obsdata->weight());
+      h_data.Fill( xdata->getVal(), obsdata->weight());
     }
     obsdatabinned.reset(new RooDataSet(OBSDSNAME+"binned",OBSDSNAME+"binned",obs_plus_wt,WeightVar(wt)));
     for( int ibin = 1 ; ibin <= h_data.GetNbinsX() ; ibin ++ ) {
       x->setVal(h_data.GetBinCenter(ibin));
       double weight = h_data.GetBinContent(ibin);
       wt.setVal(weight);
-      obsdatabinned -> add( RooArgSet(*x ,wt) , weight);
+      obsdatabinned -> add( RooArgSet(*x, wt), weight);
     }
   }
-
+  
   wchannel->import(*obsdata);
   wchannel->import(*obsdatabinned);
   clearUp();			// Remove content in the vectors and maps
+  cout<<endl<<"---------------------------------------"<<endl<<endl;
 }
 
-void xmlAnaWSBuilder::NPMaker(RooWorkspace *w, Systematic *syst, RooArgSet *nuispara, RooArgSet *constraints , RooArgSet *globobs, RooArgSet *expected){
+void xmlAnaWSBuilder::NPMaker(RooWorkspace *w, Systematic *syst, RooArgSet *nuispara, RooArgSet *constraints, RooArgSet *globobs, RooArgSet *expected){
   
   TString varName=syst->whereTo+"_"+syst->NPName;
   if(syst->domain!=ALLPROC) varName+="_"+syst->process;
@@ -627,7 +630,7 @@ void xmlAnaWSBuilder::NPMaker(RooWorkspace *w, Systematic *syst, RooArgSet *nuis
   }
   else{
     TString nominal_expr=implementObj(w, "nominal_"+varName+Form("[%f]", syst->nominal));
-    TString NPName=implementObj(w, syst->NPName+"[ 0 , -5 , 5 ]", true); // Sometimes the duplicated variable cannot be recycled
+    TString NPName=implementObj(w, syst->NPName+"[ 0, -5, 5 ]", true); // Sometimes the duplicated variable cannot be recycled
     TString nuis_times_beta_expr=implementObj(w, "prod::"+varName+"_times_beta("+syst->NPName+", beta_"+varName+Form("[%f])", syst->beta));
     
     if(syst->constrTerm==GAUSSIAN){
@@ -930,7 +933,7 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
     double weight=(_numData==0)?auxUtil::epsilon/1000.:_numData;
     x->setVal(binCenter);
     w->setVal(weight);
-    obsdata->add( RooArgSet(*x ,*w) , weight);
+    obsdata->add( RooArgSet(*x, *w), weight);
   }
   else{
     unique_ptr<RooDataSet> obsdata_tmp;
@@ -952,10 +955,9 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
       x->setVal(xdata_tmp->getVal());
       double weight=1;
       w->setVal(weight);
-      obsdata->add( RooArgSet(*x ,*w) , weight);
+      obsdata->add( RooArgSet(*x, *w), weight);
     }
   }
-  
   if(_debug) obsdata->Print("v");
   return obsdata;
 }

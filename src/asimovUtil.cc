@@ -61,7 +61,7 @@ void asimovUtil::generateAsimov(ModelConfig *mc, TString dataName){
 	continue;
       }
     }
-
+    cout<<"\tREGTEST: Action list ("<<_asimovProfiles[iAsimov]<<")"<<endl<<endl;
     vector<TString> actionList=auxUtil::splitString(_asimovProfiles[iAsimov], ':');
 
     for(vector<TString>::iterator act = actionList.begin(); act != actionList.end(); ++act){
@@ -70,7 +70,7 @@ void asimovUtil::generateAsimov(ModelConfig *mc, TString dataName){
       if(action==FIT){
 	int status=fitUtil::profileToData(mc, data);
 	if(status!=0&&status!=1){
-	  cerr<<"Potential fitting issue found. You may want to investigate more before moving on. Press any key to continue..."<<endl;
+	  cerr<<"\n\033[91m \tERROR: Fit not converging properly. You may want to investigate more before moving on. Press any key to continue... \033[0m\n"<<endl;
 	  getchar();
 	}
       }
@@ -153,6 +153,7 @@ void asimovUtil::generateAsimov(ModelConfig *mc, TString dataName){
       else if(find(_Snapshots.begin(), _Snapshots.end(), action)!=_Snapshots.end()) w->loadSnapshot(action);
       else cerr<<"\tERROR: Unknown action: "<<action<<endl;
     }
+    cout<<endl<<"---------------------------------------"<<endl<<endl;
   }
 }
 
