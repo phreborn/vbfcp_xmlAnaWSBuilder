@@ -33,13 +33,14 @@
 
 <!ELEMENT Data EMPTY>
 <!ATTLIST Data
-          InputFile         CDATA            #REQUIRED
+          InputFile         CDATA            #IMPLIED
           FileType          CDATA            #IMPLIED
 	  TreeName          CDATA            #IMPLIED
 	  VarName           CDATA            #IMPLIED
           Observable        CDATA            #REQUIRED
           Binning           CDATA            #REQUIRED
           InjectGhost       CDATA            #IMPLIED
+	  NumData           CDATA            #IMPLIED
 	  >
 
 <!ELEMENT Item  EMPTY>

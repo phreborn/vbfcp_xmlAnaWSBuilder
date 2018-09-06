@@ -362,7 +362,8 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
       
   int nbinx=atoi(auxUtil::getAttributeValue(dataNode, "Binning"));
   wfactory->var(_observableName)->setBins(nbinx);
-  _inputDataFileName=auxUtil::getAttributeValue(dataNode, "InputFile");
+  
+  _inputDataFileName=auxUtil::getAttributeValue(dataNode, "InputFile", (channeltype==COUNTING), "");
   _inputDataFileType=auxUtil::getAttributeValue(dataNode, "FileType", true, ASCII);
   _inputDataFileType.ToLower();
   if(_inputDataFileType!=ASCII){	// means that we are reading data from a tree
@@ -371,6 +372,8 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   }
   _injectGhost=auxUtil::to_bool(auxUtil::getAttributeValue(dataNode, "InjectGhost", true, "0")); // Default false
 
+  _numData=(channeltype==COUNTING && _inputDataFileName=="") ? atoi(auxUtil::getAttributeValue(dataNode, "NumData")) : -1; // Only needed for counting experiment where the input data file is not specified
+  
   dataFileSanityCheck();	// Check now and report, before it is too late
   
   TXMLNode *correlateNode=auxUtil::findNode(rootNode, "Correlate"); // This attribute is only allowed to appear at most once per-channel, and cannot be hided in a sub-XML file
@@ -922,26 +925,35 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
   
   RooDataSet* obsdata=new RooDataSet(OBSDSNAME,OBSDSNAME,obs_plus_wt,WeightVar(*w));
 
-  unique_ptr<RooDataSet> obsdata_tmp;
-  
-  if(_inputDataFileType==ASCII){
-    obsdata_tmp.reset(RooDataSet::read(_inputDataFileName, RooArgList(*x)));
-  }
-  else{
-    RooRealVar x_tree(_inputDataVarName,_inputDataVarName, _xMin, _xMax);
-
-    obsdata_tmp.reset(new RooDataSet("obsdata_tmp","obsdata_tmp", RooArgSet(x_tree), ImportFromFile(_inputDataFileName.Data(), _inputDataTreeName.Data())));
-  }
-
-  RooArgSet* obs_tmp = const_cast<RooArgSet*>(obsdata_tmp->get());
-  RooRealVar* xdata_tmp = dynamic_cast<RooRealVar*>(obs_tmp->first()); // We only have one observable in total, so it is okay
-  
-  for (int i=0 ; i<obsdata_tmp->numEntries() ; i++) {
-    obsdata_tmp->get(i) ;
-    x->setVal(xdata_tmp->getVal());
-    double weight=1;
+  if(_Type.back()==COUNTING && _numData>=0){ // Generate number of events for counting experiment
+    double binCenter=(x->getMin()+x->getMax())/2.;
+    double weight=(_numData==0)?auxUtil::epsilon/1000.:_numData;
+    x->setVal(binCenter);
     w->setVal(weight);
     obsdata->add( RooArgSet(*x ,*w) , weight);
+  }
+  else{
+    unique_ptr<RooDataSet> obsdata_tmp;
+
+    if(_inputDataFileType==ASCII){
+      obsdata_tmp.reset(RooDataSet::read(_inputDataFileName, RooArgList(*x)));
+    }
+    else{
+      RooRealVar x_tree(_inputDataVarName,_inputDataVarName, _xMin, _xMax);
+
+      obsdata_tmp.reset(new RooDataSet("obsdata_tmp","obsdata_tmp", RooArgSet(x_tree), ImportFromFile(_inputDataFileName.Data(), _inputDataTreeName.Data())));
+    }
+
+    RooArgSet* obs_tmp = const_cast<RooArgSet*>(obsdata_tmp->get());
+    RooRealVar* xdata_tmp = dynamic_cast<RooRealVar*>(obs_tmp->first()); // We only have one observable in total, so it is okay
+  
+    for (int i=0 ; i<obsdata_tmp->numEntries() ; i++) {
+      obsdata_tmp->get(i) ;
+      x->setVal(xdata_tmp->getVal());
+      double weight=1;
+      w->setVal(weight);
+      obsdata->add( RooArgSet(*x ,*w) , weight);
+    }
   }
   
   if(_debug) obsdata->Print("v");
@@ -1015,13 +1027,19 @@ void xmlAnaWSBuilder::readChannelXMLNode(TXMLNode *node){
 }
 
 void xmlAnaWSBuilder::dataFileSanityCheck(){
-  if(!auxUtil::checkExist(_inputDataFileName)) auxUtil::alertAndAbort("Cannot find input data file "+_inputDataFileName);
-  if(_inputDataFileType!=ASCII){	// means that we are reading data from a tree
-    TFile *f=TFile::Open(_inputDataFileName);
-    TTree *t=dynamic_cast<TTree*>(f->Get(_inputDataTreeName));
-    if(!t) auxUtil::alertAndAbort("Cannot find TTree "+_inputDataTreeName+" in data file "+_inputDataFileName);
-    TBranch *b=t->FindBranch(_inputDataVarName);
-    if(!b) auxUtil::alertAndAbort("Cannot find TBranch "+_inputDataVarName+" in TTree "+_inputDataTreeName+" in data file "+_inputDataFileName);
-    f->Close();
+  if(_Type.back()==COUNTING){
+    if(_inputDataFileName!="" && !auxUtil::checkExist(_inputDataFileName)) auxUtil::alertAndAbort("Cannot find input data file "+_inputDataFileName);
+    else if(_inputDataFileName=="" && _numData<0) auxUtil::alertAndAbort("Please either provide a input data file, or provide a valid number of data events for a counting experiment");
+  }
+  else{
+    if(!auxUtil::checkExist(_inputDataFileName)) auxUtil::alertAndAbort("Cannot find input data file "+_inputDataFileName);
+    if(_inputDataFileType!=ASCII){	// means that we are reading data from a tree
+      TFile *f=TFile::Open(_inputDataFileName);
+      TTree *t=dynamic_cast<TTree*>(f->Get(_inputDataTreeName));
+      if(!t) auxUtil::alertAndAbort("Cannot find TTree "+_inputDataTreeName+" in data file "+_inputDataFileName);
+      TBranch *b=t->FindBranch(_inputDataVarName);
+      if(!b) auxUtil::alertAndAbort("Cannot find TBranch "+_inputDataVarName+" in TTree "+_inputDataTreeName+" in data file "+_inputDataFileName);
+      f->Close();
+    }
   }
 }

@@ -73,6 +73,7 @@ private:
   TString _inputDataTreeName;
   TString _inputDataVarName;
   bool _injectGhost;
+  int _numData;
   
   // Vectors and maps which will be cleared after generating model for each channel
   map<TString, vector<Systematic> > _Systematics;
