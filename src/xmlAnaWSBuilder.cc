@@ -256,7 +256,8 @@ void xmlAnaWSBuilder::readSample(TXMLNode* sampleNode){
   // sample.yield=atof(auxUtil::getAttributeValue(sampleNode, "Norm"));
   sample.inputFile=auxUtil::getAttributeValue(sampleNode, "InputFile", (_Type.back()==COUNTING), "");
 
-  TString importSystGroupList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, COMMON);
+  // TString importSystGroupList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, COMMON);
+  TString importSystGroupList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, SELF);
   auxUtil::removeWhiteSpace(importSystGroupList);
   sample.systGroups=auxUtil::splitString(importSystGroupList.Data(),',');
   sort( sample.systGroups.begin(), sample.systGroups.end() );
