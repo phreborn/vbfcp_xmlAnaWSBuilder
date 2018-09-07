@@ -578,7 +578,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
       obsdatabinned -> add( RooArgSet(*x, wt), weight);
     }
   }
-  
+  cout<<"\tREGTEST: Number of data events: "<<obsdata->sumEntries()<<endl;
   wchannel->import(*obsdata);
   wchannel->import(*obsdatabinned);
   clearUp();			// Remove content in the vectors and maps
@@ -865,7 +865,6 @@ void xmlAnaWSBuilder::checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara){
   while((parg=dynamic_cast<RooRealVar*>(iter->Next()))){
     if(!parg->isConstant()){
       // Only check floating variables
-      // Ri ni ge wen sang, shua lao zi o
       if(parg->getMax()==parg->getMin()){
       	cout<<"\tREGTEST: fixing "<<parg->GetName()<<" to constant as it has same upper and lower boundary"<<endl;
       	parg->setConstant(true);

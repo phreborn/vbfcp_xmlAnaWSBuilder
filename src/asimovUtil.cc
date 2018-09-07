@@ -92,6 +92,7 @@ void asimovUtil::generateAsimov(ModelConfig *mc, TString dataName){
       }
       // Generating Asimov
       else if(action==GENASIMOV){
+	cout<<"\tREGTEST: Generating Asimov dataset "<<_asimovNames[iAsimov]<<endl;
         unique_ptr<RooAbsData> asimovData(AsymptoticCalculator::GenerateAsimovData( *mc->GetPdf(), *mc->GetObservables()));
 	// Need to perform injection here.
         w->import(*asimovData, Rename(_asimovNames[iAsimov]));

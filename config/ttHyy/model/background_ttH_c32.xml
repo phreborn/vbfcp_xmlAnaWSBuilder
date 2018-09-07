@@ -1,4 +1,0 @@
-<!DOCTYPE Model SYSTEM 'AnaWSBuilder.dtd'>
-<Model Type="UserDef">
-  <ModelItem Name="EXPR::bkgPdf_ttH_c32('TMath::Power((@0*1),@1)', :observable:,  lambda_c32[-1,-1000,1000])"/>
-</Model>

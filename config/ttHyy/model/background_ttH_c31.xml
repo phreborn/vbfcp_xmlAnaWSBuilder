@@ -1,4 +1,0 @@
-<!DOCTYPE Model SYSTEM 'AnaWSBuilder.dtd'>
-<Model Type="UserDef">
-  <ModelItem Name="EXPR::bkgPdf_ttH_c31('exp(@0*@1)', :observable:,  slope_c31[-1,-1000,1000])"/>
-</Model>
