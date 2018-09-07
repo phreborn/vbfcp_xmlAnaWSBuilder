@@ -26,7 +26,7 @@
 <!ATTLIST Channel
           Name              CDATA            #REQUIRED
 	  Type              CDATA            #REQUIRED
-	  Lumi              CDATA            #REQUIRED
+	  Lumi              CDATA            #IMPLIED
 	  >
 
 <!ELEMENT Correlate (#PCDATA) >
@@ -37,6 +37,7 @@
           FileType          CDATA            #IMPLIED
 	  TreeName          CDATA            #IMPLIED
 	  VarName           CDATA            #IMPLIED
+	  Cut               CDATA            #IMPLIED
           Observable        CDATA            #REQUIRED
           Binning           CDATA            #IMPLIED
           InjectGhost       CDATA            #IMPLIED

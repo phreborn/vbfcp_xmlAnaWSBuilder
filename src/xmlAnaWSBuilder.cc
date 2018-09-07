@@ -271,7 +271,7 @@ void xmlAnaWSBuilder::readSample(TXMLNode* sampleNode){
   TString acceptance=auxUtil::getAttributeValue(sampleNode, "Acceptance", true, ""); // default value 1
   TString correction=auxUtil::getAttributeValue(sampleNode, "Correction", true, ""); // default value 1
   
-  bool isMultiplyLumi=auxUtil::to_bool(auxUtil::getAttributeValue(sampleNode, "MultiplyLumi", true, "1")); // default value true
+  bool isMultiplyLumi=(_luminosity>0) ? auxUtil::to_bool(auxUtil::getAttributeValue(sampleNode, "MultiplyLumi", true, "1")) : false; // default value true. If luminosity not provided it will always be false
 
   // Assamble the yield central value
   if(isMultiplyLumi) sample.normFactors.push_back(LUMINAME);
@@ -343,7 +343,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   // Get the category name and property from
   TString channelname=auxUtil::getAttributeValue(rootNode, "Name");
   TString channeltype=auxUtil::getAttributeValue(rootNode, "Type");
-  _luminosity=atof(auxUtil::getAttributeValue(rootNode, "Lumi"));
+  _luminosity=atof(auxUtil::getAttributeValue(rootNode, "Lumi", true, "-1"));
   
   channeltype.ToLower();
 
@@ -353,7 +353,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   /* all the attributes of a channel */
 
   unique_ptr<RooWorkspace> wfactory(new RooWorkspace("factory_"+channelname));
-  implementObj(wfactory.get(), LUMINAME+Form("[%f]", _luminosity)); // First thing: create a luminosity variable
+  if(_luminosity>0) implementObj(wfactory.get(), LUMINAME+Form("[%f]", _luminosity)); // First thing: create a luminosity variable
 
   TXMLNode *dataNode=auxUtil::findNode(rootNode, "Data"); // This attribute is only allowed to appear once per-channel, and cannot be hided in a sub-XML file
   if (!dataNode) auxUtil::alertAndAbort("No data node found in channel XML file "+xmlName);
