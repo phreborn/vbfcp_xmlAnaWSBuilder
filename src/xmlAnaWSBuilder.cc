@@ -50,6 +50,8 @@ TString xmlAnaWSBuilder::LT=":lt:";
 TString xmlAnaWSBuilder::LE=":le:";
 TString xmlAnaWSBuilder::GT=":gt:";
 TString xmlAnaWSBuilder::GE=":ge:";
+TString xmlAnaWSBuilder::AND=":and:";
+TString xmlAnaWSBuilder::OR=":or:";
 
 // Observed dataset name
 TString xmlAnaWSBuilder::OBSDSNAME="obsdata";

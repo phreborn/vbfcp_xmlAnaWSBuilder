@@ -137,6 +137,8 @@ private:
   static TString LE;
   static TString GT;
   static TString GE;
+  static TString AND;
+  static TString OR;
 
   static TString OBSDSNAME;
   
