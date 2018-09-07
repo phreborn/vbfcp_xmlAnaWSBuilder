@@ -374,6 +374,8 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   if(_inputDataFileType!=ASCII){	// means that we are reading data from a tree
     _inputDataTreeName=auxUtil::getAttributeValue(dataNode, "TreeName");
     _inputDataVarName=auxUtil::getAttributeValue(dataNode, "VarName");
+    _Cut=auxUtil::getAttributeValue(dataNode, "Cut", true, "");
+    translateKeyword(_Cut);
   }
   _injectGhost=auxUtil::to_bool(auxUtil::getAttributeValue(dataNode, "InjectGhost", true, "0")); // Default false
 
@@ -940,9 +942,12 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
       obsdata_tmp.reset(RooDataSet::read(_inputDataFileName, RooArgList(*x)));
     }
     else{
+      unique_ptr<TFile> f(TFile::Open(_inputDataFileName));
+      TTree *t=dynamic_cast<TTree*>(f->Get(_inputDataTreeName));
+      if(_Cut!="") t=t->CopyTree(_Cut);
       RooRealVar x_tree(_inputDataVarName,_inputDataVarName, _xMin, _xMax);
-
-      obsdata_tmp.reset(new RooDataSet("obsdata_tmp","obsdata_tmp", RooArgSet(x_tree), ImportFromFile(_inputDataFileName.Data(), _inputDataTreeName.Data())));
+      obsdata_tmp.reset(new RooDataSet(OBSDSNAME+"_tmp",OBSDSNAME+"_tmp", RooArgSet(x_tree), Import(*t)));
+      f->Close();
     }
 
     RooArgSet* obs_tmp = const_cast<RooArgSet*>(obsdata_tmp->get());

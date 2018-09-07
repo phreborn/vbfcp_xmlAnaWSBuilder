@@ -72,6 +72,7 @@ private:
   TString _inputDataFileType;
   TString _inputDataTreeName;
   TString _inputDataVarName;
+  TString _Cut;
   bool _injectGhost;
   int _numData;
   
