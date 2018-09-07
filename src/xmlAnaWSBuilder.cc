@@ -909,12 +909,7 @@ void xmlAnaWSBuilder::checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara){
 TString xmlAnaWSBuilder::getItemExpr(TXMLNode *node, TString attrName, TString process){
   TString expr=auxUtil::getAttributeValue(node, attrName);
 
-  expr.ReplaceAll(RESPONSE, RESPONSEPREFIX+SHAPE+"_"); // Implement proper response terms. Assume only shape uncertainty would appear
-  expr.ReplaceAll(OBSERVABLE, _observableName); // Implement proper observables
-  expr.ReplaceAll(LT,"<");
-  expr.ReplaceAll(LE,"<=");
-  expr.ReplaceAll(GT,">");
-  expr.ReplaceAll(GE,">=");
+  translateKeyword(expr);
   
   if(expr.Contains(PROCESS)){
     if(process=="") auxUtil::alertAndAbort("Process name not provided for expression "+expr);
@@ -1047,4 +1042,15 @@ void xmlAnaWSBuilder::dataFileSanityCheck(){
       f->Close();
     }
   }
+}
+
+void xmlAnaWSBuilder::translateKeyword(TString &expr){
+  expr.ReplaceAll(RESPONSE, RESPONSEPREFIX+SHAPE+"_"); // Implement proper response terms. Assume only shape uncertainty would appear
+  expr.ReplaceAll(OBSERVABLE, _observableName); // Implement proper observables
+  expr.ReplaceAll(LT,"<");
+  expr.ReplaceAll(LE,"<=");
+  expr.ReplaceAll(GT,">");
+  expr.ReplaceAll(GE,">=");
+  expr.ReplaceAll(AND,"&&");
+  expr.ReplaceAll(OR,"||");
 }

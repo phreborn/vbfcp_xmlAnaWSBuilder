@@ -166,6 +166,8 @@ public:
   void setUseBinned(bool flag){_useBinned=flag;};
   void setPlotOption(TString option){_plotOpt=option;};
   void dataFileSanityCheck();
+  void translateKeyword(TString &expr);
+  
   ClassDef(xmlAnaWSBuilder,3);
 };
 
