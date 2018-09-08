@@ -19,7 +19,7 @@ public:
   enum _uncertType{UPERROR, LOERROR, SYMMERROR};
   
   static void printTime(){time_t result=time(nullptr);cout<<asctime(localtime(&result));}
-  static void printTitle(const char* titleText, int width, TString separator="-");
+  static void printTitle(TString titleText, TString separator="-", int width=10);
   static vector<TString> splitString(const TString& theOpt, const char separator );
   
   static int parseXMLFile(TDOMParser *xmlparser, TString inputFile);

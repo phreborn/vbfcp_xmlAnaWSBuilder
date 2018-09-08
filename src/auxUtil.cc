@@ -8,13 +8,19 @@ TString auxUtil::UNCERTHIPREFIX="uncertHi__";
 TString auxUtil::UNCERTLOPREFIX="uncertLo__";
 TString auxUtil::UNCERTSYMMPREFIX="uncertSymm__";
 
-void auxUtil::printTitle(const char* titleText, int width, TString separator){
-  TString line="";
+void auxUtil::printTitle(TString titleText, TString separator, int width){
+  TString fullLine="", line="";
+  
+  int stringLength=titleText.Length();
+  int fullLineWidth=2*width+((stringLength>2*width) ? (stringLength) : (2*width))+2;
+    
+  for(int i=0;i<fullLineWidth;i++) fullLine+=separator;
   for(int i=0;i<width;i++) line+=separator;
-  TString fullline=line+line+line+line;
-  cout<<TString("\t "+fullline)<<endl;
-  printf("\t "+line+"%*s%*s"+line+"\n",int(width+strlen(titleText)/2),titleText,int(width-strlen(titleText)/2),"");
-  cout<<TString("\t "+fullline)<<endl;
+  
+  cout<<endl<<TString("\t "+fullLine)<<endl;
+  if(stringLength>2*width) cout<<"\t "<<line<<" "<<titleText<<" "<<line<<endl;
+  else printf("\t "+line+" %*s%*s "+line+"\n",int(width+titleText.Length()/2),titleText.Data(),int(width-titleText.Length()/2),"");
+  cout<<TString("\t "+fullLine)<<endl<<endl;
 }
 
 void auxUtil::Reset(RooArgSet* original, RooArgSet* snapshot){
