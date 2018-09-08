@@ -199,7 +199,7 @@ void xmlAnaWSBuilder::generateWS(){
   outputFigName.ReplaceAll(".root",".pdf");
   
   cout<<"========================================================================"<<endl;
-  auxUtil::Summary(_mConfig.get(),_dataName, outputFigName, _plotOpt, _debug);
+  Summary(outputFigName);
   cout<<"Workspace "<<_wsName<<" has be successfully generated and saved in file "<<_outputFileName<<endl;
   cout<<"Plots for each category are summarized in "<<outputFigName<<endl;
   auxUtil::printTime();
@@ -1086,4 +1086,66 @@ void xmlAnaWSBuilder::translateKeyword(TString &expr){
   expr.ReplaceAll(GE,">=");
   expr.ReplaceAll(AND,"&&");
   expr.ReplaceAll(OR,"||");
+}
+
+void xmlAnaWSBuilder::Summary(TString outputFigName){
+  RooMsgService::instance().setGlobalKillBelow(RooFit::FATAL);
+  gErrorIgnoreLevel=kWarning;
+
+  RooSimultaneous *m_pdf = dynamic_cast<RooSimultaneous*>(_mConfig->GetPdf()); assert (m_pdf);
+  RooAbsCategoryLValue* m_cat = const_cast<RooAbsCategoryLValue*>(&m_pdf->indexCat());
+  const RooArgSet *m_gobs = dynamic_cast<const RooArgSet*>(_mConfig->GetGlobalObservables()); assert(m_gobs);
+  int numChannels = m_cat->numBins(0);
+  RooDataSet *m_data=dynamic_cast<RooDataSet*>(_combWS->data(_dataName));
+  TList *m_dataList = m_data->split( *m_cat, true );
+
+  auxUtil::printTitle("Begin summary", "~");
+  cout << "\tThere are " << numChannels << " sub channels:" << endl;
+  TCanvas c("summary","summary",800,600);
+  
+  c.Print(outputFigName+"[");
+  for ( int i= 0; i < numChannels; i++ ) {
+    m_cat->setBin(i);
+    TString channelname=m_cat->getLabel();
+    RooAbsPdf* pdfi = m_pdf->getPdf(channelname);
+    RooDataSet* datai = ( RooDataSet* )( m_dataList->At( i ) );
+    cout << "\t\tIndex: " << i << ", Pdf: " << pdfi->GetName() << ", Data: " << datai->GetName() << ", SumEntries: " << datai->sumEntries() << endl;
+
+    RooRealVar *x=dynamic_cast<RooRealVar*>(pdfi->getObservables(datai)->first());
+    unique_ptr<RooPlot> frame(x->frame());
+    datai->plotOn(frame.get(), DataError(RooAbsData::Poisson));
+
+    if(_goBlind){
+      pdfi->plotOn(frame.get(), LineColor(kBlue), LineStyle(2), NormRange(SBLO+"_"+channelname+","+SBHI+"_"+channelname), Normalization(1.0,RooAbsReal::RelativeExpected));
+      pdfi->plotOn(frame.get(), LineColor(kBlue), LineStyle(1), Range(SBLO+"_"+channelname+","+SBHI+"_"+channelname), NormRange(SBLO+"_"+channelname+","+SBHI+"_"+channelname), Normalization(1.0,RooAbsReal::RelativeExpected));
+    }
+    else pdfi->plotOn(frame.get(), LineColor(kBlue), Normalization(1.0,RooAbsReal::RelativeExpected));
+
+    c.cd();
+    frame->SetMinimum(auxUtil::epsilon*10);
+    if(_plotOpt.Contains("logy")){
+      frame->SetMinimum(1e-1);
+      c.SetLogy();
+    }
+    
+    frame->Draw();
+    c.Print(outputFigName);
+  }
+  c.Print(outputFigName+"]");
+  
+  auxUtil::printTitle("POI");
+  _mConfig->GetParametersOfInterest()->Print("v");
+  if(_debug){
+    auxUtil::printTitle("Nuisance parameters");
+    _mConfig->GetNuisanceParameters()->Print();
+    auxUtil::printTitle("Global observables");
+    _mConfig->GetGlobalObservables()->Print();
+  }
+  auxUtil::printTitle("Dataset");
+  list<RooAbsData*> allData=_combWS->allData();
+  for (list<RooAbsData*>::iterator data = allData.begin(); data != allData.end(); data++) {
+    (*data)->Print();
+  }
+
+  auxUtil::printTitle("End summary", "~");
 }

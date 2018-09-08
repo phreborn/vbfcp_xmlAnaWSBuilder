@@ -175,7 +175,8 @@ public:
   void setPlotOption(TString option){_plotOpt=option;};
   void dataFileSanityCheck();
   void translateKeyword(TString &expr);
-  
+
+  void Summary(TString outputFigName);
   ClassDef(xmlAnaWSBuilder,3);
 };
 
