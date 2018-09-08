@@ -68,7 +68,7 @@ void asimovUtil::generateAsimov(ModelConfig *mc, TString dataName){
       TString action=*act;
       // Do fit
       if(action==FIT){
-	int status=fitUtil::profileToData(mc, data);
+	int status=fitUtil::profileToData(mc, data, _rangeName);
 	if(status!=0&&status!=1){
 	  cerr<<"\n\033[91m \tERROR: Fit not converging properly. You may want to investigate more before moving on. Press any key to continue... \033[0m\n"<<endl;
 	  getchar();
