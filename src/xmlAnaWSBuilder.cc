@@ -86,6 +86,7 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   _goBlind=auxUtil::to_bool(auxUtil::getAttributeValue(rootNode, "Blind", true, "0"));
   
   _asimovHandler=auto_ptr<asimovUtil>(new asimovUtil());
+  if(_goBlind) _asimovHandler->setRange(SBLO+","+SBHI);
   
   while ( node != 0 ){
     TString nodeName=node->GetNodeName();
