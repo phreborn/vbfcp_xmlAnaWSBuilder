@@ -86,7 +86,7 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   _goBlind=auxUtil::to_bool(auxUtil::getAttributeValue(rootNode, "Blind", true, "0"));
   
   _asimovHandler=auto_ptr<asimovUtil>(new asimovUtil());
-  if(_goBlind) _asimovHandler->setRange(SBLO+","+SBHI);
+  if(_goBlind) _asimovHandler->setRange(_rangeName);
   
   while ( node != 0 ){
     TString nodeName=node->GetNodeName();
@@ -107,6 +107,7 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   _Nch=_xmlPath.size();
   _useBinned=false;
   _plotOpt="";
+  _rangeName="";
   
   auxUtil::printTime();
   _timer.Start();
@@ -115,6 +116,7 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   cout<<"Workspace name: "<<_wsName<<endl;
   cout<<"ModelConfig name: "<<_mcName<<endl;
   cout<<"Data name: "<<_dataName<<endl;
+  if(_goBlind) cout<<"\033[91mBlind analysis\033[0m"<<endl;
   cout<<"POI: ";
   for(auto poi : _POIList) cout<<poi<<" ";
   cout<<endl;
@@ -122,7 +124,6 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   for(int ich=0;ich<_Nch;ich++) cout<<"XML file "<<ich<<": "<<_xmlPath[ich]<<endl;
   _asimovHandler->printSummary();
   cout<<"======================================="<<endl;
-  if(_goBlind) cout<<"\n\033[91m \tREGTEST: Blind analysis \033[0m\n"<<endl;
   // Start working...
   _combWS=auto_ptr<RooWorkspace>(new RooWorkspace(_wsName));
   _mConfig=auto_ptr<ModelConfig>(new ModelConfig(_mcName, _combWS.get()));
@@ -385,9 +386,18 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
       _blindMin=rangeComp[0].Atof();
       _blindMax=rangeComp[1].Atof();
       if(_blindMax<=_blindMin || _blindMax>_xMax || _blindMin<_xMin) auxUtil::alertAndAbort(Form("Invalid blinding range provided: min %f, max %f", _blindMin, _blindMax));
+
       wfactory->var(_observableName)->setRange(SBLO+"_"+channelname, _xMin, _blindMin);
       wfactory->var(_observableName)->setRange(BLIND+"_"+channelname, _blindMin, _blindMax);
       wfactory->var(_observableName)->setRange(SBHI+"_"+channelname, _blindMax, _xMax);
+
+      if(_blindMax==_xMax && _blindMin==_xMin){
+	cout<<"\n\033[91m \tREGTEST: Category "+channelname+" fully blinded. No side-band exists. \033[0m\n"<<endl;
+	_rangeName="";
+      }
+      else if(_blindMax==_xMax) _rangeName=SBLO;
+      else if(_blindMin==_xMin) _rangeName=SBHI;
+      else _rangeName=SBLO+","+SBHI;
     }
     else{
       _blindMin=_xMax;

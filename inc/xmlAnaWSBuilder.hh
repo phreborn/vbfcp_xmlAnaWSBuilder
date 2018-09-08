@@ -78,6 +78,7 @@ private:
   TString _Cut;
   bool _injectGhost;
   int _numData;
+  TString _rangeName;
   
   // Vectors and maps which will be cleared after generating model for each channel
   map<TString, vector<Systematic> > _Systematics;
