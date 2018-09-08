@@ -51,6 +51,7 @@ public:
   static vector<TString> decomposeFuncStr(TString function);
   static bool to_bool(TString str);
   static TXMLNode* findNode(TXMLNode* rootNode, TString nodeName);
+  static TXMLAttr* findAttribute(TXMLNode* rootNode, TString attributeKey);
 
   static bool checkExist(TString name);
   

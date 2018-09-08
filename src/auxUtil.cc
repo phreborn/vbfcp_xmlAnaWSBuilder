@@ -217,20 +217,15 @@ TString auxUtil::getObjName(TString objName){
 }
 
 TString auxUtil::getAttributeValue( TXMLNode* rootNode, TString attributeKey, bool allowEmpty, TString defaultStr){
-  TListIter attribIt = rootNode->GetAttributes();
-  TXMLAttr* curAttr = 0;
-  TString attributeValue = "";
-
-  while (( curAttr = dynamic_cast< TXMLAttr* >( attribIt() ) ) != 0 ){
-    if ( curAttr->GetName() == attributeKey ){
-      attributeValue = curAttr->GetValue() ;
-      break;
-    }
-  }
-  if(attributeValue==""){
+  TXMLAttr* attr = auxUtil::findAttribute(rootNode, attributeKey);
+  TString attributeValue;
+  
+  if(!attr){
     if(allowEmpty) attributeValue=defaultStr;
     else alertAndAbort("Attribute "+attributeKey+" cannot be found in node "+rootNode->GetNodeName());
   }
+  else attributeValue = attr->GetValue();
+
   removeWhiteSpace(attributeValue);
   return attributeValue;
 }
@@ -289,6 +284,16 @@ TXMLNode *auxUtil::findNode(TXMLNode* rootNode, TString nodeName){
     if(nodeName==TString(node->GetNodeName())) return node;
     node=node->GetNextNode();
   }
+  return NULL;
+}
+
+TXMLAttr *auxUtil::findAttribute(TXMLNode* rootNode, TString attributeKey){
+  TListIter attribIt = rootNode->GetAttributes();
+  TXMLAttr* curAttr = 0;
+
+  while (( curAttr = dynamic_cast< TXMLAttr* >( attribIt() ) ) != 0 )
+    if ( curAttr->GetName() == attributeKey ) return curAttr;
+
   return NULL;
 }
 
