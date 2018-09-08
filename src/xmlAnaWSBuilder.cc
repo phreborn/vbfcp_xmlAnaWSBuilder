@@ -105,6 +105,9 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   }
 
   _Nch=_xmlPath.size();
+  _useBinned=false;
+  _plotOpt="";
+  
   auxUtil::printTime();
   _timer.Start();
   cout<<"======================================="<<endl;
@@ -118,9 +121,7 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   cout<<_Nch<<" categories to be included"<<endl;
   for(int ich=0;ich<_Nch;ich++) cout<<"XML file "<<ich<<": "<<_xmlPath[ich]<<endl;
   _asimovHandler->printSummary();
-  // if(_useBinned) cout<<"\tREGTEST: Binned data will be used for fits to be performed"<<endl;
-  _useBinned=false;
-  cout<<"======================================="<<endl<<endl;
+  cout<<"======================================="<<endl;
   if(_goBlind) cout<<"\n\033[91m \tREGTEST: Blind analysis \033[0m\n"<<endl;
   // Start working...
   _combWS=auto_ptr<RooWorkspace>(new RooWorkspace(_wsName));
@@ -135,24 +136,24 @@ void xmlAnaWSBuilder::generateWS(){
   RooArgSet POI, nuisanceParameters, globalObservables, Observables, constraints;
 
   map<string,RooDataSet*> datasetMap, datasetMap_binned;
-  vector<shared_ptr<RooWorkspace> > w;
+  vector<shared_ptr<RooWorkspace> > wArr;
   
   for( int ich = 0 ; ich < _Nch; ich ++ ){
-    w.push_back(shared_ptr<RooWorkspace>(new RooWorkspace(Form("wchannel_%d", ich))));
+    wArr.push_back(shared_ptr<RooWorkspace>(new RooWorkspace(Form("wchannel_%d", ich))));
 
-    generateSingleChannel(_xmlPath[ich], w[ich].get());
+    generateSingleChannel(_xmlPath[ich], wArr[ich].get());
     
     channellist.defineType(_CN[ich]) ;
-    CombinedPdf.addPdf(*w[ich]->pdf(FINALPDFNAME+"_"+_CN[ich]),_CN[ich]) ;
+    CombinedPdf.addPdf(*wArr[ich]->pdf(FINALPDFNAME+"_"+_CN[ich]),_CN[ich]) ;
 
-    nuisanceParameters.add(*w[ich]->set("nuisanceParameters"), true);
-    globalObservables.add(*w[ich]->set("globalObservables"), true);
-    Observables.add(*w[ich]->set("Observables"));
-    POI.add(*w[ich]->set("POI"), true);
+    nuisanceParameters.add(*wArr[ich]->set("nuisanceParameters"), true);
+    globalObservables.add(*wArr[ich]->set("globalObservables"), true);
+    Observables.add(*wArr[ich]->set("Observables"));
+    POI.add(*wArr[ich]->set("POI"), true);
 
-    datasetMap[_CN[ich].Data()] = dynamic_cast<RooDataSet*>(w[ich]->data(OBSDSNAME));
-    datasetMap_binned[_CN[ich].Data()] = dynamic_cast<RooDataSet*>(w[ich]->data(OBSDSNAME+"binned"));
-    if(_debug) w[ich]->Print();
+    datasetMap[_CN[ich].Data()] = dynamic_cast<RooDataSet*>(wArr[ich]->data(OBSDSNAME));
+    datasetMap_binned[_CN[ich].Data()] = dynamic_cast<RooDataSet*>(wArr[ich]->data(OBSDSNAME+"binned"));
+    if(_debug) wArr[ich]->Print();
   }
   Observables.add(channellist);
   _combWS->import(CombinedPdf, Silence());
@@ -184,7 +185,7 @@ void xmlAnaWSBuilder::generateWS(){
     cout<<"\n\033[91m \tREGTEST: No need to keep binned dataset, as the number of data events is smaller than the number of bins in all categories. \033[0m\n"<<endl;
     _useBinned=false;
   }
-  w.clear();
+  wArr.clear();
 
   // Save the original snapshot
   // _combWS->saveSnapshot("nominalNuis",*_mConfig->GetNuisanceParameters());
@@ -342,7 +343,6 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
 
   map<TString, RooArgSet> expectedMap;
   
-  cout << "Parsing file: " << xmlName << endl;
   TDOMParser xmlparser;
   // reading in the file and parse by DOM
   auxUtil::parseXMLFile(&xmlparser, xmlName);
@@ -359,6 +359,8 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
 
   if(find(_CN.begin(), _CN.end(), channelname)==_CN.end()) _CN.push_back(channelname);
   else auxUtil::alertAndAbort("Category name "+channelname+" used in XML file"+xmlName+" is already used by other categories. Please use a different name");
+  auxUtil::printTitle("Category "+channelname);
+  
   _Type.push_back(channeltype);
   /* all the attributes of a channel */
 
@@ -496,7 +498,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   for(auto it : expectedMap) implementObj(wfactory.get(), auxUtil::generateExpr("prod::"+EXPECTATIONPREFIX+it.first+"(", &it.second));
   
   for(auto& sample : _Samples){
-    if(_debug) auxUtil::printTitle(sample.procName.Data(), 20, "<");
+    if(_debug) auxUtil::printTitle(sample.procName.Data(), "<", 20);
     
     implementObjArray(wfactory.get(), sample.shapeFactors);
 
@@ -524,7 +526,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
     
     implementObj(wfactory.get(), normStr);
     
-    cout<<"\tREGTEST: Yield for channel \""<<channelname<<"\" process \""<<sample.procName<<"\": "<<wfactory->function(sample.normName)->getVal()<<endl;
+    cout<<"\tREGTEST: Yield for category \""<<channelname<<"\" process \""<<sample.procName<<"\": "<<wfactory->function(sample.normName)->getVal()<<endl;
     if(_debug) wfactory->Print();
     getModel(wfactory.get(), &sample, channeltype, &nuispara, &constraints, &globobs);
   }
@@ -610,7 +612,6 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   wchannel->import(*obsdata);
   wchannel->import(*obsdatabinned);
   clearUp();			// Remove content in the vectors and maps
-  cout<<endl<<"---------------------------------------"<<endl<<endl;
 }
 
 void xmlAnaWSBuilder::NPMaker(RooWorkspace *w, Systematic *syst, RooArgSet *nuispara, RooArgSet *constraints, RooArgSet *globobs, RooArgSet *expected){

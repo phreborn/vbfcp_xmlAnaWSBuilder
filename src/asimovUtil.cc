@@ -23,7 +23,7 @@ void asimovUtil::generateAsimov(ModelConfig *mc, TString dataName){
   for(int iAsimov=0;iAsimov<nAsimov;iAsimov++){
     unique_ptr<RooArgSet> originalSnapshot(dynamic_cast<RooArgSet*>(everything.snapshot()));
     TString fixedVar="";
-    
+    auxUtil::printTitle("Operation "+_asimovNames[iAsimov], "+");
     _asimovSetups[iAsimov].ReplaceAll(" ","");
     // Nothing to be done...
     if(_asimovSetups[iAsimov]==""){
@@ -154,7 +154,6 @@ void asimovUtil::generateAsimov(ModelConfig *mc, TString dataName){
       else if(find(_Snapshots.begin(), _Snapshots.end(), action)!=_Snapshots.end()) w->loadSnapshot(action);
       else cerr<<"\tERROR: Unknown action: "<<action<<endl;
     }
-    cout<<endl<<"---------------------------------------"<<endl<<endl;
   }
 }
 
