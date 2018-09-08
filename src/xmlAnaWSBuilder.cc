@@ -56,6 +56,11 @@ TString xmlAnaWSBuilder::OR=":or:";
 // Observed dataset name
 TString xmlAnaWSBuilder::OBSDSNAME="obsdata";
 
+// Sideband fit range
+TString xmlAnaWSBuilder::SBLO="SBLo";
+TString xmlAnaWSBuilder::BLIND="Blind";
+TString xmlAnaWSBuilder::SBHI="SBHi";
+
 xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   cout << "Parsing file: " << inputFile << endl;
   TDOMParser xmlparser;
@@ -78,7 +83,8 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   _wsName=auxUtil::getAttributeValue(rootNode, "WorkspaceName");
   _mcName=auxUtil::getAttributeValue(rootNode, "ModelConfigName");
   _dataName=auxUtil::getAttributeValue(rootNode, "DataName");
-
+  _goBlind=auxUtil::to_bool(auxUtil::getAttributeValue(rootNode, "Blind", true, "0"));
+  
   _asimovHandler=auto_ptr<asimovUtil>(new asimovUtil());
   
   while ( node != 0 ){
@@ -114,6 +120,7 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   // if(_useBinned) cout<<"\tREGTEST: Binned data will be used for fits to be performed"<<endl;
   _useBinned=false;
   cout<<"======================================="<<endl<<endl;
+  if(_goBlind) cout<<"\n\033[91m \tREGTEST: Blind analysis \033[0m\n"<<endl;
   // Start working...
   _combWS=auto_ptr<RooWorkspace>(new RooWorkspace(_wsName));
   _mConfig=auto_ptr<ModelConfig>(new ModelConfig(_mcName, _combWS.get()));
@@ -364,7 +371,27 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   _observableName=implementObj(wfactory.get(), _observableName);
   _xMin=wfactory->var(_observableName)->getMin();
   _xMax=wfactory->var(_observableName)->getMax();
-      
+
+  if(_xMax<=_xMin) auxUtil::alertAndAbort("Invalid range for observable "+_observableName+Form(": min %f, max %f", _xMin, _xMax));
+
+  TString blindRange=auxUtil::getAttributeValue(dataNode, "BlindRange", true, "");
+  if(_goBlind){
+    if(blindRange!=""){
+      vector<TString> rangeComp=auxUtil::splitString(blindRange,',');
+      if(rangeComp.size()!=2 || !rangeComp[0].IsFloat() || !rangeComp[1].IsFloat()) auxUtil::alertAndAbort("Invalid format for blinding range: "+blindRange);
+      _blindMin=rangeComp[0].Atof();
+      _blindMax=rangeComp[1].Atof();
+      if(_blindMax<=_blindMin || _blindMax>_xMax || _blindMin<_xMin) auxUtil::alertAndAbort(Form("Invalid blinding range provided: min %f, max %f", _blindMin, _blindMax));
+      wfactory->var(_observableName)->setRange(SBLO+"_"+channelname, _xMin, _blindMin);
+      wfactory->var(_observableName)->setRange(BLIND+"_"+channelname, _blindMin, _blindMax);
+      wfactory->var(_observableName)->setRange(SBHI+"_"+channelname, _blindMax, _xMax);
+    }
+    else{
+      _blindMin=_xMax;
+      _blindMax=_xMin;
+    }
+  }
+
   int nbinx=(channeltype==COUNTING) ? 1 : atoi(auxUtil::getAttributeValue(dataNode, "Binning"));
   wfactory->var(_observableName)->setBins(nbinx);
   
@@ -957,6 +984,7 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
       x->setVal(xdata_tmp->getVal());
       double weight=1;
       w->setVal(weight);
+      if(_goBlind && x->getVal()>_blindMin && x->getVal()<_blindMax) continue;
       obsdata->add( RooArgSet(*x, *w), weight);
     }
   }

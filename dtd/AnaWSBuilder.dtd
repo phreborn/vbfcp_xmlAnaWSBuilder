@@ -4,6 +4,7 @@
           ModelConfigName    CDATA            #REQUIRED
           DataName           CDATA            #REQUIRED
           OutputFile         CDATA            #REQUIRED
+	  Blind              CDATA            #IMPLIED
 > 
 
 <!ELEMENT Input (#PCDATA) >
@@ -42,6 +43,7 @@
           Binning           CDATA            #IMPLIED
           InjectGhost       CDATA            #IMPLIED
 	  NumData           CDATA            #IMPLIED
+	  BlindRange        CDATA            #IMPLIED
 	  >
 
 <!ELEMENT Item  EMPTY>

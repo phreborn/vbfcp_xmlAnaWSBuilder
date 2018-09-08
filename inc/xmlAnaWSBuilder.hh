@@ -66,6 +66,9 @@ private:
   TString _observableName;
   double _xMin;
   double _xMax;
+  bool _goBlind;
+  double _blindMin;
+  double _blindMax;
   int _Nch;
   double _luminosity;
   TString _inputDataFileName;
@@ -142,6 +145,10 @@ private:
   static TString OR;
 
   static TString OBSDSNAME;
+
+  static TString SBLO;
+  static TString BLIND;
+  static TString SBHI;
   
   TStopwatch _timer;
 
