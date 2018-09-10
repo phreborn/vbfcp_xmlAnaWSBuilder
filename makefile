@@ -46,9 +46,12 @@ SRCS += $(DICTNAME).cc
 OBJS = $(SRCS:.cc=.o)
 PROGS = $(notdir $(wildcard ${PROG_DIR}/*.cpp)) 
 EXES = $(PROGS:.cpp=)
+DEPS = $(OBJS:.o=.d)
 
 # Classes with dicts -----------------------------------------------------------
-DICTHDRS= $(notdir $(shell grep -l ClassDef ${INC_DIR}/*hh))
+HEADERS = $(shell grep -l ClassDef ${INC_DIR}/*hh)
+DICTHDRS = $(notdir $(HEADERS))
+
 #Makefile Rules ---------------------------------------------------------------
 .PHONY: clean dirs dict obj lib exe
 
@@ -67,35 +70,39 @@ dict: dirs
 
 obj: dict 
 
-$(OBJ_DIR)/%.o : $(SRC_DIR)/%.cc $(INC_DIR)/%.hh
-	$(CC) $(CCFLAGS) -I $(INC_DIR) -c $< -o $@
+$(OBJ_DIR)/%.o : $(SRC_DIR)/%.cc
+	@echo "Compiling $@"
+	@$(CC) $(CCFLAGS) -I $(INC_DIR) -c $< -MD -o $@
 
-$(OBJ_DIR)/$(DICTNAME).o :
-	echo $(DICTHDRS)
-	rootcling -f $(DICTNAME).cc -c -p -I$(INC_DIR) -I$(ROOTINC) $(DICTHDRS) $(INC_DIR)/LinkDef.h
-	$(CC) $(CCFLAGS) -I $(INC_DIR) -c $(DICTNAME).cc -o $@
-	rm -f $(DICTNAME).cc $(DICTNAME).h
+$(SRC_DIR)/$(DICTNAME).cc : $(HEADERS) $(INC_DIR)/LinkDef.h
+	@echo "Creating $@"
+	@rootcling -f $(SRC_DIR)/$(DICTNAME).cc -c -p -s lib/$(DICTNAME) -I$(INC_DIR) -I$(ROOTINC) $(DICTHDRS) $(INC_DIR)/LinkDef.h
+
+$(OBJ_DIR)/$(DICTNAME).o : $(SRC_DIR)/$(DICTNAME).cc
+	@echo "Compiling $@"
+	@$(CC) $(CCFLAGS) -I $(INC_DIR) -c $(SRC_DIR)/$(DICTNAME).cc -MD -o $@
 #---------------------------------------
 
+-include $(addprefix $(OBJ_DIR)/,$(DEPS))
 lib: dirs ${LIB_DIR}/$(SONAME)
 ${LIB_DIR}/$(SONAME):$(addprefix $(OBJ_DIR)/,$(OBJS))
-		$(LD) $(LDFLAGS) $(addprefix $(OBJ_DIR)/,$(OBJS))  $(SOFLAGS) -o $@ $(LIBS)
+		@echo "Linking $@"
+		@$(LD) $(LDFLAGS) $(addprefix $(OBJ_DIR)/,$(OBJS)) $(SOFLAGS) -o $@ $(LIBS)
 
 #---------------------------------------
 
 exe: $(addprefix $(EXE_DIR)/,$(EXES))
-$(addprefix $(EXE_DIR)/,$(EXES)) : $(addprefix $(PROG_DIR)/,$(PROGS))
-	$(CC) $< -o $@ $(CCFLAGS) -L $(LIB_DIR) -l $(LIBNAME) -I $(INC_DIR) $(LIBS)
+$(addprefix $(EXE_DIR)/,$(EXES)) : $(addprefix $(PROG_DIR)/,$(PROGS)) ${LIB_DIR}/$(SONAME)
+	@echo "Linking $@"
+	@$(CC) $< -o $@ $(CCFLAGS) -L $(LIB_DIR) -l $(LIBNAME) -I $(INC_DIR) $(LIBS)
 
 
 #---------------------------------------
 
 clean:
-	@rm -rf $(DICTNAME).cc
-	@rm -rf $(DICTNAME).hh
+	@rm -rf $(SRC_DIR)/$(DICTNAME).cc
 	@rm -rf $(OBJ_DIR) 
 	@rm -rf $(EXE_DIR)
 	@rm -rf $(LIB_DIR)
-	@rm -rf $(DICTNAME)_rdict.pcm
 
 #---------------------------------------
