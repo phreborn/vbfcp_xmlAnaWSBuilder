@@ -34,6 +34,7 @@ public:
   void printSummary();
   bool genAsimov(){return _asimovNames.size()>0;}
   void setRange(TString rangeName){_rangeName=rangeName;}
+  void matchGlob(ModelConfig *mc);
   ClassDef(asimovUtil,2);
 };
 
