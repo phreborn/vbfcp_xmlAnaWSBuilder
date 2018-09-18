@@ -17,6 +17,7 @@ private:
   vector<TString> _asimovNames, _asimovSetups, _asimovProfiles;
   vector<TString> _SnapshotsAll, _SnapshotsNuis, _SnapshotsGlob, _SnapshotsPOI, _Snapshots;
   vector<TString> _injectionFiles;
+  TString _rangeName;
   // action items
   static TString RAW;
   static TString FIT;
@@ -27,11 +28,13 @@ private:
   static TString MATCHGLOB;
   static TString SAVESNAPSHOT;
 public:
-  asimovUtil(){}
+  asimovUtil(){_rangeName="";}
   void addEntry(TXMLNode *node);
   void generateAsimov(ModelConfig *mc, TString dataName);
   void printSummary();
   bool genAsimov(){return _asimovNames.size()>0;}
+  void setRange(TString rangeName){_rangeName=rangeName;}
+  void matchGlob(ModelConfig *mc);
   ClassDef(asimovUtil,2);
 };
 

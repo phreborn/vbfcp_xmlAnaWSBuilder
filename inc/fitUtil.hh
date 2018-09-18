@@ -20,7 +20,7 @@ public:
   static bool _nllOffset;
   static int _printLevel;
 
-  static int profileToData(ModelConfig *mc, RooAbsData *data);
+  static int profileToData(ModelConfig *mc, RooAbsData *data, TString rangeName="");
   ClassDef(fitUtil,1);
 };
 

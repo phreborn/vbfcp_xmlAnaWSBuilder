@@ -10,7 +10,7 @@
 
 #include "FlexibleInterpVarMkII.hh"
 // Additional custom classes
-#include "HggTwoSidedCBPdf.hh"
+#include "RooTwoSidedCBShape.hh"
 #include "HggMG5aMCNLOLineShapePdf.hh"
 
 using namespace std;
@@ -18,21 +18,23 @@ using namespace RooFit;
 using namespace RooStats;
 
 struct Sample{
-  TString procName;
-  vector<TString> procType;		// systematics to be imported
-  double yield;
-  TString inputFile;		// For parametrization input if needed
-  TString normFactors;	// Collection of scale factors for normalization
-  TString correlatedNFs;	// Collection of scale factors to not be renamed
-  TString shapeFactors;	// Collection of scale factors for shape
-  RooArgSet expected;		// Collection of response terms and scale factors to be timed to the signal yield
+  TString procName;	        // Name of the process 
+  TString inputFile;		// Input XML file for constructing pdf (if needed)
+  vector<TString> normFactors;	// Collection of scale factors for normalization
+  vector<TString> shapeFactors;	// Collection of scale factors for shape
+  vector<TString> systGroups;	// List of systematic groups to be imported
+  RooArgSet expected;		// Collection of response terms and scale factors to be multiplied to the yield
   TString modelName;		// Name of pdf model for the process
-  TString normName;		// Name of the final normalization
-  TString sharePdfGroup;
+  TString normName;		// Name of normalization function for the process
+  TString sharePdfGroup;	// Whether this process share a PDF with other processes
+
+  friend bool operator==(const Sample& x, const Sample& y){return x.procName==y.procName;} // Process name is the only identity for a sample. Duplicating it is not allowed.
+  friend bool operator==(const Sample& x, const TString& y){return x.procName==y;}
 };
 
 struct Systematic{
   TString NPName;
+  TString domain;
   TString process;
   TString whereTo;
   TString constrTerm;
@@ -42,10 +44,9 @@ struct Systematic{
 
   TString errLoExpr;
   TString errHiExpr;
-};
 
-typedef std::map<TString, Sample>::iterator it_sample;
-typedef std::map<TString, vector<Systematic> >::iterator it_syst;
+  friend bool operator==(const Systematic& x, const Systematic& y){return (x.NPName==y.NPName&&x.process==y.process&&x.whereTo==y.whereTo);} // NP name, NP group (process) and NP destination identify a systematic. Duplicating it is not allowed.
+};
 
 class xmlAnaWSBuilder : public TObject{
 private:
@@ -65,26 +66,32 @@ private:
   TString _observableName;
   double _xMin;
   double _xMax;
+  bool _goBlind;
+  double _blindMin;
+  double _blindMax;
   int _Nch;
   double _luminosity;
   TString _inputDataFileName;
   TString _inputDataFileType;
   TString _inputDataTreeName;
   TString _inputDataVarName;
+  TString _Cut;
   bool _injectGhost;
+  int _numData;
+  TString _rangeName;
   
   // Vectors and maps which will be cleared after generating model for each channel
   map<TString, vector<Systematic> > _Systematics;
-  map<TString, Sample> _Samples;
+  vector<Sample> _Samples;
   vector<TString> _ItemsLowPriority;  
   vector<TString> _ItemsHighPriority;  
-
+  vector<TString> _ItemsCorrelate;
+  
   // Vectors and variables which will NOT be cleared after generating model for each channel
   vector<TString> _xmlPath;
   vector<TString> _CN;
   vector<TString> _Type;
   vector<TString> _POIList;
-  vector<TString> _ItemsCorrelate;
 
   // Flags
   bool _useBinned;
@@ -123,35 +130,54 @@ private:
   static TString SUMPDFNAME;
   static TString FINALPDFNAME;
 
+  static TString LUMINAME;
+  static TString XSNAME;
+  static TString BRNAME;
+  static TString NORMNAME;
+  static TString ACCEPTANCENAME;
+  static TString EFFICIENCYNAME;
+  static TString CORRECTIONNAME;
+  
   static TString LT;
   static TString LE;
   static TString GT;
   static TString GE;
+  static TString AND;
+  static TString OR;
+
+  static TString OBSDSNAME;
+
+  static TString SBLO;
+  static TString BLIND;
+  static TString SBHI;
   
   TStopwatch _timer;
 
-  int CN2IDX(TString channelname);
   void NPMaker(RooWorkspace *w, Systematic *syst, RooArgSet *nuispara, RooArgSet *constraints , RooArgSet *globobs, RooArgSet *expected);
   void generateSingleChannel(TString xmlName, RooWorkspace *wchannel);
   void readSyst(TXMLNode* systNode, TString process="allproc");
   void readSample(TXMLNode* sampleNode);
-  void readSampleChildren(TXMLNode* subNode, Sample& sample);
+  void readSampleXMLNode(TXMLNode* node, Sample& sample);
   void getModel(RooWorkspace *w, Sample *sample, TString channeltype="shape", RooArgSet *nuispara=NULL, RooArgSet *constraints=NULL, RooArgSet *globobs=NULL);
   void checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara);
-  void clearUp(){_Systematics.clear();_ItemsLowPriority.clear(); _ItemsHighPriority.clear(); _Samples.clear();}
+  void clearUp(){_Systematics.clear();_ItemsLowPriority.clear(); _ItemsHighPriority.clear(); _ItemsCorrelate.clear(); _Samples.clear();}
   void attachConstraints(RooWorkspace *w, TString sumPdfStr, RooArgSet *constraints, TString finalModelName);
   TString getItemExpr(TXMLNode *node, TString attrName, TString process="");
   RooDataSet* readInData(RooRealVar *x, RooRealVar *w);
   TString implementObj(RooWorkspace *w, TString expr, bool checkExistBeforeImp=false);
-  void implementObjArray(RooWorkspace *w, vector<TString> objArr);
+  TString implementObjArray(RooWorkspace *w, vector<TString> objArr);
   TString implementUncertExpr(RooWorkspace *w, TString expr, TString varName, int uncertType);
-  
+  void readChannelXMLNode(TXMLNode *node);
 public:
   xmlAnaWSBuilder(TString inputFile);
   void generateWS();
   void setDebug(bool flag){_debug=flag;};
   void setUseBinned(bool flag){_useBinned=flag;};
   void setPlotOption(TString option){_plotOpt=option;};
+  void dataFileSanityCheck();
+  void translateKeyword(TString &expr);
+
+  void Summary(TString outputFigName);
   ClassDef(xmlAnaWSBuilder,3);
 };
 

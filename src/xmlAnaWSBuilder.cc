@@ -36,11 +36,30 @@ TString xmlAnaWSBuilder::EXPECTATIONPREFIX="expectation__";
 TString xmlAnaWSBuilder::SUMPDFNAME="_modelSB";
 TString xmlAnaWSBuilder::FINALPDFNAME="_model";
 
+// Factor names
+TString xmlAnaWSBuilder::LUMINAME="_luminosity";
+TString xmlAnaWSBuilder::XSNAME="_xs";
+TString xmlAnaWSBuilder::BRNAME="_BR";
+TString xmlAnaWSBuilder::NORMNAME="_norm";
+TString xmlAnaWSBuilder::ACCEPTANCENAME="_A";
+TString xmlAnaWSBuilder::CORRECTIONNAME="_C";
+TString xmlAnaWSBuilder::EFFICIENCYNAME="_eff";
+
 // C++ logics not displayable in XML format
 TString xmlAnaWSBuilder::LT=":lt:";
 TString xmlAnaWSBuilder::LE=":le:";
 TString xmlAnaWSBuilder::GT=":gt:";
 TString xmlAnaWSBuilder::GE=":ge:";
+TString xmlAnaWSBuilder::AND=":and:";
+TString xmlAnaWSBuilder::OR=":or:";
+
+// Observed dataset name
+TString xmlAnaWSBuilder::OBSDSNAME="obsdata";
+
+// Sideband fit range
+TString xmlAnaWSBuilder::SBLO="SBLo";
+TString xmlAnaWSBuilder::BLIND="Blind";
+TString xmlAnaWSBuilder::SBHI="SBHi";
 
 xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   cout << "Parsing file: " << inputFile << endl;
@@ -64,8 +83,10 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   _wsName=auxUtil::getAttributeValue(rootNode, "WorkspaceName");
   _mcName=auxUtil::getAttributeValue(rootNode, "ModelConfigName");
   _dataName=auxUtil::getAttributeValue(rootNode, "DataName");
-
+  _goBlind=auxUtil::to_bool(auxUtil::getAttributeValue(rootNode, "Blind", true, "0"));
+  
   _asimovHandler=auto_ptr<asimovUtil>(new asimovUtil());
+  if(_goBlind) _asimovHandler->setRange(_rangeName);
   
   while ( node != 0 ){
     TString nodeName=node->GetNodeName();
@@ -74,11 +95,6 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
       auxUtil::removeWhiteSpace(poiStr);
       _POIList=auxUtil::splitString(poiStr.Data(),',');
     } 
-    if(nodeName=="Correlate"){
-      TString itemStr=node->GetText();
-      auxUtil::removeWhiteSpace(itemStr);
-      _ItemsCorrelate=auxUtil::splitString(itemStr.Data(),',');
-    }
     if(nodeName=="Input"){
       _xmlPath.push_back(node->GetText());
     } 
@@ -89,6 +105,10 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   }
 
   _Nch=_xmlPath.size();
+  _useBinned=false;
+  _plotOpt="";
+  _rangeName="";
+  
   auxUtil::printTime();
   _timer.Start();
   cout<<"======================================="<<endl;
@@ -96,13 +116,13 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   cout<<"Workspace name: "<<_wsName<<endl;
   cout<<"ModelConfig name: "<<_mcName<<endl;
   cout<<"Data name: "<<_dataName<<endl;
+  if(_goBlind) cout<<"\033[91mBlind analysis\033[0m"<<endl;
   cout<<"POI: ";
-  for(vector<TString>::iterator poi = _POIList.begin(); poi != _POIList.end(); ++poi) cout<<*poi<<" ";
+  for(auto poi : _POIList) cout<<poi<<" ";
   cout<<endl;
   cout<<_Nch<<" categories to be included"<<endl;
   for(int ich=0;ich<_Nch;ich++) cout<<"XML file "<<ich<<": "<<_xmlPath[ich]<<endl;
   _asimovHandler->printSummary();
-  // if(_useBinned) cout<<"Binned data will be used for profiling models"<<endl;
   cout<<"======================================="<<endl;
   // Start working...
   _combWS=auto_ptr<RooWorkspace>(new RooWorkspace(_wsName));
@@ -117,24 +137,24 @@ void xmlAnaWSBuilder::generateWS(){
   RooArgSet POI, nuisanceParameters, globalObservables, Observables, constraints;
 
   map<string,RooDataSet*> datasetMap, datasetMap_binned;
-  vector<shared_ptr<RooWorkspace> > w;
+  vector<shared_ptr<RooWorkspace> > wArr;
   
   for( int ich = 0 ; ich < _Nch; ich ++ ){
-    w.push_back(shared_ptr<RooWorkspace>(new RooWorkspace(Form("wchannel_%d", ich))));
+    wArr.push_back(shared_ptr<RooWorkspace>(new RooWorkspace(Form("wchannel_%d", ich))));
 
-    generateSingleChannel(_xmlPath[ich], w[ich].get());
+    generateSingleChannel(_xmlPath[ich], wArr[ich].get());
     
     channellist.defineType(_CN[ich]) ;
-    CombinedPdf.addPdf(*w[ich]->pdf(FINALPDFNAME+"_"+_CN[ich]),_CN[ich]) ;
+    CombinedPdf.addPdf(*wArr[ich]->pdf(FINALPDFNAME+"_"+_CN[ich]),_CN[ich]) ;
 
-    nuisanceParameters.add( *w[ich]->set("nuisanceParameters"));
-    globalObservables.add(*w[ich]->set("globalObservables"));
-    Observables.add(*w[ich]->set("Observables"));
-    POI.add( *w[ich]->set("POI"));
+    nuisanceParameters.add(*wArr[ich]->set("nuisanceParameters"), true);
+    globalObservables.add(*wArr[ich]->set("globalObservables"), true);
+    Observables.add(*wArr[ich]->set("Observables"));
+    POI.add(*wArr[ich]->set("POI"), true);
 
-    datasetMap[_CN[ich].Data()] = dynamic_cast<RooDataSet*>(w[ich]->data("obsdata"));
-    datasetMap_binned[_CN[ich].Data()] = dynamic_cast<RooDataSet*>(w[ich]->data("obsdatabinned"));
-    if(_debug) w[ich]->Print();
+    datasetMap[_CN[ich].Data()] = dynamic_cast<RooDataSet*>(wArr[ich]->data(OBSDSNAME));
+    datasetMap_binned[_CN[ich].Data()] = dynamic_cast<RooDataSet*>(wArr[ich]->data(OBSDSNAME+"binned"));
+    if(_debug) wArr[ich]->Print();
   }
   Observables.add(channellist);
   _combWS->import(CombinedPdf, Silence());
@@ -157,16 +177,22 @@ void xmlAnaWSBuilder::generateWS(){
   args.add(Observables);
   args.add(wt);
 
-  RooDataSet obsData(_dataName,"Combined data ", args, Index(channellist), Import(datasetMap) ,WeightVar(wt));
-  RooDataSet obsDatabinned(_dataName+"binned","Binned combined data ", args, Index(channellist), Import(datasetMap_binned) ,WeightVar(wt));
+  RooDataSet obsData(_dataName, "Combined data", args, Index(channellist), Import(datasetMap), WeightVar(wt));
+  RooDataSet obsDatabinned(_dataName+"binned", "Binned combined data", args, Index(channellist), Import(datasetMap_binned), WeightVar(wt));
   
   _combWS->import(obsData);
-  _combWS->import(obsDatabinned);
-  w.clear();
+  if(obsDatabinned.numEntries()<obsData.numEntries()) _combWS->import(obsDatabinned);
+  else{
+    cout<<"\n\033[91m \tREGTEST: No need to keep binned dataset, as the number of data events is smaller than the number of bins in all categories. \033[0m\n"<<endl;
+    _useBinned=false;
+  }
+  wArr.clear();
 
   // Save the original snapshot
   // _combWS->saveSnapshot("nominalNuis",*_mConfig->GetNuisanceParameters());
   // _combWS->saveSnapshot("nominalGlobs",*_mConfig->GetGlobalObservables());
+  if(_useBinned) cout<<"\033[91m \tREGTEST: Fitting binned dataset. \033[0m\n"<<endl;
+  
   if(_asimovHandler->genAsimov()) _asimovHandler->generateAsimov(_mConfig.get(), _useBinned?_dataName+"binned":_dataName);
   _combWS->importClassCode();
   _combWS->writeToFile(_outputFileName);
@@ -175,7 +201,7 @@ void xmlAnaWSBuilder::generateWS(){
   outputFigName.ReplaceAll(".root",".pdf");
   
   cout<<"========================================================================"<<endl;
-  auxUtil::Summary(_mConfig.get(),_dataName, outputFigName, _plotOpt);
+  Summary(outputFigName);
   cout<<"Workspace "<<_wsName<<" has be successfully generated and saved in file "<<_outputFileName<<endl;
   cout<<"Plots for each category are summarized in "<<outputFigName<<endl;
   auxUtil::printTime();
@@ -184,16 +210,25 @@ void xmlAnaWSBuilder::generateWS(){
   cout<<"========================================================================"<<endl;
 }
 
-void xmlAnaWSBuilder::readSyst(TXMLNode* systNode, TString process){
+void xmlAnaWSBuilder::readSyst(TXMLNode* systNode, TString domain){
   Systematic syst;
   syst.NPName=auxUtil::getAttributeValue(systNode, "Name");
-  if(process==ALLPROC) syst.process=auxUtil::getAttributeValue(systNode, "Process", true, process); // If the process of the systematic is specified, use the specified process. Otherwise use the default one
-  else syst.process=process;
+  syst.process=auxUtil::getAttributeValue(systNode, "Process", true, ""); // If the process of the systematic is specified, use the specified process. Otherwise use the default one
+  if(domain==ALLPROC){		// Common systematics
+    if(syst.process!="") syst.domain=syst.process; // If a process name is specified, use it as domain name and remove it from common systematic
+    else syst.domain=domain;			   // Otherwise consider it as common systematic
+  }
+  else{
+    syst.domain=domain;		// For systematics under a sample, the domain is always the sample name
+    if(syst.process=="") syst.process=domain;
+    else syst.process=domain+"_"+syst.process; // If the systematic has a process, attach it to domain name as process name
+  }
+  
   syst.whereTo=auxUtil::getAttributeValue(systNode, "WhereTo");
   syst.nominal=atof(auxUtil::getAttributeValue(systNode, "CentralValue"));
   syst.constrTerm=auxUtil::getAttributeValue(systNode, "Constr");
   if(syst.nominal<=0&&(syst.constrTerm==LOGNORMAL||syst.constrTerm==ASYMMETRIC))
-    auxUtil::alertAndAbort("For constraint term type "+syst.constrTerm+Form(" non-positive central value (%f) is not acceptable.", syst.nominal));
+    auxUtil::alertAndAbort("For constraint term type "+syst.constrTerm+Form(" non-positive central value (%f) is not acceptable", syst.nominal));
   TString uncert=auxUtil::getAttributeValue(systNode, "Mag");
   
   auxUtil::removeWhiteSpace(uncert);
@@ -223,57 +258,73 @@ void xmlAnaWSBuilder::readSyst(TXMLNode* systNode, TString process){
     syst.errHiExpr=syst.errLoExpr=uncert;
   }
 
-  _Systematics[syst.process].push_back(syst);
+  if(find(_Systematics[syst.domain].begin(), _Systematics[syst.domain].end(), syst)==_Systematics[syst.domain].end()) _Systematics[syst.domain].push_back(syst);
+  else auxUtil::alertAndAbort("Systematic "+syst.NPName+" applied on "+syst.whereTo+" is duplicated for process "+syst.process);
 }
 
 void xmlAnaWSBuilder::readSample(TXMLNode* sampleNode){
   Sample sample;
   sample.procName=auxUtil::getAttributeValue(sampleNode, "Name");
   // sample.yield=atof(auxUtil::getAttributeValue(sampleNode, "Norm"));
-  sample.inputFile=auxUtil::getAttributeValue(sampleNode, "InputFile");
+  sample.inputFile=auxUtil::getAttributeValue(sampleNode, "InputFile", (_Type.back()==COUNTING), "");
 
-  TString importSystList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, COMMON);
-  auxUtil::removeWhiteSpace(importSystList);
-  sample.procType=auxUtil::splitString(importSystList.Data(),',');
-  sort( sample.procType.begin(), sample.procType.end() );
-  sample.procType.erase( unique( sample.procType.begin(), sample.procType.end() ), sample.procType.end() );
-  sample.procType.erase( remove( sample.procType.begin(), sample.procType.end(), sample.procName ), sample.procType.end() ); 
+  // TString importSystGroupList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, COMMON);
+  TString importSystGroupList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, SELF);
+  auxUtil::removeWhiteSpace(importSystGroupList);
+  sample.systGroups=auxUtil::splitString(importSystGroupList.Data(),',');
+  sort( sample.systGroups.begin(), sample.systGroups.end() );
+  sample.systGroups.erase( unique( sample.systGroups.begin(), sample.systGroups.end() ), sample.systGroups.end() );
+  sample.systGroups.erase( remove( sample.systGroups.begin(), sample.systGroups.end(), sample.procName ), sample.systGroups.end() ); 
   
-  double norm=atof(auxUtil::getAttributeValue(sampleNode, "Norm", true, "1")); // default value 1
-  double xsection=atof(auxUtil::getAttributeValue(sampleNode, "XSection")); // mandatory
-  double selectionEff=atof(auxUtil::getAttributeValue(sampleNode, "SelectionEff")); // mandatory
+  TString norm=auxUtil::getAttributeValue(sampleNode, "Norm", true, ""); // default value 1
+  TString xsection=auxUtil::getAttributeValue(sampleNode, "XSection", true, ""); // default value 1
+  TString br=auxUtil::getAttributeValue(sampleNode, "BR", true, ""); // default value 1
+  TString selectionEff=auxUtil::getAttributeValue(sampleNode, "SelectionEff", true, ""); // default value 1
+  TString acceptance=auxUtil::getAttributeValue(sampleNode, "Acceptance", true, ""); // default value 1
+  TString correction=auxUtil::getAttributeValue(sampleNode, "Correction", true, ""); // default value 1
   
-  bool isMultiplyLumi=atoi(auxUtil::getAttributeValue(sampleNode, "MultiplyLumi", true, "1")); // default value true
-  sample.yield=norm*(isMultiplyLumi?_luminosity:1)*xsection*selectionEff;
+  bool isMultiplyLumi=(_luminosity>0) ? auxUtil::to_bool(auxUtil::getAttributeValue(sampleNode, "MultiplyLumi", true, "1")) : false; // default value true. If luminosity not provided it will always be false
+
+  // Assamble the yield central value
+  if(isMultiplyLumi) sample.normFactors.push_back(LUMINAME);
+  if(norm!="") sample.normFactors.push_back(NORMNAME+"_"+sample.procName+"["+norm+"]");
+  if(xsection!="") sample.normFactors.push_back(XSNAME+"_"+sample.procName+"["+xsection+"]");
+  if(br!="") sample.normFactors.push_back(BRNAME+"_"+sample.procName+"["+br+"]");
+  if(selectionEff!="") sample.normFactors.push_back(EFFICIENCYNAME+"_"+sample.procName+"["+selectionEff+"]");
+  if(acceptance!="") sample.normFactors.push_back(ACCEPTANCENAME+"_"+sample.procName+"["+acceptance+"]");
+  if(correction!="") sample.normFactors.push_back(ACCEPTANCENAME+"_"+sample.procName+"["+correction+"]");
 
   sample.sharePdfGroup=auxUtil::getAttributeValue(sampleNode, "SharePdf", true, ""); // default value false
   
   TXMLNode* subNode = sampleNode->GetChildren();
   if(_debug) cout<<"\tREGTEST: Reading sample "<<sample.procName<<endl;
-  readSampleChildren( subNode, sample ); // read xml file
-  if(_debug) cout<<"\tREGTEST: Process: "<<sample.procName<<", norm factors: "<<sample.normFactors<<endl;
-  _Samples[sample.procName]=sample;
+  readSampleXMLNode( subNode, sample ); // read xml file
+
+  if(find(_Samples.begin(), _Samples.end(), sample)==_Samples.end()) _Samples.push_back(sample);
+  else auxUtil::alertAndAbort("Sample "+sample.procName+" has been included more than once");
   return;
 }
 
-void xmlAnaWSBuilder::readSampleChildren(TXMLNode* subNode, Sample& sample){
-  while ( subNode != 0 ){
-    if ( subNode->GetNodeName() == TString( "Systematic" ) ){
-      if(_debug) cout<<"\tREGTEST: Reading systematic: "<<auxUtil::getAttributeValue(subNode, "Name")<<endl;
-      readSyst(subNode, sample.procName);
+void xmlAnaWSBuilder::readSampleXMLNode(TXMLNode* node, Sample& sample){
+  while ( node != 0 ){
+    if ( node->GetNodeName() == TString( "Systematic" ) ){
+      if(_debug) cout<<"\tREGTEST: Reading systematic: "<<auxUtil::getAttributeValue(node, "Name")<<endl;
+      readSyst(node, sample.procName);
     }
-    else if ( subNode->GetNodeName() == TString( "NormFactor" ) ){
-      TString normFactor=getItemExpr(subNode, "Name", sample.procName);
-      sample.normFactors+=normFactor+";";
-      bool keepCorr=atoi(auxUtil::getAttributeValue(subNode, "Correlate", true, "0")); // default value false
-      if (keepCorr) sample.correlatedNFs+=normFactor+";";
+    else if ( node->GetNodeName() == TString( "NormFactor" ) ){
+      TString normFactor=getItemExpr(node, "Name", sample.procName);
+      sample.normFactors.push_back(normFactor);
+      bool isCorrelated=auxUtil::to_bool(auxUtil::getAttributeValue(node, "Correlate", true, "0"));
+      if(isCorrelated) _ItemsCorrelate.push_back(auxUtil::getObjName(normFactor));
     }
-    else if ( subNode->GetNodeName() == TString( "ShapeFactor" ) ){
-      TString shapeFactor=getItemExpr(subNode, "Name", sample.procName);
-      sample.shapeFactors+=shapeFactor+";";
+    else if ( node->GetNodeName() == TString( "ShapeFactor" ) ){
+      TString shapeFactor=getItemExpr(node, "Name", sample.procName);
+      sample.shapeFactors.push_back(shapeFactor);
+      bool isCorrelated=auxUtil::to_bool(auxUtil::getAttributeValue(node, "Correlate", true, "0"));
+      if(isCorrelated) _ItemsCorrelate.push_back(auxUtil::getObjName(shapeFactor));
     }
-    else if ( subNode->GetNodeName() == TString( "ImportItems" ) ){
-      TString inputFileName=getItemExpr(subNode, "FileName", sample.procName);
+    else if ( node->GetNodeName() == TString( "ImportItems" ) ){
+      TString inputFileName=auxUtil::getAttributeValue(node, "FileName");
       TDOMParser xmlparser;
       auxUtil::parseXMLFile(&xmlparser, inputFileName);
       cout<<"\tREGTEST: Importing Items for "<< sample.procName << " from " << inputFileName << endl;
@@ -281,9 +332,9 @@ void xmlAnaWSBuilder::readSampleChildren(TXMLNode* subNode, Sample& sample){
       TXMLDocument* xmldoc=xmlparser.GetXMLDocument();
       TXMLNode* rootNode=xmldoc->GetRootNode();
       TXMLNode* importNode=rootNode->GetChildren();
-      readSampleChildren( importNode, sample );
+      readSampleXMLNode( importNode, sample );
     }
-    subNode=subNode->GetNextNode();
+    node=node->GetNextNode();
   }
 }
 
@@ -293,68 +344,93 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
 
   map<TString, RooArgSet> expectedMap;
   
-  cout << "Parsing file: " << xmlName << endl;
   TDOMParser xmlparser;
   // reading in the file and parse by DOM
   auxUtil::parseXMLFile(&xmlparser, xmlName);
 
   TXMLDocument* xmldoc=xmlparser.GetXMLDocument();
   TXMLNode* rootNode = xmldoc->GetRootNode();
-  TXMLNode* node = rootNode->GetChildren();
 
   // Get the category name and property from
   TString channelname=auxUtil::getAttributeValue(rootNode, "Name");
   TString channeltype=auxUtil::getAttributeValue(rootNode, "Type");
-  _luminosity=atof(auxUtil::getAttributeValue(rootNode, "Lumi"));
+  _luminosity=atof(auxUtil::getAttributeValue(rootNode, "Lumi", true, "-1"));
   
   channeltype.ToLower();
 
-  _CN.push_back(channelname);
+  if(find(_CN.begin(), _CN.end(), channelname)==_CN.end()) _CN.push_back(channelname);
+  else auxUtil::alertAndAbort("Category name "+channelname+" used in XML file"+xmlName+" is already used by other categories. Please use a different name");
+  auxUtil::printTitle("Category "+channelname);
+  
   _Type.push_back(channeltype);
   /* all the attributes of a channel */
 
   unique_ptr<RooWorkspace> wfactory(new RooWorkspace("factory_"+channelname));
+  if(_luminosity>0) implementObj(wfactory.get(), LUMINAME+Form("[%f]", _luminosity)); // First thing: create a luminosity variable
+
+  TXMLNode *dataNode=auxUtil::findNode(rootNode, "Data"); // This attribute is only allowed to appear once per-channel, and cannot be hided in a sub-XML file
+  if (!dataNode) auxUtil::alertAndAbort("No data node found in channel XML file "+xmlName);
   
-  /* walk through the key node */
+  _observableName=auxUtil::getAttributeValue(dataNode, "Observable");
+  _observableName=implementObj(wfactory.get(), _observableName);
+  _xMin=wfactory->var(_observableName)->getMin();
+  _xMax=wfactory->var(_observableName)->getMax();
 
-  while ( node != 0 ){
-    // Common systematics: which apply to all processes in this channel unless specified
-    if ( node->GetNodeName() == TString( "Data" ) ){
-      _observableName=auxUtil::getAttributeValue(node, "Observable");
-      _observableName=implementObj(wfactory.get(), _observableName);
-      _xMin=wfactory->var(_observableName)->getMin();
-      _xMax=wfactory->var(_observableName)->getMax();
-      
-      int nbinx=atoi(auxUtil::getAttributeValue(node, "Binning"));
-      wfactory->var(_observableName)->setBins(nbinx);
-      _inputDataFileName=auxUtil::getAttributeValue(node, "InputFile");
-      _inputDataFileType=auxUtil::getAttributeValue(node, "FileType", true, ASCII);
-      _inputDataFileType.ToLower();
-      if(_inputDataFileType!=ASCII){	// means that we are reading data from a tree
-      	_inputDataTreeName=auxUtil::getAttributeValue(node, "TreeName");
-      	_inputDataVarName=auxUtil::getAttributeValue(node, "VarName");
+  if(_xMax<=_xMin) auxUtil::alertAndAbort("Invalid range for observable "+_observableName+Form(": min %f, max %f", _xMin, _xMax));
+
+  TString blindRange=auxUtil::getAttributeValue(dataNode, "BlindRange", true, "");
+  if(_goBlind){
+    if(blindRange!=""){
+      vector<TString> rangeComp=auxUtil::splitString(blindRange,',');
+      if(rangeComp.size()!=2 || !rangeComp[0].IsFloat() || !rangeComp[1].IsFloat()) auxUtil::alertAndAbort("Invalid format for blinding range: "+blindRange);
+      _blindMin=rangeComp[0].Atof();
+      _blindMax=rangeComp[1].Atof();
+      if(_blindMax<=_blindMin || _blindMax>_xMax || _blindMin<_xMin) auxUtil::alertAndAbort(Form("Invalid blinding range provided: min %f, max %f", _blindMin, _blindMax));
+
+      wfactory->var(_observableName)->setRange(SBLO+"_"+channelname, _xMin, _blindMin);
+      wfactory->var(_observableName)->setRange(BLIND+"_"+channelname, _blindMin, _blindMax);
+      wfactory->var(_observableName)->setRange(SBHI+"_"+channelname, _blindMax, _xMax);
+
+      if(_blindMax==_xMax && _blindMin==_xMin){
+	cout<<"\n\033[91m \tREGTEST: Category "+channelname+" fully blinded. No side-band exists. \033[0m\n"<<endl;
+	_rangeName="";
       }
-      _injectGhost=atoi(auxUtil::getAttributeValue(node, "InjectGhost"));
+      else if(_blindMax==_xMax) _rangeName=SBLO;
+      else if(_blindMin==_xMin) _rangeName=SBHI;
+      else _rangeName=SBLO+","+SBHI;
     }
-    
-    if ( node->GetNodeName() == TString( "Systematic" ) ){
-      readSyst(node, ALLPROC);
+    else{
+      _blindMin=_xMax;
+      _blindMax=_xMin;
     }
-
-    if ( node->GetNodeName() == TString( "Item" ) ){
-      // Cannot provide a specifc process here. user has to define by him/her/itself.
-      TString item=getItemExpr(node, "Name");
-      bool keepCorr=atoi(auxUtil::getAttributeValue(node, "Correlate", true, "0")); // default value false
-      if (keepCorr) _ItemsCorrelate.push_back(item);
-      if(item.Contains(RESPONSEPREFIX)) _ItemsLowPriority.push_back(item);
-      else _ItemsHighPriority.push_back(item);
-    }
-
-    if ( node->GetNodeName() == TString( "Sample" ) ){
-      readSample(node);
-    }
-    node = node->GetNextNode();
   }
+
+  int nbinx=(channeltype==COUNTING) ? 1 : atoi(auxUtil::getAttributeValue(dataNode, "Binning"));
+  wfactory->var(_observableName)->setBins(nbinx);
+  
+  _inputDataFileName=auxUtil::getAttributeValue(dataNode, "InputFile", (channeltype==COUNTING), "");
+  _inputDataFileType=auxUtil::getAttributeValue(dataNode, "FileType", true, ASCII);
+  _inputDataFileType.ToLower();
+  if(_inputDataFileType!=ASCII){	// means that we are reading data from a tree
+    _inputDataTreeName=auxUtil::getAttributeValue(dataNode, "TreeName");
+    _inputDataVarName=auxUtil::getAttributeValue(dataNode, "VarName");
+    _Cut=auxUtil::getAttributeValue(dataNode, "Cut", true, "");
+    translateKeyword(_Cut);
+  }
+  _injectGhost=auxUtil::to_bool(auxUtil::getAttributeValue(dataNode, "InjectGhost", true, "0")); // Default false
+
+  _numData=(channeltype==COUNTING && _inputDataFileName=="") ? atoi(auxUtil::getAttributeValue(dataNode, "NumData")) : -1; // Only needed for counting experiment where the input data file is not specified
+  
+  dataFileSanityCheck();	// Check now and report, before it is too late
+  
+  TXMLNode *correlateNode=auxUtil::findNode(rootNode, "Correlate"); // This attribute is only allowed to appear at most once per-channel, and cannot be hided in a sub-XML file
+  if(correlateNode){	// If you would like to put some parameters which are not POI correlated
+    TString itemStr=correlateNode->GetText();
+    auxUtil::removeWhiteSpace(itemStr);
+    _ItemsCorrelate=auxUtil::splitString(itemStr.Data(),',');
+  }
+
+  readChannelXMLNode(rootNode->GetChildren());
 
   // Bug reported by Jared and Leo: if a high priority item contains a low priority item as proxy, the creation will fail. Therefore we need to go through the proxies used in high-priority items and move those which contain low-priority proxies to low-priority
   for(vector<TString>::iterator it=_ItemsHighPriority.begin(); it!=_ItemsHighPriority.end();){
@@ -397,15 +473,18 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   implementObjArray(wfactory.get(), _ItemsHighPriority);
 
   // Secondly implement systematics and import them into the workspace
-  for(it_syst it=_Systematics.begin(); it!=_Systematics.end(); it++){
-    TString process=it->first;
-    vector<Systematic> systArr=it->second;
+  for(auto syst : _Systematics){
+    TString domain=syst.first;
+    vector<Systematic> systArr=syst.second;
     RooArgSet *respCollection=NULL, *respCollectionYield=NULL;
     
-    if(process==ALLPROC) respCollectionYield=&expected;      // Systematics to be applied to all resonant processes
-    else if(_Samples.find(process)!=_Samples.end()) respCollectionYield=&_Samples[process].expected;
-    else respCollectionYield=&expectedMap[process];
-
+    if(domain==ALLPROC) respCollectionYield=&expected;      // Systematics to be applied to all resonant processes
+    else{
+      auto it=find(_Samples.begin(), _Samples.end(), domain);
+      if(it!=_Samples.end()) respCollectionYield=&it->expected;
+      else respCollectionYield=&expectedMap[domain];
+    }
+    
     for(Systematic syst : systArr){
       if(syst.whereTo==YIELD){
 	respCollection=respCollectionYield;
@@ -414,7 +493,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
       else auxUtil::alertAndAbort("Unknown systematic loacation "+syst.whereTo
 				  +". Choose from \""+SHAPE+"\" or \""+YIELD+"\"");
 
-      NPMaker(wfactory.get(), &syst, &nuispara , &constraints , &globobs, respCollection);
+      NPMaker(wfactory.get(), &syst, &nuispara, &constraints, &globobs, respCollection);
     }
   }
 
@@ -424,79 +503,51 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   if(_debug) wfactory->Print();
 
   // Finally organize the scale factors on each sample
-  // The common one will be generated even if it is empty
-  TString expectationCommonStr=auxUtil::generateExpr("prod::"+EXPECTATIONPREFIX+"common(", &expected);
-  if(_debug) cout<<"\tREGTEST: Generating "<<expectationCommonStr;
-  implementObj(wfactory.get(), expectationCommonStr);
-  if(_debug) cout<<"Done."<<endl;
+  if(expected.getSize()>0) implementObj(wfactory.get(), auxUtil::generateExpr("prod::"+EXPECTATIONPREFIX+"common(", &expected));
 
-  for(map<TString, RooArgSet>::iterator it=expectedMap.begin(); it!=expectedMap.end(); it++){
-    TString systSrc=it->first;
-    TString expectationSystSrcStr=auxUtil::generateExpr("prod::"+EXPECTATIONPREFIX+systSrc+"(", &it->second);
-    implementObj(wfactory.get(), expectationSystSrcStr);
-  }
+  for(auto it : expectedMap) implementObj(wfactory.get(), auxUtil::generateExpr("prod::"+EXPECTATIONPREFIX+it.first+"(", &it.second));
   
-  vector<TString> correlatedNFs;
-  for(it_sample it=_Samples.begin();it!=_Samples.end();it++){
-    Sample *sample=&it->second;
-    auxUtil::printTitle(sample->procName.Data(), 20, "<");
-    vector<TString> normFactors=auxUtil::splitString(sample->normFactors,';');
-    int nnorm=normFactors.size();
-
-    for(int inorm=0;inorm<nnorm;inorm++){
-      TString varName=implementObj(wfactory.get(), normFactors[inorm]);
-      sample->expected.add(*wfactory->arg(varName));
-    }
-
-    vector<TString> corrNFs=auxUtil::splitString(sample->correlatedNFs,';');
-    for( int inorm=0; inorm<(int)corrNFs.size(); inorm++) {
-      vector<TString> corrNF = auxUtil::splitString(corrNFs[inorm],'[');
-      correlatedNFs.push_back(corrNF[0]); // quick hack to ignore bracket text, better to use regex
-    }
- 
-    vector<TString> shapeFactors=auxUtil::splitString(sample->shapeFactors,';');
-    int nshape=shapeFactors.size();
-    for(int ishape=0;ishape<nshape;ishape++){
-      implementObj(wfactory.get(), shapeFactors[ishape]);
-    }
+  for(auto& sample : _Samples){
+    if(_debug) auxUtil::printTitle(sample.procName.Data(), "<", 20);
     
-    TString expectationStr=auxUtil::generateExpr("prod::"+EXPECTATIONPREFIX+"proc_"+sample->procName+"(", &sample->expected);
-    if(_debug) cout<<"Generating the scale factor "<<expectationStr<<"...";
-    implementObj(wfactory.get(), expectationStr);
-    if(_debug) cout<<"Done"<<endl;
-    TString yieldName=YIELDPREFIX+sample->procName+"_expected";
-    sample->normName=YIELDPREFIX+sample->procName;
-    implementObj(wfactory.get(), Form("%s[%f]",yieldName.Data(), sample->yield));
+    implementObjArray(wfactory.get(), sample.shapeFactors);
 
-    TString normStr="prod::"+sample->normName+"("+yieldName;
-    for(TString systSrc : sample->procType){
-      if(systSrc == SELF){
-	normStr="prod::"+sample->normName+"("+yieldName;
-	break;			     // If :self: appears anywhere, do not do anything
-      }
-      else if(systSrc == COMMON) normStr+=", "+EXPECTATIONPREFIX+"common"; // Common systematics
-      else{
-	if(expectedMap.find(systSrc)==expectedMap.end()) auxUtil::alertAndAbort("Unknown systematic source "+systSrc);
-	normStr+=", "+EXPECTATIONPREFIX+systSrc;
+    sample.normName=YIELDPREFIX+sample.procName;
+    
+    TString normStr="prod::"+sample.normName+"("+implementObjArray(wfactory.get(), sample.normFactors);
+
+    if(sample.expected.getSize()>0){
+      TString expectationStr=auxUtil::generateExpr("prod::"+EXPECTATIONPREFIX+"proc_"+sample.procName+"(", &sample.expected);
+      normStr+=", "+implementObj(wfactory.get(), expectationStr);
+    }
+
+    if(find(sample.systGroups.begin(), sample.systGroups.end(), SELF)==sample.systGroups.end()){ // If :self: appears anywhere, do not do anything
+      for(TString systGrp : sample.systGroups){
+	if(systGrp == COMMON){
+	  if(expected.getSize()>0) normStr+=", "+EXPECTATIONPREFIX+"common"; // Common systematics: only add if exist
+	}
+	else{
+	  if(expectedMap.find(systGrp)==expectedMap.end()) auxUtil::alertAndAbort("Unknown systematic group "+systGrp+" in Sample "+sample.procName);
+	  normStr+=", "+EXPECTATIONPREFIX+systGrp;
+	}
       }
     }
-    normStr+=", "+EXPECTATIONPREFIX+"proc_"+sample->procName+")";
+    auxUtil::closeFuncExpr(normStr);
+    
     implementObj(wfactory.get(), normStr);
-    cout<<"\tREGTEST: Yield for channel \""<<channelname<<"\" process \""<<sample->procName<<"\": "<<wfactory->function(sample->normName)->getVal()<<endl;
+    
+    cout<<"\tREGTEST: Yield for category \""<<channelname<<"\" process \""<<sample.procName<<"\": "<<wfactory->function(sample.normName)->getVal()<<endl;
     if(_debug) wfactory->Print();
-    getModel(wfactory.get(), sample, channeltype, &nuispara , &constraints , &globobs);
+    getModel(wfactory.get(), &sample, channeltype, &nuispara, &constraints, &globobs);
   }
 
   if(_debug) wfactory->Print();
 
   // Generate the combined PDF
   TString sumPdfStr="SUM::"+SUMPDFNAME+"(";
-  for(it_sample it=_Samples.begin();it!=_Samples.end();it++){
-    Sample *sample=&it->second;
-    if(_debug) cout<<sample->normName<<" and "<<sample->modelName<<endl;
-    sumPdfStr+=sample->normName+"*"+sample->modelName+",";
-  }
-  auxUtil::closeFuncExpr(&sumPdfStr);
+  for(auto sample : _Samples) sumPdfStr+=sample.normName+"*"+sample.modelName+",";
+
+  auxUtil::closeFuncExpr(sumPdfStr);
   if(_debug) cout<<sumPdfStr<<endl;
   implementObj(wfactory.get(), sumPdfStr);
   // sumPdfStr=auxUtil::getObjName(sumPdfStr);
@@ -505,27 +556,26 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
 
   // Keep Track of Correlated variables
   TString correlated = "";
+
+  for(auto poi : _POIList) _ItemsCorrelate.push_back(poi);
+
+  // remove duplicates from list of _ItemsCorrelate (must be sorted to work)
+  sort( _ItemsCorrelate.begin(), _ItemsCorrelate.end() );
+  _ItemsCorrelate.erase( unique( _ItemsCorrelate.begin(), _ItemsCorrelate.end() ), _ItemsCorrelate.end() );
+
+  for(auto item : _ItemsCorrelate){
+    if(!wfactory->obj(item)) continue; // Does not exist
+    if(!wfactory->var(item)) auxUtil::alertAndAbort("Correlated variable "+item+" is not properly implemented as RooRealVar in the workspace"); // Only variables can be keep the names unchanged.
+    correlated+=item+",";
+  }
   
-  // remove duplicates from list of correlatedNFs (must be sorted to work)
-  sort( correlatedNFs.begin(), correlatedNFs.end() );
-  correlatedNFs.erase( unique( correlatedNFs.begin(), correlatedNFs.end() ), correlatedNFs.end() );
-
-  for(vector<TString>::iterator corrNF = correlatedNFs.begin(); corrNF != correlatedNFs.end(); ++corrNF)
-    correlated += *corrNF+",";
-
   correlated += auxUtil::generateExpr("",&nuispara,false);
-
-  for(vector<TString>::iterator poi = _POIList.begin(); poi != _POIList.end(); ++poi)
-    correlated+=*poi+",";
-
-  for(vector<TString>::iterator item = _ItemsCorrelate.begin(); item != _ItemsCorrelate.end(); ++item)
-    correlated+=*item+",";
 
   correlated+=_observableName;
 
   // Now, import the pdf to a new workspace, where the renaming of objects will happen automatically
-  cout<<"\tREGTEST: The following variables will not be renamed: "<<correlated<<endl;
-  wchannel->import( (*wfactory->pdf(SUMPDFNAME)) , RenameAllNodes(channelname), RenameAllVariablesExcept(channelname,correlated), Silence());
+  if(_debug) cout<<"\tREGTEST: The following variables will not be renamed: "<<correlated<<endl;
+  wchannel->import( (*wfactory->pdf(SUMPDFNAME)), RenameAllNodes(channelname), RenameAllVariablesExcept(channelname,correlated), Silence());
 
   // Import constraint terms. Note we should not rename the constraint term gaussians
   attachConstraints(wchannel, SUMPDFNAME+"_"+channelname, &constraints, FINALPDFNAME+"_"+channelname);
@@ -549,53 +599,43 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   if(_injectGhost) auxUtil::releaseTheGhost(obsdata.get(),x, &wt, auxUtil::epsilon/1000.);
 
   // prepare binned data
-  unique_ptr<RooDataSet> obsdatabinned(dynamic_cast<RooDataSet*>(obsdata->Clone("obsdatabinned")));
+  unique_ptr<RooDataSet> obsdatabinned(dynamic_cast<RooDataSet*>(obsdata->Clone(OBSDSNAME+"binned")));
 
-  if(channeltype!=COUNTING&&obsdata->sumEntries()>x->numBins()){
+  if(obsdata->sumEntries()>x->numBins()){
     TH1D h_data("h_data","",x->numBins(),x->getMin(),x->getMax());
     RooArgSet* obs = const_cast<RooArgSet*>(obsdata->get());
     RooRealVar* xdata = dynamic_cast<RooRealVar*>(obs->find(_observableName));
     
     for (int i=0 ; i<obsdata->numEntries() ; i++) {
       obsdata->get(i) ;
-      h_data.Fill( xdata->getVal() ,obsdata->weight());
+      h_data.Fill( xdata->getVal(), obsdata->weight());
     }
-    obsdatabinned.reset(new RooDataSet("obsdatabinned","obsdatabinned",obs_plus_wt,WeightVar(wt)));
+    obsdatabinned.reset(new RooDataSet(OBSDSNAME+"binned",OBSDSNAME+"binned",obs_plus_wt,WeightVar(wt)));
     for( int ibin = 1 ; ibin <= h_data.GetNbinsX() ; ibin ++ ) {
       x->setVal(h_data.GetBinCenter(ibin));
       double weight = h_data.GetBinContent(ibin);
       wt.setVal(weight);
-      obsdatabinned -> add( RooArgSet(*x ,wt) , weight);
+      obsdatabinned -> add( RooArgSet(*x, wt), weight);
     }
   }
-
+  cout<<"\tREGTEST: Number of data events: "<<obsdata->sumEntries()<<endl;
   wchannel->import(*obsdata);
   wchannel->import(*obsdatabinned);
   clearUp();			// Remove content in the vectors and maps
 }
 
-int xmlAnaWSBuilder::CN2IDX(TString channelname){
-  int cate=-1;
-
-  for(int ich=0;ich<_Nch;ich++){
-    if(_CN[ich]==channelname) cate=ich;
-  }
-
-  return cate;
-}
-
-void xmlAnaWSBuilder::NPMaker(RooWorkspace *w, Systematic *syst, RooArgSet *nuispara, RooArgSet *constraints , RooArgSet *globobs, RooArgSet *expected){
+void xmlAnaWSBuilder::NPMaker(RooWorkspace *w, Systematic *syst, RooArgSet *nuispara, RooArgSet *constraints, RooArgSet *globobs, RooArgSet *expected){
   
-  TString varName=syst->NPName;
-  if(syst->process!=ALLPROC) varName+="_"+syst->process;
+  TString varName=syst->whereTo+"_"+syst->NPName;
+  if(syst->domain!=ALLPROC) varName+="_"+syst->process;
 
   TString globName=GLOBALOBSPREFIX+syst->NPName;
   TString constrName=CONSTRTERMPREFIX+syst->NPName;
-  TString responseName=RESPONSEPREFIX+syst->whereTo+varName; // Important: a NP can be applied to both shape and yield.
+  TString responseName=RESPONSEPREFIX+varName; // Important: a NP can be applied to both shape and yield.
 
   if(syst->constrTerm==ASYMMETRIC) {
-    cout << "\tREGTEST: Set up nuisance parameter "
-	 << syst->NPName << " as asymmetric uncertainty on process "<< syst->process <<endl;
+    if(_debug) cout << "\tREGTEST: Set up nuisance parameter "
+		    << syst->NPName << " as asymmetric uncertainty on process "<< syst->process <<endl;
     RooRealVar nuis_var(syst->NPName,syst->NPName,0,-5,5);
     RooRealVar beta_var("beta_"+varName,"beta_"+varName,syst->beta);
     RooProduct nuis_times_beta(varName+"_times_beta",varName+"_times_beta",RooArgSet(nuis_var,beta_var));
@@ -634,22 +674,22 @@ void xmlAnaWSBuilder::NPMaker(RooWorkspace *w, Systematic *syst, RooArgSet *nuis
   }
   else{
     TString nominal_expr=implementObj(w, "nominal_"+varName+Form("[%f]", syst->nominal));
-    TString NPName=implementObj(w, syst->NPName+"[ 0 , -5 , 5 ]", true); // Sometimes the duplicated variable cannot be recycled
+    TString NPName=implementObj(w, syst->NPName+"[ 0, -5, 5 ]", true); // Sometimes the duplicated variable cannot be recycled
     TString nuis_times_beta_expr=implementObj(w, "prod::"+varName+"_times_beta("+syst->NPName+", beta_"+varName+Form("[%f])", syst->beta));
     
     if(syst->constrTerm==GAUSSIAN){
       // The reason we need to keep plain implementation for Gaussian uncertainty is mainly due to spurious signal.
       // If we use FlexibleInterpVar, the response will be truncated at 0, but we need the response to go negative.
-      cout << "\tREGTEST: Set up nuisance parameter "
-	   << syst->NPName << " as gaussian uncertainty on process "<< syst->process <<endl;
+      if(_debug) cout << "\tREGTEST: Set up nuisance parameter "
+		      << syst->NPName << " as gaussian uncertainty on process "<< syst->process <<endl;
       TString uncertName=implementUncertExpr(w, syst->errHiExpr, varName, auxUtil::SYMMERROR);
       TString uncert_wrapper_expr="prod::uncert_"+GAUSSIAN+"_"+varName+"("+nuis_times_beta_expr+", "+uncertName+")";
       TString expected_expr="sum::"+responseName+"("+nominal_expr+", "+uncert_wrapper_expr+")";
       implementObj(w, expected_expr);
     }
     else if(syst->constrTerm==LOGNORMAL){
-      cout << "\tREGTEST: Set up nuisance parameter "
-	   << syst->NPName << " as lognormal uncertainty on process "<< syst->process <<endl;
+      if(_debug) cout << "\tREGTEST: Set up nuisance parameter "
+		      << syst->NPName << " as lognormal uncertainty on process "<< syst->process <<endl;
       TString uncertName=implementUncertExpr(w, syst->errHiExpr, varName, auxUtil::SYMMERROR);
       TString log_kappa_expr="expr::log_kappa_"+varName+"('log(1+@0/@1)', "+uncertName+", "+nominal_expr+")";
       
@@ -680,10 +720,10 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, TString channelt
 
   if(bool(w->pdf(sample->modelName))){
     if(isSharedPdf){
-      cout<<"\tREGTEST: PDF "<<sample->modelName<<" has been created in the workspace."<<endl;
+      if(_debug) cout<<"\tREGTEST: PDF "<<sample->modelName<<" has been created in the workspace."<<endl;
       return; // Use shared pdf
     }
-    else auxUtil::alertAndAbort("PDF "+sample->modelName+" already exists but the user asks to create it again. Please intervene...");
+    else auxUtil::alertAndAbort("PDF "+sample->modelName+" already exists but the user asks to create it again");
   }
   
   if(_debug) cout<<sample->modelName<<endl;
@@ -705,7 +745,7 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, TString channelt
     TString modelType=auxUtil::getAttributeValue(rootNode, "Type");
     modelType.ToLower();
     if(modelType==USERDEF){
-      cout<<"\tREGTEST: Creating user-defined pdf from "<<inputFileName<<endl;
+      if(_debug) cout<<"\tREGTEST: Creating user-defined pdf from "<<inputFileName<<endl;
       int cacheBinning=atoi(auxUtil::getAttributeValue(rootNode, "CacheBinning", true, "-1"));
       if(cacheBinning>0) w->var(_observableName)->setBins(cacheBinning, "cache"); // For the accuracy of Fourier transformation
       while ( node != 0 ){
@@ -729,7 +769,6 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, TString channelt
     }
     else if(modelType==EXTERNAL){
       // In this case a workspace containing the model is used as input
-      // NOTE: THIS PART HAS NOT BEEN VALIDED YET
       TString inputWSFileName=auxUtil::getAttributeValue(rootNode, "Input");
       TString wsName=auxUtil::getAttributeValue(rootNode, "WSName");
       TString modelName=auxUtil::getAttributeValue(rootNode, "ModelName");
@@ -768,7 +807,7 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, TString channelt
 	  doNotTouch+=NPName+",";
 	  if(GOName!=""){
 	    if(!wModel->var(NPName)||!wModel->var(GOName)||!wModel->pdf(constrName)){
-	      auxUtil::alertAndAbort("Something is wrong with "+NPName+" "+GOName+" "+constrName+". Please double check!");
+	      auxUtil::alertAndAbort("Something is wrong with "+NPName+" "+GOName+" "+constrName);
 	    }
 	    TString newConstrName=CONSTRTERMPREFIX+NPName;
 	    TString newGOName=GLOBALOBSPREFIX+NPName;
@@ -865,7 +904,6 @@ void xmlAnaWSBuilder::checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara){
   while((parg=dynamic_cast<RooRealVar*>(iter->Next()))){
     if(!parg->isConstant()){
       // Only check floating variables
-      // Ri ni ge wen sang, shua lao zi o
       if(parg->getMax()==parg->getMin()){
       	cout<<"\tREGTEST: fixing "<<parg->GetName()<<" to constant as it has same upper and lower boundary"<<endl;
       	parg->setConstant(true);
@@ -895,11 +933,13 @@ void xmlAnaWSBuilder::checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara){
     // There are redundant nuisance parameters in the model, which we do not care...
     cerr<<"\tWARNING: There supposed to be "<<nPOI+nNP<<" free parameters, but only seen "<<floatSet.getSize()<<" in the channel "<<_CN.back()<<endl;
     cout<<"\tIn principle not a issue, but please make sure you understand what you are doing."<<endl;
-    cout<<"++++++++++++++++++++++ all the free parameters ++++++++++++++++++++++"<<endl;
-    floatSet.Print();
-    cout<<"++++++++++++++++++++++ all the nuisance parameters ++++++++++++++++++++++"<<endl;
-    nuispara->Print();
-    cout<<"++++++++++++++++++++++ end of printout ++++++++++++++++++++++"<<endl;
+    if(_debug){
+      cout<<"++++++++++++++++++++++ all the free parameters ++++++++++++++++++++++"<<endl;
+      floatSet.Print();
+      cout<<"++++++++++++++++++++++ all the nuisance parameters ++++++++++++++++++++++"<<endl;
+      nuispara->Print();
+      cout<<"++++++++++++++++++++++ end of printout ++++++++++++++++++++++"<<endl;
+    }
   }
   else{
     cout<<"\tREGTEST: Number of nuisance parameters looks good!"<<endl;
@@ -908,13 +948,8 @@ void xmlAnaWSBuilder::checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara){
 
 TString xmlAnaWSBuilder::getItemExpr(TXMLNode *node, TString attrName, TString process){
   TString expr=auxUtil::getAttributeValue(node, attrName);
-  auxUtil::removeWhiteSpace(expr);
-  expr.ReplaceAll(RESPONSE, RESPONSEPREFIX+SHAPE); // Implement proper response terms. Assume only shape uncertainty would appear
-  expr.ReplaceAll(OBSERVABLE, _observableName); // Implement proper observables
-  expr.ReplaceAll(LT,"<");
-  expr.ReplaceAll(LE,"<=");
-  expr.ReplaceAll(GT,">");
-  expr.ReplaceAll(GE,">=");
+
+  translateKeyword(expr);
   
   if(expr.Contains(PROCESS)){
     if(process=="") auxUtil::alertAndAbort("Process name not provided for expression "+expr);
@@ -929,30 +964,42 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
   obs_plus_wt.add(*w);
   obs_plus_wt.add(*x);
   
-  RooDataSet* obsdata=new RooDataSet("obsdata","obsdata",obs_plus_wt,WeightVar(*w));
+  RooDataSet* obsdata=new RooDataSet(OBSDSNAME,OBSDSNAME,obs_plus_wt,WeightVar(*w));
 
-  unique_ptr<RooDataSet> obsdata_tmp;
-  
-  if(_inputDataFileType==ASCII){
-    obsdata_tmp.reset(RooDataSet::read(_inputDataFileName, RooArgList(*x)));
+  if(_Type.back()==COUNTING && _numData>=0){ // Generate number of events for counting experiment
+    double binCenter=(x->getMin()+x->getMax())/2.;
+    double weight=(_numData==0)?auxUtil::epsilon/1000.:_numData;
+    x->setVal(binCenter);
+    w->setVal(weight);
+    obsdata->add( RooArgSet(*x, *w), weight);
   }
   else{
-    RooRealVar x_tree(_inputDataVarName,_inputDataVarName, _xMin, _xMax);
+    unique_ptr<RooDataSet> obsdata_tmp;
 
-    obsdata_tmp.reset(new RooDataSet("obsdata_tmp","obsdata_tmp", RooArgSet(x_tree), ImportFromFile(_inputDataFileName.Data(), _inputDataTreeName.Data())));
-  }
+    if(_inputDataFileType==ASCII){
+      obsdata_tmp.reset(RooDataSet::read(_inputDataFileName, RooArgList(*x)));
+    }
+    else{
+      unique_ptr<TFile> f(TFile::Open(_inputDataFileName));
+      TTree *t=dynamic_cast<TTree*>(f->Get(_inputDataTreeName));
+      if(_Cut!="") t=t->CopyTree(_Cut);
+      RooRealVar x_tree(_inputDataVarName,_inputDataVarName, _xMin, _xMax);
+      obsdata_tmp.reset(new RooDataSet(OBSDSNAME+"_tmp",OBSDSNAME+"_tmp", RooArgSet(x_tree), Import(*t)));
+      f->Close();
+    }
 
-  RooArgSet* obs_tmp = const_cast<RooArgSet*>(obsdata_tmp->get());
-  RooRealVar* xdata_tmp = dynamic_cast<RooRealVar*>(obs_tmp->first()); // We only have one observable in total, so it is okay
+    RooArgSet* obs_tmp = const_cast<RooArgSet*>(obsdata_tmp->get());
+    RooRealVar* xdata_tmp = dynamic_cast<RooRealVar*>(obs_tmp->first()); // We only have one observable in total, so it is okay
   
-  for (int i=0 ; i<obsdata_tmp->numEntries() ; i++) {
-    obsdata_tmp->get(i) ;
-    x->setVal(xdata_tmp->getVal());
-    double weight=1;
-    w->setVal(weight);
-    obsdata->add( RooArgSet(*x ,*w) , weight);
+    for (int i=0 ; i<obsdata_tmp->numEntries() ; i++) {
+      obsdata_tmp->get(i) ;
+      x->setVal(xdata_tmp->getVal());
+      double weight=1;
+      w->setVal(weight);
+      if(_goBlind && x->getVal()>_blindMin && x->getVal()<_blindMax) continue;
+      obsdata->add( RooArgSet(*x, *w), weight);
+    }
   }
-  
   if(_debug) obsdata->Print("v");
   return obsdata;
 }
@@ -975,20 +1022,141 @@ TString xmlAnaWSBuilder::implementObj(RooWorkspace *w, TString expr, bool checkE
   }
 
   // Otherwise we just blindly implement
-  cout<<"\tREGTEST: Generating "<<auxUtil::translateItemType(type)<<" "<<expr<<endl;
-  w->factory(expr);
+  if(_debug) cout<<"\tREGTEST: Generating "<<auxUtil::translateItemType(type)<<" "<<expr<<endl;
+  if(!w->factory(expr)) auxUtil::alertAndAbort("Creation of expression "+expr+" failed");
   
   return varName;
 }
 
-void xmlAnaWSBuilder::implementObjArray(RooWorkspace *w, vector<TString> objArr){
-  int nitem=objArr.size();
-  for(int iitem=0;iitem<nitem;iitem++){
-    implementObj(w, objArr[iitem]);
-  }
+TString xmlAnaWSBuilder::implementObjArray(RooWorkspace *w, vector<TString> objArr){
+  TString outputStr="";
+  for(auto item : objArr) outputStr+=implementObj(w, item)+",";
+  return outputStr.Chop();
 }
 
 TString xmlAnaWSBuilder::implementUncertExpr(RooWorkspace *w, TString expr, TString varName, int uncertType){
   if(expr.IsFloat()) return implementObj(w, auxUtil::translateUncertType(uncertType)+varName+"["+expr+"]");
   else return implementObj(w, expr);
+}
+
+void xmlAnaWSBuilder::readChannelXMLNode(TXMLNode *node){
+  while ( node != 0 ){
+    if ( node->GetNodeName() == TString( "Item" ) ){
+      TString item=getItemExpr(node, "Name");
+      if(item.Contains(RESPONSEPREFIX)) _ItemsLowPriority.push_back(item);
+      else _ItemsHighPriority.push_back(item);
+    }
+    
+    else if ( node->GetNodeName() == TString( "Systematic" ) ){
+      readSyst(node, ALLPROC);
+    }
+
+    else if ( node->GetNodeName() == TString( "Sample" ) ){
+      readSample(node);
+    }
+
+    else if ( node->GetNodeName() == TString( "ImportItems" ) || node->GetNodeName() == TString( "IncludeSysts" ) ){
+      TString inputFileName=auxUtil::getAttributeValue(node, "FileName");
+      TDOMParser xmlparser;
+      auxUtil::parseXMLFile(&xmlparser, inputFileName);
+      cout<<"\tREGTEST: Importing Items from " << inputFileName << endl;
+
+      TXMLDocument* xmldoc=xmlparser.GetXMLDocument();
+      TXMLNode* rootNode=xmldoc->GetRootNode();
+      TXMLNode* importNode=rootNode->GetChildren();
+      readChannelXMLNode( importNode );
+    }
+    node=node->GetNextNode();
+  }
+}
+
+void xmlAnaWSBuilder::dataFileSanityCheck(){
+  if(_Type.back()==COUNTING){
+    if(_inputDataFileName!="" && !auxUtil::checkExist(_inputDataFileName)) auxUtil::alertAndAbort("Cannot find input data file "+_inputDataFileName);
+    else if(_inputDataFileName=="" && _numData<0) auxUtil::alertAndAbort("Please either provide a input data file, or provide a valid number of data events for a counting experiment");
+  }
+  else{
+    if(!auxUtil::checkExist(_inputDataFileName)) auxUtil::alertAndAbort("Cannot find input data file "+_inputDataFileName);
+    if(_inputDataFileType!=ASCII){	// means that we are reading data from a tree
+      TFile *f=TFile::Open(_inputDataFileName);
+      TTree *t=dynamic_cast<TTree*>(f->Get(_inputDataTreeName));
+      if(!t) auxUtil::alertAndAbort("Cannot find TTree "+_inputDataTreeName+" in data file "+_inputDataFileName);
+      TBranch *b=t->FindBranch(_inputDataVarName);
+      if(!b) auxUtil::alertAndAbort("Cannot find TBranch "+_inputDataVarName+" in TTree "+_inputDataTreeName+" in data file "+_inputDataFileName);
+      f->Close();
+    }
+  }
+}
+
+void xmlAnaWSBuilder::translateKeyword(TString &expr){
+  expr.ReplaceAll(RESPONSE, RESPONSEPREFIX+SHAPE+"_"); // Implement proper response terms. Assume only shape uncertainty would appear
+  expr.ReplaceAll(OBSERVABLE, _observableName); // Implement proper observables
+  expr.ReplaceAll(LT,"<");
+  expr.ReplaceAll(LE,"<=");
+  expr.ReplaceAll(GT,">");
+  expr.ReplaceAll(GE,">=");
+  expr.ReplaceAll(AND,"&&");
+  expr.ReplaceAll(OR,"||");
+}
+
+void xmlAnaWSBuilder::Summary(TString outputFigName){
+  RooMsgService::instance().setGlobalKillBelow(RooFit::FATAL);
+  gErrorIgnoreLevel=kWarning;
+
+  RooSimultaneous *m_pdf = dynamic_cast<RooSimultaneous*>(_mConfig->GetPdf()); assert (m_pdf);
+  RooAbsCategoryLValue* m_cat = const_cast<RooAbsCategoryLValue*>(&m_pdf->indexCat());
+  const RooArgSet *m_gobs = dynamic_cast<const RooArgSet*>(_mConfig->GetGlobalObservables()); assert(m_gobs);
+  int numChannels = m_cat->numBins(0);
+  RooDataSet *m_data=dynamic_cast<RooDataSet*>(_combWS->data(_dataName));
+  TList *m_dataList = m_data->split( *m_cat, true );
+
+  auxUtil::printTitle("Begin summary", "~");
+  cout << "\tThere are " << numChannels << " sub channels:" << endl;
+  TCanvas c("summary","summary",800,600);
+  
+  c.Print(outputFigName+"[");
+  for ( int i= 0; i < numChannels; i++ ) {
+    m_cat->setBin(i);
+    TString channelname=m_cat->getLabel();
+    RooAbsPdf* pdfi = m_pdf->getPdf(channelname);
+    RooDataSet* datai = ( RooDataSet* )( m_dataList->At( i ) );
+    cout << "\t\tIndex: " << i << ", Pdf: " << pdfi->GetName() << ", Data: " << datai->GetName() << ", SumEntries: " << datai->sumEntries() << endl;
+
+    RooRealVar *x=dynamic_cast<RooRealVar*>(pdfi->getObservables(datai)->first());
+    unique_ptr<RooPlot> frame(x->frame());
+    datai->plotOn(frame.get(), DataError(RooAbsData::Poisson));
+
+    if(_goBlind){
+      pdfi->plotOn(frame.get(), LineColor(kBlue), LineStyle(2), NormRange(SBLO+"_"+channelname+","+SBHI+"_"+channelname), Normalization(1.0,RooAbsReal::RelativeExpected));
+      pdfi->plotOn(frame.get(), LineColor(kBlue), LineStyle(1), Range(SBLO+"_"+channelname+","+SBHI+"_"+channelname), NormRange(SBLO+"_"+channelname+","+SBHI+"_"+channelname), Normalization(1.0,RooAbsReal::RelativeExpected));
+    }
+    else pdfi->plotOn(frame.get(), LineColor(kBlue), Normalization(1.0,RooAbsReal::RelativeExpected));
+
+    c.cd();
+    frame->SetMinimum(auxUtil::epsilon*10);
+    if(_plotOpt.Contains("logy")){
+      frame->SetMinimum(1e-1);
+      c.SetLogy();
+    }
+    
+    frame->Draw();
+    c.Print(outputFigName);
+  }
+  c.Print(outputFigName+"]");
+  
+  auxUtil::printTitle("POI");
+  _mConfig->GetParametersOfInterest()->Print("v");
+  if(_debug){
+    auxUtil::printTitle("Nuisance parameters");
+    _mConfig->GetNuisanceParameters()->Print();
+    auxUtil::printTitle("Global observables");
+    _mConfig->GetGlobalObservables()->Print();
+  }
+  auxUtil::printTitle("Dataset");
+  list<RooAbsData*> allData=_combWS->allData();
+  for (list<RooAbsData*>::iterator data = allData.begin(); data != allData.end(); data++) {
+    (*data)->Print();
+  }
+
+  auxUtil::printTitle("End summary", "~");
 }

@@ -8,13 +8,19 @@ TString auxUtil::UNCERTHIPREFIX="uncertHi__";
 TString auxUtil::UNCERTLOPREFIX="uncertLo__";
 TString auxUtil::UNCERTSYMMPREFIX="uncertSymm__";
 
-void auxUtil::printTitle(const char* titleText, int width, TString separator){
-  TString line="";
+void auxUtil::printTitle(TString titleText, TString separator, int width){
+  TString fullLine="", line="";
+  
+  int stringLength=titleText.Length();
+  int fullLineWidth=2*width+((stringLength>2*width) ? (stringLength) : (2*width))+2;
+    
+  for(int i=0;i<fullLineWidth;i++) fullLine+=separator;
   for(int i=0;i<width;i++) line+=separator;
-  TString fullline=line+line+line+line;
-  cout<<TString("\t "+fullline)<<endl;
-  printf("\t "+line+"%*s%*s"+line+"\n",int(width+strlen(titleText)/2),titleText,int(width-strlen(titleText)/2),"");
-  cout<<TString("\t "+fullline)<<endl;
+  
+  cout<<endl<<TString("\t "+fullLine)<<endl;
+  if(stringLength>2*width) cout<<"\t "<<line<<" "<<titleText<<" "<<line<<endl;
+  else printf("\t "+line+" %*s%*s "+line+"\n",int(width+titleText.Length()/2),titleText.Data(),int(width-titleText.Length()/2),"");
+  cout<<TString("\t "+fullLine)<<endl<<endl;
 }
 
 void auxUtil::Reset(RooArgSet* original, RooArgSet* snapshot){
@@ -68,70 +74,8 @@ TString auxUtil::generateExpr(TString head, RooArgSet *set, bool closeExpr){
   while((parg=dynamic_cast<RooAbsArg*>(iter->Next()))){
     exprStr+=TString(parg->GetName())+",";
   }
-  if(closeExpr) closeFuncExpr(&exprStr);
+  if(closeExpr) closeFuncExpr(exprStr);
   return exprStr;
-}
-
-void auxUtil::Summary(ModelConfig *mc, TString dataName, TString outputFigName, TString plotOption){
-  RooMsgService::instance().setGlobalKillBelow(RooFit::FATAL);
-  gErrorIgnoreLevel=kWarning;
-  RooWorkspace *w=mc->GetWS();
-  RooSimultaneous *m_pdf = dynamic_cast<RooSimultaneous*>(mc->GetPdf()); assert (m_pdf);
-  RooAbsCategoryLValue* m_cat = const_cast<RooAbsCategoryLValue*>(&m_pdf->indexCat());
-  const RooArgSet *m_gobs = dynamic_cast<const RooArgSet*>(mc->GetGlobalObservables()); assert(m_gobs);
-  int numChannels = m_cat->numBins(0);
-  RooDataSet *m_data=dynamic_cast<RooDataSet*>(w->data(dataName));
-  TList *m_dataList = m_data->split( *m_cat, true );
-
-  RooRealVar *firstPOI=dynamic_cast<RooRealVar*>(mc->GetParametersOfInterest()->first());
-  double muhat=firstPOI->getVal();
-  int width=10;
-  printTitle("Begin summary",width,"~");
-  cout << "\tThere are " << numChannels << " sub channels:" << endl;
-  TCanvas c("summary","summary",800,600);
-  
-  c.Print(outputFigName+"[");
-  for ( int i= 0; i < numChannels; i++ ) {
-    m_cat->setBin(i);
-    TString channelname=m_cat->getLabel();
-    RooAbsPdf* pdfi = m_pdf->getPdf(channelname);
-    RooDataSet* datai = ( RooDataSet* )( m_dataList->At( i ) );
-    cout << "\t\tIndex: " << i << ", Pdf: " << pdfi->GetName() << ", Data: " << datai->GetName()  << ", SumEntries: " << datai->sumEntries() << endl;
-
-    RooRealVar *x=dynamic_cast<RooRealVar*>(pdfi->getObservables(datai)->first());
-    unique_ptr<RooPlot> frame(x->frame());
-    datai->plotOn(frame.get(), DataError(RooAbsData::Poisson));
-    firstPOI->setVal(0);
-    pdfi->plotOn(frame.get(), LineColor(kBlue), Normalization(1.0,RooAbsReal::RelativeExpected));
-    if(plotOption.Contains("ucmles")){
-      w->loadSnapshot("ucmles");
-    }
-    else firstPOI->setVal(1);
-    pdfi->plotOn(frame.get(), LineColor(kRed), Normalization(1.0,RooAbsReal::RelativeExpected));
-    c.cd();
-    frame->SetMinimum(auxUtil::epsilon*10);
-    if(plotOption.Contains("logy")){
-      frame->SetMinimum(1e-1);
-      c.SetLogy();
-    }
-    frame->Draw();
-    c.Print(outputFigName);
-  }
-  c.Print(outputFigName+"]");
-  firstPOI->setVal(muhat);
-  printTitle("POI",width);
-  mc->GetParametersOfInterest()->Print("v");
-  printTitle("Nuisance parameters",width);
-  mc->GetNuisanceParameters()->Print();
-  printTitle("Global observables",width);
-  mc->GetGlobalObservables()->Print();
-  printTitle("Dataset",width);
-  list<RooAbsData*> allData=w->allData();
-  for (list<RooAbsData*>::iterator data = allData.begin(); data != allData.end(); data++) {
-    (*data)->Print();
-  }
-
-  printTitle("End summary",width,"~");
 }
 
 void auxUtil::defineSet(RooWorkspace *w, RooArgSet set, TString setName){
@@ -209,25 +153,21 @@ TString auxUtil::getObjName(TString objName){
 }
 
 TString auxUtil::getAttributeValue( TXMLNode* rootNode, TString attributeKey, bool allowEmpty, TString defaultStr){
-  TListIter attribIt = rootNode->GetAttributes();
-  TXMLAttr* curAttr = 0;
-  TString attributeValue = "";
-
-  while (( curAttr = dynamic_cast< TXMLAttr* >( attribIt() ) ) != 0 ){
-    if ( curAttr->GetName() == attributeKey ){
-      attributeValue = curAttr->GetValue() ;
-      break;
-    }
-  }
-  if(attributeValue==""){
+  TXMLAttr* attr = auxUtil::findAttribute(rootNode, attributeKey);
+  TString attributeValue;
+  
+  if(!attr){
     if(allowEmpty) attributeValue=defaultStr;
     else alertAndAbort("Attribute "+attributeKey+" cannot be found in node "+rootNode->GetNodeName());
   }
+  else attributeValue = attr->GetValue();
+
+  removeWhiteSpace(attributeValue);
   return attributeValue;
 }
 
 void auxUtil::alertAndAbort(TString msg){
-  cerr<<"\tERROR: "<<msg<<". Please intervene..."<<endl;
+  cerr<<"\n\033[91m \tERROR: "<<msg<<". Please intervene... \033[0m\n"<<endl;
   exit(-1);
 }
 
@@ -257,8 +197,46 @@ void auxUtil::removeWhiteSpace(TString& item){
 }
 
 vector<TString> auxUtil::decomposeFuncStr(TString function){
-  auxUtil::removeWhiteSpace(function);
+  removeWhiteSpace(function);
   vector<TString> itemList=splitString(function(function.First('(')+1,function.Last(')')-function.First('(')-1),',');
   if(function.Contains("expr::")) itemList.erase(itemList.begin()); // TODO: find other special syntax to be taken care of
   return itemList;
+}
+
+bool auxUtil::to_bool(TString str) {
+  bool b;
+  if(str.IsDigit()) b=str.Atoi();
+  else{				// Is a string
+    str.ToLower();
+    std::istringstream is(str.Data());
+    is >> std::boolalpha >> b;
+  }
+  return b;
+}
+
+TXMLNode *auxUtil::findNode(TXMLNode* rootNode, TString nodeName){
+  TXMLNode* node=rootNode->GetChildren();
+  while ( node != 0 ){
+    if(nodeName==TString(node->GetNodeName())) return node;
+    node=node->GetNextNode();
+  }
+  return NULL;
+}
+
+TXMLAttr *auxUtil::findAttribute(TXMLNode* rootNode, TString attributeKey){
+  TListIter attribIt = rootNode->GetAttributes();
+  TXMLAttr* curAttr = 0;
+
+  while (( curAttr = dynamic_cast< TXMLAttr* >( attribIt() ) ) != 0 )
+    if ( curAttr->GetName() == attributeKey ) return curAttr;
+
+  return NULL;
+}
+
+bool auxUtil::checkExist(TString name) {
+  if (FILE *file = fopen(name, "r")) {
+    fclose(file);
+    return true;
+  }
+  else return false;
 }

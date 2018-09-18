@@ -23,6 +23,7 @@
 #include <iosfwd>
 #include <functional>
 #include <memory>
+#include <getopt.h>
 
 /// ROOT headers
 #include <TROOT.h>
