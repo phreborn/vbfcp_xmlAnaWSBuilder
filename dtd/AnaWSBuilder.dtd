@@ -49,6 +49,7 @@
 <!ELEMENT Item  EMPTY>
 <!ATTLIST Item 
 	  Name                 CDATA         #REQUIRED
+	  Correlate            CDATA         #IMPLIED
 	  >
 
 <!ELEMENT Sample ( Systematic | NormFactor | ShapeFactor | ImportItems )*>
