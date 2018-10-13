@@ -240,3 +240,13 @@ bool auxUtil::checkExist(TString name) {
   }
   else return false;
 }
+
+vector<TString> auxUtil::diffSet(vector<TString> A, vector<TString> B){
+  sort(A.begin(), A.end());
+  sort(B.begin(), B.end());
+  vector<TString> results;
+  std::set_difference(A.begin(), A.end(),
+		      B.begin(), B.end(),
+		      std::back_inserter(results));
+  return results;
+}

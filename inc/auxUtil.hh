@@ -21,7 +21,9 @@ public:
   static void printTime(){time_t result=time(nullptr);cout<<asctime(localtime(&result));}
   static void printTitle(TString titleText, TString separator="-", int width=10);
   static vector<TString> splitString(const TString& theOpt, const char separator );
-  
+  static void removeDuplicatedString(vector<TString>& strArr){sort(strArr.begin(), strArr.end()); strArr.erase(unique(strArr.begin(), strArr.end()), strArr.end());}
+  static void removeString(vector<TString>& strArr, TString target){strArr.erase(remove( strArr.begin(), strArr.end(), target), strArr.end());}
+  static vector<TString> diffSet(vector<TString> A, vector<TString> B);
   static int parseXMLFile(TDOMParser *xmlparser, TString inputFile);
   static TString getAttributeValue( TXMLNode* rootNode, TString attributeKey, bool allowEmpty=false, TString defaultStr="");
 
