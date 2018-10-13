@@ -92,7 +92,6 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
     TString nodeName=node->GetNodeName();
     if(nodeName=="POI"){
       TString poiStr=node->GetText();
-      auxUtil::removeWhiteSpace(poiStr);
       _POIList=auxUtil::splitString(poiStr.Data(),',');
     } 
     if(nodeName=="Input"){
@@ -231,8 +230,6 @@ void xmlAnaWSBuilder::readSyst(TXMLNode* systNode, TString domain){
     auxUtil::alertAndAbort("For constraint term type "+syst.constrTerm+Form(" non-positive central value (%f) is not acceptable", syst.nominal));
   TString uncert=auxUtil::getAttributeValue(systNode, "Mag");
   
-  auxUtil::removeWhiteSpace(uncert);
-
   syst.beta=auxUtil::stripSign(uncert);
   
   if(uncert.Contains(',')){
@@ -270,7 +267,6 @@ void xmlAnaWSBuilder::readSample(TXMLNode* sampleNode){
 
   // TString importSystGroupList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, COMMON);
   TString importSystGroupList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, SELF);
-  auxUtil::removeWhiteSpace(importSystGroupList);
   sample.systGroups=auxUtil::splitString(importSystGroupList.Data(),',');
   sort( sample.systGroups.begin(), sample.systGroups.end() );
   sample.systGroups.erase( unique( sample.systGroups.begin(), sample.systGroups.end() ), sample.systGroups.end() );
@@ -426,7 +422,6 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   TXMLNode *correlateNode=auxUtil::findNode(rootNode, "Correlate"); // This attribute is only allowed to appear at most once per-channel, and cannot be hided in a sub-XML file
   if(correlateNode){	// If you would like to put some parameters which are not POI correlated
     TString itemStr=correlateNode->GetText();
-    auxUtil::removeWhiteSpace(itemStr);
     _ItemsCorrelate=auxUtil::splitString(itemStr.Data(),',');
   }
 

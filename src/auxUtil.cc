@@ -197,7 +197,6 @@ void auxUtil::removeWhiteSpace(TString& item){
 }
 
 vector<TString> auxUtil::decomposeFuncStr(TString function){
-  removeWhiteSpace(function);
   vector<TString> itemList=splitString(function(function.First('(')+1,function.Last(')')-function.First('(')-1),',');
   if(function.Contains("expr::")) itemList.erase(itemList.begin()); // TODO: find other special syntax to be taken care of
   return itemList;
