@@ -857,11 +857,12 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, TString channelt
       // Create a signal with simple histogram
       TString inputHistFileName=auxUtil::getAttributeValue(rootNode, "Input");
       TString modelName=auxUtil::getAttributeValue(rootNode, "ModelName");
-
+      int rebin=atoi(auxUtil::getAttributeValue(rootNode, "Rebin", true, "-1"));
       unique_ptr<TFile> fExtHist(TFile::Open(inputHistFileName, "read"));
 
       TH1 *h=dynamic_cast<TH1*>(fExtHist->Get(modelName));
-
+      if(rebin>0) h->Rebin(rebin);
+      
       RooDataHist hdata("hdata","hdata",*w->var(_observableName), h);
 
       RooHistPdf hpdf(sample->modelName,sample->modelName,*w->var(_observableName),hdata);

@@ -97,6 +97,7 @@
 	  ModelName         CDATA            #IMPLIED
 	  ObservableName    CDATA            #IMPLIED
 	  CacheBinning      CDATA            #IMPLIED
+	  Rebin             CDATA            #IMPLIED
 	  >
 
 <!ELEMENT ModelItem  EMPTY>
