@@ -58,19 +58,27 @@ int main( int argc , char **argv){
       break;
     case 'v':
       isVerbose = auxUtil::to_bool(optarg);
+      cout<<"Set verbose mode to "<<isVerbose<<endl;
       break;
     case 'm':
       fitUtil::_minimizerAlgo = optarg;
+      cout<<"Set minimizer algorithm to "<<fitUtil::_minimizerAlgo<<endl;
       break;
     case 's':
       fitUtil::_minimizerStrategy = atoi(optarg);
+      cout<<"Set minimizer strategy to "<<fitUtil::_minimizerStrategy<<endl;
       break;
     case 't':
       fitUtil::_minimizerTolerance = atof(optarg);
+      cout<<"Set minimizer tolerance to "<<fitUtil::_minimizerTolerance<<endl;
+      break;
     case 'n':
       fitUtil::_nllOffset = auxUtil::to_bool(optarg);
+      cout<<"Set NLL offset to "<<fitUtil::_nllOffset<<endl;
+      break;
     case 'p':
       fitUtil::_printLevel = atoi(optarg);
+      cout<<"Set print level to "<<fitUtil::_printLevel<<endl;
       break;
     case 'b':
       binned = auxUtil::to_bool(optarg);
