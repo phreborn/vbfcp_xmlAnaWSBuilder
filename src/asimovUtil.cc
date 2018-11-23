@@ -67,8 +67,14 @@ void asimovUtil::generateAsimov(ModelConfig *mc, TString dataName){
     for(vector<TString>::iterator act = actionList.begin(); act != actionList.end(); ++act){
       TString action=*act;
       // Do fit
+      int status=-1;
       if(action==FIT){
-	int status=fitUtil::profileToData(mc, data, _rangeName);
+	if(_dataToFit[iAsimov]!=""){
+	  RooAbsData* newData=w->data(_dataToFit[iAsimov]);
+	  if(!newData) auxUtil::alertAndAbort("Dataset"+_dataToFit[iAsimov]+" cannot be found in the workspace");
+	  status=fitUtil::profileToData(mc, newData, _rangeName);
+	}
+	else status=fitUtil::profileToData(mc, data, _rangeName);
 	if(status!=0&&status!=1){
 	  cerr<<"\n\033[91m \tERROR: Fit not converging properly. You may want to investigate more before moving on. Press any key to continue... \033[0m\n"<<endl;
 	  getchar();
@@ -152,7 +158,7 @@ void asimovUtil::addEntry(TXMLNode *node){
   _SnapshotsGlob.push_back(auxUtil::getAttributeValue(node, "SnapshotGlob", true, ""));
   _SnapshotsNuis.push_back(auxUtil::getAttributeValue(node, "SnapshotNuis", true, ""));
   _SnapshotsPOI.push_back(auxUtil::getAttributeValue(node, "SnapshotPOI", true, ""));
-  // _injectionFiles.push_back(auxUtil::getAttributeValue(node, "Injection", true, ""));
+  _dataToFit.push_back(auxUtil::getAttributeValue(node, "Data", true, ""));
 }
 
 void asimovUtil::printSummary(){

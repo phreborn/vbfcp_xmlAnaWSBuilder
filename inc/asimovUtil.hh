@@ -16,7 +16,7 @@ class asimovUtil : public TObject{
 private:
   vector<TString> _asimovNames, _asimovSetups, _asimovProfiles;
   vector<TString> _SnapshotsAll, _SnapshotsNuis, _SnapshotsGlob, _SnapshotsPOI, _Snapshots;
-  vector<TString> _injectionFiles;
+  vector<TString> _dataToFit;
   TString _rangeName;
   // action items
   static TString RAW;
