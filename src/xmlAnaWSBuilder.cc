@@ -282,9 +282,8 @@ void xmlAnaWSBuilder::readSample(TXMLNode* sampleNode){
   // TString importSystGroupList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, COMMON);
   TString importSystGroupList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, SELF);
   sample.systGroups=auxUtil::splitString(importSystGroupList.Data(),',');
-  sort( sample.systGroups.begin(), sample.systGroups.end() );
-  sample.systGroups.erase( unique( sample.systGroups.begin(), sample.systGroups.end() ), sample.systGroups.end() );
-  sample.systGroups.erase( remove( sample.systGroups.begin(), sample.systGroups.end(), sample.procName ), sample.systGroups.end() ); 
+  auxUtil::removeDuplicatedString(sample.systGroups);
+  auxUtil::removeString(sample.systGroups, sample.procName);
   
   TString norm=auxUtil::getAttributeValue(sampleNode, "Norm", true, ""); // default value 1
   TString xsection=auxUtil::getAttributeValue(sampleNode, "XSection", true, ""); // default value 1
@@ -569,9 +568,8 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   for(auto poi : _POIList) _ItemsCorrelate.push_back(poi);
 
   // remove duplicates from list of _ItemsCorrelate (must be sorted to work)
-  sort( _ItemsCorrelate.begin(), _ItemsCorrelate.end() );
-  _ItemsCorrelate.erase( unique( _ItemsCorrelate.begin(), _ItemsCorrelate.end() ), _ItemsCorrelate.end() );
-
+  auxUtil::removeDuplicatedString(_ItemsCorrelate);
+  
   for(auto item : _ItemsCorrelate){
     if(!wfactory->obj(item)) continue; // Does not exist
     if(!wfactory->var(item)) auxUtil::alertAndAbort("Correlated variable "+item+" is not properly implemented as RooRealVar in the workspace"); // Only variables can be keep the names unchanged.
