@@ -755,6 +755,7 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, RooArgSet *nuisp
       if(_debug) cout<<"\tREGTEST: Creating user-defined pdf from "<<inputFileName<<endl;
       int cacheBinning=atoi(auxUtil::getAttributeValue(rootNode, "CacheBinning", true, "-1"));
       if(cacheBinning>0) w->var(_observableName)->setBins(cacheBinning, "cache"); // For the accuracy of Fourier transformation
+      bool isSuccess=false;
       while ( node != 0 ){
 	TString nodeName=node->GetNodeName();
 	if(_debug) cout<<nodeName<<endl;
@@ -766,6 +767,7 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, RooArgSet *nuisp
 	  TString oldPdfName=auxUtil::getObjName(factoryStr);
 	  factoryStr.ReplaceAll(oldPdfName, sample->modelName);
 	  implementObj(w, factoryStr);
+	  isSuccess=true;
 	  break;		// Assume model already constructed. No need to continue;
 	}
 	else{
@@ -773,6 +775,7 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, RooArgSet *nuisp
 	}
 	node=node->GetNextNode();
       }
+      if(!isSuccess) auxUtil::alertAndAbort("Cannot find \"ModelItem\" in XML file "+inputFileName);
     }
     else if(modelType==EXTERNAL){
       // In this case a workspace containing the model is used as input
