@@ -64,6 +64,8 @@ private:
 
   // Global variables which will be rewritten for each channel
   TString _observableName;
+  TString _categoryName;
+  TString _categoryType;
   double _xMin;
   double _xMax;
   bool _goBlind;
@@ -99,6 +101,30 @@ private:
   bool _debug;			// Flag for printing out more info
   
   // Global names
+
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  // XML workspace builder keywords: below can be used in 
+  // building likelihood model. They will be replaced by
+  // corresponding objects.
+  // +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  static TString RESPONSE;
+  static TString OBSERVABLE;
+  static TString PROCESS;
+  static TString COMMON;
+  static TString SELF;
+  static TString CATEGORY;
+  
+  static TString LT;
+  static TString LE;
+  static TString GT;
+  static TString GE;
+  static TString AND;
+  static TString OR;
+
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  // XML workspace builder keywords: below are used to
+  // Indicate type of operations one perform
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   static TString ALLPROC;
   static TString YIELD;
   static TString SHAPE;
@@ -107,17 +133,15 @@ private:
   static TString EXTERNAL;
   static TString HISTOGRAM;
   static TString ASCII;
-  
-  static TString RESPONSE;
-  static TString OBSERVABLE;
-  static TString PROCESS;
-  static TString COMMON;
-  static TString SELF;
 
   static TString GAUSSIAN;
   static TString LOGNORMAL;
   static TString ASYMMETRIC;
-  
+
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+  // Hard-coded object naming partten: do not duplicate
+  // these partten when constructing your own model!
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   static TString RESPONSEPREFIX;
   static TString CONSTRTERMPREFIX;
   static TString GLOBALOBSPREFIX;
@@ -138,13 +162,6 @@ private:
   static TString EFFICIENCYNAME;
   static TString CORRECTIONNAME;
   
-  static TString LT;
-  static TString LE;
-  static TString GT;
-  static TString GE;
-  static TString AND;
-  static TString OR;
-
   static TString OBSDSNAME;
 
   static TString SBLO;
@@ -158,7 +175,7 @@ private:
   void readSyst(TXMLNode* systNode, TString process="allproc");
   void readSample(TXMLNode* sampleNode);
   void readSampleXMLNode(TXMLNode* node, Sample& sample);
-  void getModel(RooWorkspace *w, Sample *sample, TString channeltype="shape", RooArgSet *nuispara=NULL, RooArgSet *constraints=NULL, RooArgSet *globobs=NULL);
+  void getModel(RooWorkspace *w, Sample *sample, RooArgSet *nuispara=NULL, RooArgSet *constraints=NULL, RooArgSet *globobs=NULL);
   void checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara);
   void clearUp(){_Systematics.clear();_ItemsLowPriority.clear(); _ItemsHighPriority.clear(); _ItemsCorrelate.clear(); _Samples.clear();}
   void attachConstraints(RooWorkspace *w, TString sumPdfStr, RooArgSet *constraints, TString finalModelName);

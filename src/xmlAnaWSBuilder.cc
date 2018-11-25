@@ -2,6 +2,30 @@
 
 ClassImp(xmlAnaWSBuilder);
 
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// XML workspace builder keywords: below can be used in 
+// building likelihood model. They will be replaced by
+// corresponding objects.
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+TString xmlAnaWSBuilder::RESPONSE="response::";
+TString xmlAnaWSBuilder::OBSERVABLE=":observable:";
+TString xmlAnaWSBuilder::PROCESS=":process:";
+TString xmlAnaWSBuilder::COMMON=":common:";
+TString xmlAnaWSBuilder::SELF=":self:";
+TString xmlAnaWSBuilder::CATEGORY=":category:";
+
+// C++ logics not displayable in XML format
+TString xmlAnaWSBuilder::LT=":lt:";
+TString xmlAnaWSBuilder::LE=":le:";
+TString xmlAnaWSBuilder::GT=":gt:";
+TString xmlAnaWSBuilder::GE=":ge:";
+TString xmlAnaWSBuilder::AND=":and:";
+TString xmlAnaWSBuilder::OR=":or:";
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// XML workspace builder keywords: below are used to
+// Indicate type of operations one perform
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 TString xmlAnaWSBuilder::ALLPROC="_allproc_";
 TString xmlAnaWSBuilder::YIELD="yield";
 TString xmlAnaWSBuilder::SHAPE="shape";
@@ -11,17 +35,15 @@ TString xmlAnaWSBuilder::USERDEF="userdef";
 TString xmlAnaWSBuilder::EXTERNAL="external";
 TString xmlAnaWSBuilder::HISTOGRAM="histogram";
 
-TString xmlAnaWSBuilder::RESPONSE="response::";
-TString xmlAnaWSBuilder::OBSERVABLE=":observable:";
-TString xmlAnaWSBuilder::PROCESS=":process:";
-TString xmlAnaWSBuilder::COMMON=":common:";
-TString xmlAnaWSBuilder::SELF=":self:";
-
 // Constraint terms
 TString xmlAnaWSBuilder::GAUSSIAN="gaus";
 TString xmlAnaWSBuilder::LOGNORMAL="logn";
 TString xmlAnaWSBuilder::ASYMMETRIC="asym"; 
 
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Hard-coded object naming partten: do not duplicate
+// these partten when constructing your own model!
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Naming convention
 TString xmlAnaWSBuilder::RESPONSEPREFIX="expected__";
 TString xmlAnaWSBuilder::CONSTRTERMPREFIX="constr__";
@@ -44,14 +66,6 @@ TString xmlAnaWSBuilder::NORMNAME="_norm";
 TString xmlAnaWSBuilder::ACCEPTANCENAME="_A";
 TString xmlAnaWSBuilder::CORRECTIONNAME="_C";
 TString xmlAnaWSBuilder::EFFICIENCYNAME="_eff";
-
-// C++ logics not displayable in XML format
-TString xmlAnaWSBuilder::LT=":lt:";
-TString xmlAnaWSBuilder::LE=":le:";
-TString xmlAnaWSBuilder::GT=":gt:";
-TString xmlAnaWSBuilder::GE=":ge:";
-TString xmlAnaWSBuilder::AND=":and:";
-TString xmlAnaWSBuilder::OR=":or:";
 
 // Observed dataset name
 TString xmlAnaWSBuilder::OBSDSNAME="obsdata";
@@ -348,20 +362,20 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   TXMLNode* rootNode = xmldoc->GetRootNode();
 
   // Get the category name and property from
-  TString channelname=auxUtil::getAttributeValue(rootNode, "Name");
-  TString channeltype=auxUtil::getAttributeValue(rootNode, "Type");
+  _categoryName=auxUtil::getAttributeValue(rootNode, "Name");
+  _categoryType=auxUtil::getAttributeValue(rootNode, "Type");
   _luminosity=atof(auxUtil::getAttributeValue(rootNode, "Lumi", true, "-1"));
   
-  channeltype.ToLower();
+  _categoryType.ToLower();
 
-  if(find(_CN.begin(), _CN.end(), channelname)==_CN.end()) _CN.push_back(channelname);
-  else auxUtil::alertAndAbort("Category name "+channelname+" used in XML file"+xmlName+" is already used by other categories. Please use a different name");
-  auxUtil::printTitle("Category "+channelname);
+  if(find(_CN.begin(), _CN.end(), _categoryName)==_CN.end()) _CN.push_back(_categoryName);
+  else auxUtil::alertAndAbort("Category name "+_categoryName+" used in XML file"+xmlName+" is already used by other categories. Please use a different name");
+  auxUtil::printTitle("Category "+_categoryName);
   
-  _Type.push_back(channeltype);
+  _Type.push_back(_categoryType);
   /* all the attributes of a channel */
 
-  unique_ptr<RooWorkspace> wfactory(new RooWorkspace("factory_"+channelname));
+  unique_ptr<RooWorkspace> wfactory(new RooWorkspace("factory_"+_categoryName));
   if(_luminosity>0) implementObj(wfactory.get(), LUMINAME+Form("[%f]", _luminosity)); // First thing: create a luminosity variable
 
   TXMLNode *dataNode=auxUtil::findNode(rootNode, "Data"); // This attribute is only allowed to appear once per-channel, and cannot be hided in a sub-XML file
@@ -383,12 +397,12 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
       _blindMax=rangeComp[1].Atof();
       if(_blindMax<=_blindMin || _blindMax>_xMax || _blindMin<_xMin) auxUtil::alertAndAbort(Form("Invalid blinding range provided: min %f, max %f", _blindMin, _blindMax));
 
-      wfactory->var(_observableName)->setRange(SBLO+"_"+channelname, _xMin, _blindMin);
-      wfactory->var(_observableName)->setRange(BLIND+"_"+channelname, _blindMin, _blindMax);
-      wfactory->var(_observableName)->setRange(SBHI+"_"+channelname, _blindMax, _xMax);
+      wfactory->var(_observableName)->setRange(SBLO+"_"+_categoryName, _xMin, _blindMin);
+      wfactory->var(_observableName)->setRange(BLIND+"_"+_categoryName, _blindMin, _blindMax);
+      wfactory->var(_observableName)->setRange(SBHI+"_"+_categoryName, _blindMax, _xMax);
 
       if(_blindMax==_xMax && _blindMin==_xMin){
-	cout<<"\n\033[91m \tREGTEST: Category "+channelname+" fully blinded. No side-band exists. \033[0m\n"<<endl;
+	cout<<"\n\033[91m \tREGTEST: Category "+_categoryName+" fully blinded. No side-band exists. \033[0m\n"<<endl;
 	_rangeName="";
       }
       else if(_blindMax==_xMax) _rangeName=SBLO;
@@ -401,10 +415,10 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
     }
   }
 
-  int nbinx=(channeltype==COUNTING) ? 1 : atoi(auxUtil::getAttributeValue(dataNode, "Binning"));
+  int nbinx=(_categoryType==COUNTING) ? 1 : atoi(auxUtil::getAttributeValue(dataNode, "Binning"));
   wfactory->var(_observableName)->setBins(nbinx);
   
-  _inputDataFileName=auxUtil::getAttributeValue(dataNode, "InputFile", (channeltype==COUNTING), "");
+  _inputDataFileName=auxUtil::getAttributeValue(dataNode, "InputFile", (_categoryType==COUNTING), "");
   _inputDataFileType=auxUtil::getAttributeValue(dataNode, "FileType", true, ASCII);
   _inputDataFileType.ToLower();
   if(_inputDataFileType!=ASCII){	// means that we are reading data from a tree
@@ -415,7 +429,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   }
   _injectGhost=auxUtil::to_bool(auxUtil::getAttributeValue(dataNode, "InjectGhost", true, "0")); // Default false
 
-  _numData=(channeltype==COUNTING && _inputDataFileName=="") ? atoi(auxUtil::getAttributeValue(dataNode, "NumData")) : -1; // Only needed for counting experiment where the input data file is not specified
+  _numData=(_categoryType==COUNTING && _inputDataFileName=="") ? atoi(auxUtil::getAttributeValue(dataNode, "NumData")) : -1; // Only needed for counting experiment where the input data file is not specified
   
   dataFileSanityCheck();	// Check now and report, before it is too late
   
@@ -531,9 +545,9 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
     
     implementObj(wfactory.get(), normStr);
     
-    cout<<"\tREGTEST: Yield for category \""<<channelname<<"\" process \""<<sample.procName<<"\": "<<wfactory->function(sample.normName)->getVal()<<endl;
+    cout<<"\tREGTEST: Yield for category \""<<_categoryName<<"\" process \""<<sample.procName<<"\": "<<wfactory->function(sample.normName)->getVal()<<endl;
     if(_debug) wfactory->Print();
-    getModel(wfactory.get(), &sample, channeltype, &nuispara, &constraints, &globobs);
+    getModel(wfactory.get(), &sample, &nuispara, &constraints, &globobs);
   }
 
   if(_debug) wfactory->Print();
@@ -570,10 +584,10 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
 
   // Now, import the pdf to a new workspace, where the renaming of objects will happen automatically
   if(_debug) cout<<"\tREGTEST: The following variables will not be renamed: "<<correlated<<endl;
-  wchannel->import( (*wfactory->pdf(SUMPDFNAME)), RenameAllNodes(channelname), RenameAllVariablesExcept(channelname,correlated), Silence());
+  wchannel->import( (*wfactory->pdf(SUMPDFNAME)), RenameAllNodes(_categoryName), RenameAllVariablesExcept(_categoryName,correlated), Silence());
 
   // Import constraint terms. Note we should not rename the constraint term gaussians
-  attachConstraints(wchannel, SUMPDFNAME+"_"+channelname, &constraints, FINALPDFNAME+"_"+channelname);
+  attachConstraints(wchannel, SUMPDFNAME+"_"+_categoryName, &constraints, FINALPDFNAME+"_"+_categoryName);
 
   auxUtil::defineSet(wchannel, _POIList, "POI");
   auxUtil::defineSet(wchannel, nuispara, "nuisanceParameters");
@@ -706,7 +720,7 @@ void xmlAnaWSBuilder::NPMaker(RooWorkspace *w, Systematic *syst, RooArgSet *nuis
   if(_debug) cout<<"REGTEST: finished implementing systematic "<<syst->NPName<<endl;
 }
 
-void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, TString channeltype, RooArgSet *nuispara, RooArgSet *constraints, RooArgSet *globobs){
+void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, RooArgSet *nuispara, RooArgSet *constraints, RooArgSet *globobs){
   if(_debug) cout<<"Entering function getModel"<<endl;
   bool isSharedPdf=(sample->sharePdfGroup!="");
   TString tagName=(isSharedPdf?sample->sharePdfGroup:sample->procName);
@@ -722,7 +736,7 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, TString channelt
   }
   
   if(_debug) cout<<sample->modelName<<endl;
-  if(channeltype==COUNTING){
+  if(_categoryType==COUNTING){
     // In counting experiment we only need a uniform pdf
     implementObj(w, "RooUniform::"+sample->modelName+"("+_observableName+")");
   }
@@ -1087,6 +1101,7 @@ void xmlAnaWSBuilder::dataFileSanityCheck(){
 void xmlAnaWSBuilder::translateKeyword(TString &expr){
   expr.ReplaceAll(RESPONSE, RESPONSEPREFIX+SHAPE+"_"); // Implement proper response terms. Assume only shape uncertainty would appear
   expr.ReplaceAll(OBSERVABLE, _observableName); // Implement proper observables
+  expr.ReplaceAll(CATEGORY, _categoryName); // Category name
   expr.ReplaceAll(LT,"<");
   expr.ReplaceAll(LE,"<=");
   expr.ReplaceAll(GT,">");
