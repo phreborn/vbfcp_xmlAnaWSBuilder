@@ -23,7 +23,10 @@ int fitUtil::profileToData(ModelConfig *mc, RooAbsData *data, TString rangeName)
     }
   }
   unique_ptr<RooAbsReal> nll;
-  if(rangeName!="") nll.reset(pdf->createNLL(*data, Constrain(*mc->GetNuisanceParameters()), GlobalObservables(*mc->GetGlobalObservables()), Range(rangeName), SplitRange()));
+  if(rangeName!=""){
+    cout<<endl<<auxUtil::WARNING<<" \tREGTEST: Performing binned fit in range "<<rangeName<<auxUtil::ENDC<<endl<<endl;
+    nll.reset(pdf->createNLL(*data, Constrain(*mc->GetNuisanceParameters()), GlobalObservables(*mc->GetGlobalObservables()), Range(rangeName), SplitRange()));
+  }
   else nll.reset(pdf->createNLL(*data, Constrain(*mc->GetNuisanceParameters()), GlobalObservables(*mc->GetGlobalObservables())));
   nll->enableOffsetting(_nllOffset);
   RooMinimizer minim(*nll);
