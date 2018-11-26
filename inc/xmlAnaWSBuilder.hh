@@ -81,7 +81,6 @@ private:
   TString _inputDataHistName;
   bool _injectGhost;
   int _numData;
-  TString _rangeName;
   
   // Vectors and maps which will be cleared after generating model for each channel
   map<TString, vector<Systematic> > _Systematics;
@@ -95,7 +94,8 @@ private:
   vector<TString> _CN;
   vector<TString> _Type;
   vector<TString> _POIList;
-
+  vector<TString> _rangeList;
+  
   // Flags
   bool _useBinned;
   TString _plotOpt;

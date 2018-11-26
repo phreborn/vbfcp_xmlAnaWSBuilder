@@ -104,7 +104,6 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   _goBlind=auxUtil::to_bool(auxUtil::getAttributeValue(rootNode, "Blind", true, "0"));
   
   _asimovHandler=auto_ptr<asimovUtil>(new asimovUtil());
-  if(_goBlind) _asimovHandler->setRange(_rangeName);
   
   while ( node != 0 ){
     TString nodeName=node->GetNodeName();
@@ -124,7 +123,6 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   _Nch=_xmlPath.size();
   _useBinned=false;
   _plotOpt="";
-  _rangeName="";
   
   auxUtil::printTime();
   _timer.Start();
@@ -133,7 +131,7 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   cout<<"Workspace name: "<<_wsName<<endl;
   cout<<"ModelConfig name: "<<_mcName<<endl;
   cout<<"Data name: "<<_dataName<<endl;
-  if(_goBlind) cout<<""<<auxUtil::WARNING<<"Blind analysis"<<auxUtil::ENDC<<""<<endl;
+  if(_goBlind) cout<<auxUtil::WARNING<<"Blind analysis"<<auxUtil::ENDC<<endl;
   cout<<"POI: ";
   for(auto poi : _POIList) cout<<poi<<" ";
   cout<<endl;
@@ -208,7 +206,8 @@ void xmlAnaWSBuilder::generateWS(){
   // Save the original snapshot
   // _combWS->saveSnapshot("nominalNuis",*_mConfig->GetNuisanceParameters());
   // _combWS->saveSnapshot("nominalGlobs",*_mConfig->GetGlobalObservables());
-  if(_useBinned) cout<<endl<<""<<auxUtil::WARNING<<" \tREGTEST: Fitting binned dataset. "<<auxUtil::ENDC<<endl<<endl;
+  if(_goBlind) _asimovHandler->setRange(SBLO+","+SBHI);
+  if(_useBinned) cout<<endl<<auxUtil::WARNING<<" \tREGTEST: Fitting binned dataset. "<<auxUtil::ENDC<<endl<<endl;
   
   if(_asimovHandler->genAsimov()) _asimovHandler->generateAsimov(_mConfig.get(), _useBinned?_dataName+"binned":_dataName);
   _combWS->importClassCode();
@@ -391,33 +390,6 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
 
   if(_xMax<=_xMin) auxUtil::alertAndAbort("Invalid range for observable "+_observableName+Form(": min %f, max %f", _xMin, _xMax));
 
-  TString blindRange=auxUtil::getAttributeValue(dataNode, "BlindRange", true, "");
-  if(_goBlind){
-    if(blindRange!=""){
-      vector<TString> rangeComp=auxUtil::splitString(blindRange,',');
-      if(rangeComp.size()!=2 || !rangeComp[0].IsFloat() || !rangeComp[1].IsFloat()) auxUtil::alertAndAbort("Invalid format for blinding range: "+blindRange);
-      _blindMin=rangeComp[0].Atof();
-      _blindMax=rangeComp[1].Atof();
-      if(_blindMax<=_blindMin || _blindMax>_xMax || _blindMin<_xMin) auxUtil::alertAndAbort(Form("Invalid blinding range provided: min %f, max %f", _blindMin, _blindMax));
-
-      wfactory->var(_observableName)->setRange(SBLO+"_"+_categoryName, _xMin, _blindMin);
-      wfactory->var(_observableName)->setRange(BLIND+"_"+_categoryName, _blindMin, _blindMax);
-      wfactory->var(_observableName)->setRange(SBHI+"_"+_categoryName, _blindMax, _xMax);
-
-      if(_blindMax==_xMax && _blindMin==_xMin){
-	cout<<endl<<auxUtil::WARNING<<" \tREGTEST: Category "+_categoryName+" fully blinded. No side-band exists. "<<auxUtil::ENDC<<endl<<endl;
-	_rangeName="";
-      }
-      else if(_blindMax==_xMax) _rangeName=SBLO;
-      else if(_blindMin==_xMin) _rangeName=SBHI;
-      else _rangeName=SBLO+","+SBHI;
-    }
-    else{
-      _blindMin=_xMax;
-      _blindMax=_xMin;
-    }
-  }
-
   int nbinx=(_categoryType==COUNTING) ? 1 : atoi(auxUtil::getAttributeValue(dataNode, "Binning"));
   wfactory->var(_observableName)->setBins(nbinx);
   
@@ -566,8 +538,44 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   if(_debug) cout<<sumPdfStr<<endl;
   implementObj(wfactory.get(), sumPdfStr);
   // sumPdfStr=auxUtil::getObjName(sumPdfStr);
-  
-  checkNuisParam(wfactory->pdf(SUMPDFNAME), &nuispara);
+  RooAddPdf *SBPdf=dynamic_cast<RooAddPdf*>(wfactory->pdf(SUMPDFNAME));
+
+  // Now handle blinding if needed
+  TString blindRange=auxUtil::getAttributeValue(dataNode, "BlindRange", true, "");
+  if(_goBlind){
+    TString rangeName="";
+    if(blindRange!=""){
+      cout<<auxUtil::WARNING<<" \tREGTEST: Implement blind range "<<blindRange<<auxUtil::ENDC<<endl;
+      vector<TString> rangeComp=auxUtil::splitString(blindRange,',');
+      if(rangeComp.size()!=2 || !rangeComp[0].IsFloat() || !rangeComp[1].IsFloat()) auxUtil::alertAndAbort("Invalid format for blinding range: "+blindRange);
+      _blindMin=rangeComp[0].Atof();
+      _blindMax=rangeComp[1].Atof();
+      if(_blindMax<=_blindMin || _blindMax>_xMax || _blindMin<_xMin) auxUtil::alertAndAbort(Form("Invalid blinding range provided: min %f, max %f", _blindMin, _blindMax));
+
+      wfactory->var(_observableName)->setRange(SBLO+"_"+_categoryName, _xMin, _blindMin);
+      wfactory->var(_observableName)->setRange(BLIND+"_"+_categoryName, _blindMin, _blindMax);
+      wfactory->var(_observableName)->setRange(SBHI+"_"+_categoryName, _blindMax, _xMax);
+      wfactory->var(_observableName)->setRange("FULL", _xMin, _xMax); // Suggested by Wouter
+
+      if(_blindMax==_xMax && _blindMin==_xMin){
+	cout<<endl<<auxUtil::WARNING<<" \tREGTEST: Category "+_categoryName+" fully blinded. No side-band exists. "<<auxUtil::ENDC<<endl<<endl;
+	rangeName="";
+      }
+      else if(_blindMax==_xMax) rangeName=SBLO+"_"+_categoryName;
+      else if(_blindMin==_xMin) rangeName=SBHI+"_"+_categoryName;
+      else rangeName=SBLO+"_"+_categoryName+","+SBHI+"_"+_categoryName;
+
+      SBPdf->fixCoefRange("FULL");
+    }
+    else{
+      _blindMin=_xMax;
+      _blindMax=_xMin;
+    }
+    _rangeList.push_back(rangeName);
+  }
+
+
+  checkNuisParam(SBPdf, &nuispara);
 
   // Keep Track of Correlated variables
   TString correlated = "";
