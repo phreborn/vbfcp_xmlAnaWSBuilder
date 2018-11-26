@@ -8,6 +8,9 @@ TString auxUtil::UNCERTHIPREFIX="uncertHi__";
 TString auxUtil::UNCERTLOPREFIX="uncertLo__";
 TString auxUtil::UNCERTSYMMPREFIX="uncertSymm__";
 
+TString auxUtil::WARNING="\033[91m";
+TString auxUtil::ENDC="\033[0m";
+
 void auxUtil::printTitle(TString titleText, TString separator, int width){
   TString fullLine="", line="";
   

@@ -17,6 +17,9 @@ public:
 
   enum _itemType{FUNCTION, VARIABLE, EXIST};
   enum _uncertType{UPERROR, LOERROR, SYMMERROR};
+
+  static TString WARNING;
+  static TString ENDC;
   
   static void printTime(){time_t result=time(nullptr);cout<<asctime(localtime(&result));}
   static void printTitle(TString titleText, TString separator="-", int width=10);

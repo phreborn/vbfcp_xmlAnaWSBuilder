@@ -129,7 +129,7 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   cout<<"Workspace name: "<<_wsName<<endl;
   cout<<"ModelConfig name: "<<_mcName<<endl;
   cout<<"Data name: "<<_dataName<<endl;
-  if(_goBlind) cout<<"\033[91mBlind analysis\033[0m"<<endl;
+  if(_goBlind) cout<<""<<auxUtil::WARNING<<"Blind analysis"<<auxUtil::ENDC<<""<<endl;
   cout<<"POI: ";
   for(auto poi : _POIList) cout<<poi<<" ";
   cout<<endl;
@@ -196,7 +196,7 @@ void xmlAnaWSBuilder::generateWS(){
   _combWS->import(obsData);
   if(obsDatabinned.numEntries()<obsData.numEntries()) _combWS->import(obsDatabinned);
   else{
-    cout<<"\n\033[91m \tREGTEST: No need to keep binned dataset, as the number of data events is smaller than the number of bins in all categories. \033[0m\n"<<endl;
+    cout<<endl<<auxUtil::WARNING<<" \tREGTEST: No need to keep binned dataset, as the number of data events is smaller than the number of bins in all categories. "<<auxUtil::ENDC<<endl<<endl;
     _useBinned=false;
   }
   wArr.clear();
@@ -204,7 +204,7 @@ void xmlAnaWSBuilder::generateWS(){
   // Save the original snapshot
   // _combWS->saveSnapshot("nominalNuis",*_mConfig->GetNuisanceParameters());
   // _combWS->saveSnapshot("nominalGlobs",*_mConfig->GetGlobalObservables());
-  if(_useBinned) cout<<"\033[91m \tREGTEST: Fitting binned dataset. \033[0m\n"<<endl;
+  if(_useBinned) cout<<endl<<""<<auxUtil::WARNING<<" \tREGTEST: Fitting binned dataset. "<<auxUtil::ENDC<<endl<<endl;
   
   if(_asimovHandler->genAsimov()) _asimovHandler->generateAsimov(_mConfig.get(), _useBinned?_dataName+"binned":_dataName);
   _combWS->importClassCode();
@@ -277,7 +277,7 @@ void xmlAnaWSBuilder::readSample(TXMLNode* sampleNode){
   Sample sample;
   sample.procName=auxUtil::getAttributeValue(sampleNode, "Name");
   // sample.yield=atof(auxUtil::getAttributeValue(sampleNode, "Norm"));
-  sample.inputFile=auxUtil::getAttributeValue(sampleNode, "InputFile", (_Type.back()==COUNTING), "");
+  sample.inputFile=auxUtil::getAttributeValue(sampleNode, "InputFile", (_categoryType==COUNTING), "");
 
   // TString importSystGroupList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, COMMON);
   TString importSystGroupList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, SELF);
@@ -401,7 +401,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
       wfactory->var(_observableName)->setRange(SBHI+"_"+_categoryName, _blindMax, _xMax);
 
       if(_blindMax==_xMax && _blindMin==_xMin){
-	cout<<"\n\033[91m \tREGTEST: Category "+_categoryName+" fully blinded. No side-band exists. \033[0m\n"<<endl;
+	cout<<endl<<auxUtil::WARNING<<" \tREGTEST: Category "+_categoryName+" fully blinded. No side-band exists. "<<auxUtil::ENDC<<endl<<endl;
 	_rangeName="";
       }
       else if(_blindMax==_xMax) _rangeName=SBLO;
@@ -898,7 +898,7 @@ void xmlAnaWSBuilder::attachConstraints(RooWorkspace *w, TString sumPdfName, Roo
     TString NPName=constrName.ReplaceAll(CONSTRTERMPREFIX, "");
 
     if(!pdf->getVariables()->find(NPName)){
-      cerr<<"\tWARNING: Constraint term "<<parg->GetName()<<" with NP "<<NPName<<" is redundant in channel \""<<_CN.back()<<"\". It will be removed..."<<endl;
+      cerr<<"\tWARNING: Constraint term "<<parg->GetName()<<" with NP "<<NPName<<" is redundant in channel \""<<_categoryName<<"\". It will be removed..."<<endl;
       constraints->remove(*parg);
     }
     else w->import(*parg, Silence());
@@ -942,7 +942,7 @@ void xmlAnaWSBuilder::checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara){
 
   if(floatSet.getSize()<nNP){
     // There are redundant nuisance parameters in the model, which we do not care...
-    cerr<<"\tWARNING: There supposed to be "<<nPOI+nNP<<" free parameters, but only seen "<<floatSet.getSize()<<" in the channel "<<_CN.back()<<endl;
+    cerr<<"\tWARNING: There supposed to be "<<nPOI+nNP<<" free parameters, but only seen "<<floatSet.getSize()<<" in the channel "<<_categoryName<<endl;
     cout<<"\tIn principle not a issue, but please make sure you understand what you are doing."<<endl;
     if(_debug){
       cout<<"++++++++++++++++++++++ all the free parameters ++++++++++++++++++++++"<<endl;
@@ -960,8 +960,6 @@ void xmlAnaWSBuilder::checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara){
 TString xmlAnaWSBuilder::getItemExpr(TXMLNode *node, TString attrName, TString process){
   TString expr=auxUtil::getAttributeValue(node, attrName);
 
-  translateKeyword(expr);
-  
   if(expr.Contains(PROCESS)){
     if(process=="") auxUtil::alertAndAbort("Process name not provided for expression "+expr);
     expr.ReplaceAll(PROCESS, "_"+process);
@@ -977,7 +975,7 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
   
   RooDataSet* obsdata=new RooDataSet(OBSDSNAME,OBSDSNAME,obs_plus_wt,WeightVar(*w));
 
-  if(_Type.back()==COUNTING && _numData>=0){ // Generate number of events for counting experiment
+  if(_categoryType==COUNTING && _numData>=0){ // Generate number of events for counting experiment
     double binCenter=(x->getMin()+x->getMax())/2.;
     double weight=(_numData==0)?auxUtil::epsilon/1000.:_numData;
     x->setVal(binCenter);
@@ -1016,6 +1014,7 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
 }
 
 TString xmlAnaWSBuilder::implementObj(RooWorkspace *w, TString expr, bool checkExistBeforeImp){
+  translateKeyword(expr);
   // If the obj is claimed to exist, but actually not, then abort.
   int type=auxUtil::getItemType(expr);
   if(type==auxUtil::EXIST){
@@ -1082,7 +1081,7 @@ void xmlAnaWSBuilder::readChannelXMLNode(TXMLNode *node){
 }
 
 void xmlAnaWSBuilder::dataFileSanityCheck(){
-  if(_Type.back()==COUNTING){
+  if(_categoryType==COUNTING){
     if(_inputDataFileName!="" && !auxUtil::checkExist(_inputDataFileName)) auxUtil::alertAndAbort("Cannot find input data file "+_inputDataFileName);
     else if(_inputDataFileName=="" && _numData<0) auxUtil::alertAndAbort("Please either provide a input data file, or provide a valid number of data events for a counting experiment");
   }
