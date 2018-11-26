@@ -1139,7 +1139,17 @@ void xmlAnaWSBuilder::translateKeyword(TString &expr){
 void xmlAnaWSBuilder::Summary(TString outputFigName){
   RooMsgService::instance().setGlobalKillBelow(RooFit::FATAL);
   gErrorIgnoreLevel=kWarning;
-
+  vector<TString> options=auxUtil::splitString(_plotOpt,',');
+  int m_rebin=1;
+  bool m_logy=false;
+  for(auto opt : options){
+    if(opt.Contains("rebin")){
+      m_rebin=atoi(opt(opt.First("rebin")+5,opt.Length()).Data());
+      cout<<auxUtil::WARNING<<"Rebin with "<<m_rebin<<auxUtil::ENDC<<endl;
+    }
+    if(opt.Contains("logy")) m_logy=true;
+  }
+  
   RooSimultaneous *m_pdf = dynamic_cast<RooSimultaneous*>(_mConfig->GetPdf()); assert (m_pdf);
   RooAbsCategoryLValue* m_cat = const_cast<RooAbsCategoryLValue*>(&m_pdf->indexCat());
   const RooArgSet *m_gobs = dynamic_cast<const RooArgSet*>(_mConfig->GetGlobalObservables()); assert(m_gobs);
@@ -1160,23 +1170,109 @@ void xmlAnaWSBuilder::Summary(TString outputFigName){
     cout << "\t\tIndex: " << i << ", Pdf: " << pdfi->GetName() << ", Data: " << datai->GetName() << ", SumEntries: " << datai->sumEntries() << endl;
 
     RooRealVar *x=dynamic_cast<RooRealVar*>(pdfi->getObservables(datai)->first());
+    int obsNBins = x->numBins()/m_rebin;
     unique_ptr<RooPlot> frame(x->frame());
-    datai->plotOn(frame.get(), DataError(RooAbsData::Poisson));
+    datai->plotOn(frame.get(), DataError(RooAbsData::Poisson), RooFit::Binning(obsNBins));
 
-    if(_goBlind){
-      pdfi->plotOn(frame.get(), LineColor(kBlue), LineStyle(2), NormRange(SBLO+"_"+channelname+","+SBHI+"_"+channelname), Normalization(1.0,RooAbsReal::RelativeExpected));
-      pdfi->plotOn(frame.get(), LineColor(kBlue), LineStyle(1), Range(SBLO+"_"+channelname+","+SBHI+"_"+channelname), NormRange(SBLO+"_"+channelname+","+SBHI+"_"+channelname), Normalization(1.0,RooAbsReal::RelativeExpected));
+    double addSF=1;
+    if(_goBlind && _rangeList[i]!=""){
+      pdfi->plotOn(frame.get(), LineColor(kBlue), LineStyle(2), NormRange(_rangeList[i]));
+      pdfi->plotOn(frame.get(), LineColor(kBlue), LineStyle(1), Range(_rangeList[i]), NormRange(_rangeList[i]));
+      addSF=pdfi->createIntegral(RooArgSet(*x), NormSet(*x))->getVal()/pdfi->createIntegral(RooArgSet(*x), NormSet(*x), Range(_rangeList[i]))->getVal();
     }
-    else pdfi->plotOn(frame.get(), LineColor(kBlue), Normalization(1.0,RooAbsReal::RelativeExpected));
+    else pdfi->plotOn(frame.get(), LineColor(kBlue));
 
     c.cd();
-    frame->SetMinimum(auxUtil::epsilon*10);
-    if(_plotOpt.Contains("logy")){
+    TPad *pad1 =  new TPad("pad1_","pad1name",0.01,0.40,0.99,0.99);
+    TPad *pad2 =  new TPad("pad2_","pad2name",0.01,0.05,0.99,0.402);
+    pad1->Draw();
+    pad2->Draw();
+    pad1->SetBottomMargin(0.);
+    pad1->cd();
+    frame->SetMinimum(auxUtil::epsilon*1000);
+    if(m_logy){
       frame->SetMinimum(1e-1);
       c.SetLogy();
     }
     
+    frame->SetLabelFont(43,"y");
+    frame->SetLabelOffset(0.005,"y");
+    frame->SetLabelSize(14,"y");
+    frame->SetTitleFont(43,"y");
+    frame->SetTitleOffset(1.2,"y");
+    frame->SetTitleSize(17,"y");
+    frame->SetXTitle("");
     frame->Draw();
+
+    pad2->SetTopMargin(0.);
+    pad2->SetBottomMargin(0.25);
+    pad2->cd();
+    
+    TH1D* hsub = new TH1D("hsub","hsub",obsNBins,x->getMin(),x->getMax()); 
+    hsub->Sumw2();
+
+    TH1D *hbkg=(TH1D*)pdfi->createHistogram("hbkg", *x, RooFit::Binning(obsNBins));
+    TH1D *hdata=(TH1D*)datai->createHistogram("hdata", *x, RooFit::Binning(obsNBins));
+    for(int ibin=1;ibin<=obsNBins;ibin++) hdata->SetBinError(ibin, sqrt(hdata->GetBinContent(ibin)));
+    hbkg->Scale(hdata->Integral()/hbkg->Integral("width")*addSF);
+
+    for( int i = 0 ; i < obsNBins; i ++ ){
+      double weight = hbkg->GetBinContent(i+1);
+      double value = hdata->GetBinContent(i+1);
+      double error = hdata->GetBinError(i+1);
+      if(value>0.5) {
+	hsub->SetBinContent(i+1,value/weight);
+	hsub->SetBinError(i+1,error/weight);
+      }
+    }
+    hsub->GetYaxis()->SetRangeUser(0.801,1.199);
+    hsub->SetMarkerStyle(kFullCircle);
+    hsub->SetMarkerColor(kBlack);
+    hsub->SetMarkerSize(1.);
+    hsub->SetStats(kFALSE);
+    hsub->SetTitle("");
+    hsub->SetLineColor(kBlack);
+    
+    hsub->GetYaxis()->SetTitle("Data / Fit ");
+    hsub->GetYaxis()->SetTitleFont(43);
+    hsub->GetYaxis()->SetTitleSize(17);
+    hsub->GetYaxis()->SetTitleOffset(1.3);
+    hsub->GetYaxis()->SetLabelFont(43);
+    hsub->GetYaxis()->SetLabelSize(14);
+
+    hsub->GetXaxis()->SetTitleFont(43);
+    hsub->GetXaxis()->SetTitleSize(17);
+    // TString xAxisTitle(x->GetTitle()) ;
+    hsub->GetXaxis()->SetTitle(Form("%s [%s]", x->GetTitle(), x->getUnit()));
+    hsub->GetXaxis()->SetTitleOffset(3.5);
+    hsub->GetXaxis()->SetLabelFont(43);
+    hsub->GetXaxis()->SetLabelSize(14);
+    hsub->GetXaxis()->SetLabelOffset(0.016);
+    hsub->SetLineWidth(1);
+
+    RooPlot* frameS = x->frame();
+    hsub->Draw();
+
+    TLine* l = new TLine(x->getMin(),1,x->getMax(),1);
+    l->SetLineColor(kCyan+2);
+    l->SetLineWidth(2);
+    l->Draw("same");
+
+    TLine* ldown = new TLine(x->getMin(),1.1,x->getMax(),1.1);
+    ldown->SetLineColor(kCyan+1);
+    ldown->SetLineWidth(1);
+    ldown->SetLineStyle(kDashed);
+    ldown->Draw("same");
+
+    TLine* lup = new TLine(x->getMin(),0.9,x->getMax(),0.9);
+    lup->SetLineColor(kCyan+1);
+    lup->SetLineWidth(1);
+    lup->SetLineStyle(kDashed);
+    lup->Draw("same");
+
+    hsub->Draw("same");
+    frameS->Draw("same");
+
     c.Print(outputFigName);
   }
   c.Print(outputFigName+"]");
