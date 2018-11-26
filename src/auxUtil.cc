@@ -252,3 +252,19 @@ vector<TString> auxUtil::diffSet(vector<TString> A, vector<TString> B){
 		      std::back_inserter(results));
   return results;
 }
+
+RooDataSet* auxUtil::histToDataSet(TH1* h, RooRealVar* x, RooRealVar* w){
+  double xmin=x->getMin();
+  double xmax=x->getMax();
+  RooDataSet *histData =new RooDataSet(h->GetName(),h->GetTitle(),RooArgSet(*x,*w),WeightVar(*w));
+  int nbin=h->GetNbinsX();
+  for( int ibin = 1 ; ibin <= nbin ; ibin ++ ) {
+    double center=h->GetBinCenter(ibin);
+    if(center>xmax||center<xmin) continue;
+    x->setVal(h->GetBinCenter(ibin));
+    double weight = h->GetBinContent(ibin);
+    w->setVal(weight);
+    histData -> add( RooArgSet(*x,*w) , weight);
+  }
+  return histData;
+}

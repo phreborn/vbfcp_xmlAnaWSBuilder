@@ -57,7 +57,8 @@ public:
   static bool to_bool(TString str);
   static TXMLNode* findNode(TXMLNode* rootNode, TString nodeName);
   static TXMLAttr* findAttribute(TXMLNode* rootNode, TString attributeKey);
-
+  static RooDataSet* histToDataSet(TH1* h, RooRealVar* x, RooRealVar* w);
+    
   static bool checkExist(TString name);
   
   static double epsilon;

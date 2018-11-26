@@ -40,6 +40,7 @@
 	  TreeName          CDATA            #IMPLIED
 	  VarName           CDATA            #IMPLIED
 	  Cut               CDATA            #IMPLIED
+	  HistName          CDATA            #IMPLIED
           Observable        CDATA            #REQUIRED
           Binning           CDATA            #IMPLIED
           InjectGhost       CDATA            #IMPLIED

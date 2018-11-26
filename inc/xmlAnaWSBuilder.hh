@@ -78,6 +78,7 @@ private:
   TString _inputDataTreeName;
   TString _inputDataVarName;
   TString _Cut;
+  TString _inputDataHistName;
   bool _injectGhost;
   int _numData;
   TString _rangeName;

@@ -30,7 +30,11 @@ TString xmlAnaWSBuilder::ALLPROC="_allproc_";
 TString xmlAnaWSBuilder::YIELD="yield";
 TString xmlAnaWSBuilder::SHAPE="shape";
 TString xmlAnaWSBuilder::COUNTING="counting";
+
+// Type of input data file
 TString xmlAnaWSBuilder::ASCII="ascii";
+
+// Type of PDF input
 TString xmlAnaWSBuilder::USERDEF="userdef";
 TString xmlAnaWSBuilder::EXTERNAL="external";
 TString xmlAnaWSBuilder::HISTOGRAM="histogram";
@@ -420,11 +424,14 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   _inputDataFileName=auxUtil::getAttributeValue(dataNode, "InputFile", (_categoryType==COUNTING), "");
   _inputDataFileType=auxUtil::getAttributeValue(dataNode, "FileType", true, ASCII);
   _inputDataFileType.ToLower();
-  if(_inputDataFileType!=ASCII){	// means that we are reading data from a tree
-    _inputDataTreeName=auxUtil::getAttributeValue(dataNode, "TreeName");
-    _inputDataVarName=auxUtil::getAttributeValue(dataNode, "VarName");
-    _Cut=auxUtil::getAttributeValue(dataNode, "Cut", true, "");
-    translateKeyword(_Cut);
+  if(_inputDataFileType!=ASCII){	// means that we are reading data from a ntuple or histogram
+    if(_inputDataFileType==HISTOGRAM) _inputDataHistName=auxUtil::getAttributeValue(dataNode, "HistName");
+    else{
+      _inputDataTreeName=auxUtil::getAttributeValue(dataNode, "TreeName");
+      _inputDataVarName=auxUtil::getAttributeValue(dataNode, "VarName");
+      _Cut=auxUtil::getAttributeValue(dataNode, "Cut", true, "");
+      translateKeyword(_Cut);
+    }
   }
   _injectGhost=auxUtil::to_bool(auxUtil::getAttributeValue(dataNode, "InjectGhost", true, "0")); // Default false
 
@@ -988,6 +995,11 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
     if(_inputDataFileType==ASCII){
       obsdata_tmp.reset(RooDataSet::read(_inputDataFileName, RooArgList(*x)));
     }
+    else if(_inputDataFileType==HISTOGRAM){
+      unique_ptr<TFile> f(TFile::Open(_inputDataFileName));
+      TH1* h=dynamic_cast<TH1*>(f->Get(_inputDataHistName));
+      obsdata_tmp.reset(auxUtil::histToDataSet(h, x, w));
+    }
     else{
       unique_ptr<TFile> f(TFile::Open(_inputDataFileName));
       TTree *t=dynamic_cast<TTree*>(f->Get(_inputDataTreeName));
@@ -1003,7 +1015,7 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
     for (int i=0 ; i<obsdata_tmp->numEntries() ; i++) {
       obsdata_tmp->get(i) ;
       x->setVal(xdata_tmp->getVal());
-      double weight=1;
+      double weight=obsdata_tmp->weight();
       w->setVal(weight);
       if(_goBlind && x->getVal()>_blindMin && x->getVal()<_blindMax) continue;
       obsdata->add( RooArgSet(*x, *w), weight);
@@ -1089,10 +1101,16 @@ void xmlAnaWSBuilder::dataFileSanityCheck(){
     if(!auxUtil::checkExist(_inputDataFileName)) auxUtil::alertAndAbort("Cannot find input data file "+_inputDataFileName);
     if(_inputDataFileType!=ASCII){	// means that we are reading data from a tree
       TFile *f=TFile::Open(_inputDataFileName);
-      TTree *t=dynamic_cast<TTree*>(f->Get(_inputDataTreeName));
-      if(!t) auxUtil::alertAndAbort("Cannot find TTree "+_inputDataTreeName+" in data file "+_inputDataFileName);
-      TBranch *b=t->FindBranch(_inputDataVarName);
-      if(!b) auxUtil::alertAndAbort("Cannot find TBranch "+_inputDataVarName+" in TTree "+_inputDataTreeName+" in data file "+_inputDataFileName);
+      if(_inputDataFileType==HISTOGRAM){
+	TH1 *h=dynamic_cast<TH1*>(f->Get(_inputDataHistName));
+	if(!h) auxUtil::alertAndAbort("Cannot find TH1 "+_inputDataHistName+" in data file "+_inputDataFileName);
+      }
+      else{
+	TTree *t=dynamic_cast<TTree*>(f->Get(_inputDataTreeName));
+	if(!t) auxUtil::alertAndAbort("Cannot find TTree "+_inputDataTreeName+" in data file "+_inputDataFileName);
+	TBranch *b=t->FindBranch(_inputDataVarName);
+	if(!b) auxUtil::alertAndAbort("Cannot find TBranch "+_inputDataVarName+" in TTree "+_inputDataTreeName+" in data file "+_inputDataFileName);
+      }
       f->Close();
     }
   }
