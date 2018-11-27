@@ -16,6 +16,7 @@
           Name              CDATA            #REQUIRED
 	  Setup             CDATA            #IMPLIED
 	  Action            CDATA            #IMPLIED
+	  Data              CDATA            #IMPLIED
 	  SnapshotAll       CDATA            #IMPLIED
 	  SnapshotGlob      CDATA            #IMPLIED
 	  SnapshotNuis      CDATA            #IMPLIED
@@ -39,6 +40,7 @@
 	  TreeName          CDATA            #IMPLIED
 	  VarName           CDATA            #IMPLIED
 	  Cut               CDATA            #IMPLIED
+	  HistName          CDATA            #IMPLIED
           Observable        CDATA            #REQUIRED
           Binning           CDATA            #IMPLIED
           InjectGhost       CDATA            #IMPLIED
@@ -49,6 +51,7 @@
 <!ELEMENT Item  EMPTY>
 <!ATTLIST Item 
 	  Name                 CDATA         #REQUIRED
+	  Correlate            CDATA         #IMPLIED
 	  >
 
 <!ELEMENT Sample ( Systematic | NormFactor | ShapeFactor | ImportItems )*>
@@ -97,6 +100,7 @@
 	  ModelName         CDATA            #IMPLIED
 	  ObservableName    CDATA            #IMPLIED
 	  CacheBinning      CDATA            #IMPLIED
+	  Rebin             CDATA            #IMPLIED
 	  >
 
 <!ELEMENT ModelItem  EMPTY>

@@ -2,26 +2,52 @@
 
 ClassImp(xmlAnaWSBuilder);
 
-TString xmlAnaWSBuilder::ALLPROC="_allproc_";
-TString xmlAnaWSBuilder::YIELD="yield";
-TString xmlAnaWSBuilder::SHAPE="shape";
-TString xmlAnaWSBuilder::COUNTING="counting";
-TString xmlAnaWSBuilder::ASCII="ascii";
-TString xmlAnaWSBuilder::USERDEF="userdef";
-TString xmlAnaWSBuilder::EXTERNAL="external";
-TString xmlAnaWSBuilder::HISTOGRAM="histogram";
-
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// XML workspace builder keywords: below can be used in 
+// building likelihood model. They will be replaced by
+// corresponding objects.
+// +++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 TString xmlAnaWSBuilder::RESPONSE="response::";
 TString xmlAnaWSBuilder::OBSERVABLE=":observable:";
 TString xmlAnaWSBuilder::PROCESS=":process:";
 TString xmlAnaWSBuilder::COMMON=":common:";
 TString xmlAnaWSBuilder::SELF=":self:";
+TString xmlAnaWSBuilder::CATEGORY=":category:";
+
+// C++ logics not displayable in XML format
+TString xmlAnaWSBuilder::LT=":lt:";
+TString xmlAnaWSBuilder::LE=":le:";
+TString xmlAnaWSBuilder::GT=":gt:";
+TString xmlAnaWSBuilder::GE=":ge:";
+TString xmlAnaWSBuilder::AND=":and:";
+TString xmlAnaWSBuilder::OR=":or:";
+
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// XML workspace builder keywords: below are used to
+// Indicate type of operations one perform
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+TString xmlAnaWSBuilder::ALLPROC="_allproc_";
+TString xmlAnaWSBuilder::YIELD="yield";
+TString xmlAnaWSBuilder::SHAPE="shape";
+TString xmlAnaWSBuilder::COUNTING="counting";
+
+// Type of input data file
+TString xmlAnaWSBuilder::ASCII="ascii";
+
+// Type of PDF input
+TString xmlAnaWSBuilder::USERDEF="userdef";
+TString xmlAnaWSBuilder::EXTERNAL="external";
+TString xmlAnaWSBuilder::HISTOGRAM="histogram";
 
 // Constraint terms
 TString xmlAnaWSBuilder::GAUSSIAN="gaus";
 TString xmlAnaWSBuilder::LOGNORMAL="logn";
 TString xmlAnaWSBuilder::ASYMMETRIC="asym"; 
 
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// Hard-coded object naming partten: do not duplicate
+// these partten when constructing your own model!
+// ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 // Naming convention
 TString xmlAnaWSBuilder::RESPONSEPREFIX="expected__";
 TString xmlAnaWSBuilder::CONSTRTERMPREFIX="constr__";
@@ -44,14 +70,6 @@ TString xmlAnaWSBuilder::NORMNAME="_norm";
 TString xmlAnaWSBuilder::ACCEPTANCENAME="_A";
 TString xmlAnaWSBuilder::CORRECTIONNAME="_C";
 TString xmlAnaWSBuilder::EFFICIENCYNAME="_eff";
-
-// C++ logics not displayable in XML format
-TString xmlAnaWSBuilder::LT=":lt:";
-TString xmlAnaWSBuilder::LE=":le:";
-TString xmlAnaWSBuilder::GT=":gt:";
-TString xmlAnaWSBuilder::GE=":ge:";
-TString xmlAnaWSBuilder::AND=":and:";
-TString xmlAnaWSBuilder::OR=":or:";
 
 // Observed dataset name
 TString xmlAnaWSBuilder::OBSDSNAME="obsdata";
@@ -86,13 +104,11 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   _goBlind=auxUtil::to_bool(auxUtil::getAttributeValue(rootNode, "Blind", true, "0"));
   
   _asimovHandler=auto_ptr<asimovUtil>(new asimovUtil());
-  if(_goBlind) _asimovHandler->setRange(_rangeName);
   
   while ( node != 0 ){
     TString nodeName=node->GetNodeName();
     if(nodeName=="POI"){
       TString poiStr=node->GetText();
-      auxUtil::removeWhiteSpace(poiStr);
       _POIList=auxUtil::splitString(poiStr.Data(),',');
     } 
     if(nodeName=="Input"){
@@ -107,7 +123,6 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   _Nch=_xmlPath.size();
   _useBinned=false;
   _plotOpt="";
-  _rangeName="";
   
   auxUtil::printTime();
   _timer.Start();
@@ -116,7 +131,7 @@ xmlAnaWSBuilder::xmlAnaWSBuilder(TString inputFile){
   cout<<"Workspace name: "<<_wsName<<endl;
   cout<<"ModelConfig name: "<<_mcName<<endl;
   cout<<"Data name: "<<_dataName<<endl;
-  if(_goBlind) cout<<"\033[91mBlind analysis\033[0m"<<endl;
+  if(_goBlind) cout<<auxUtil::WARNING<<"Blind analysis"<<auxUtil::ENDC<<endl;
   cout<<"POI: ";
   for(auto poi : _POIList) cout<<poi<<" ";
   cout<<endl;
@@ -183,7 +198,7 @@ void xmlAnaWSBuilder::generateWS(){
   _combWS->import(obsData);
   if(obsDatabinned.numEntries()<obsData.numEntries()) _combWS->import(obsDatabinned);
   else{
-    cout<<"\n\033[91m \tREGTEST: No need to keep binned dataset, as the number of data events is smaller than the number of bins in all categories. \033[0m\n"<<endl;
+    cout<<endl<<auxUtil::WARNING<<" \tREGTEST: No need to keep binned dataset, as the number of data events is smaller than the number of bins in all categories. "<<auxUtil::ENDC<<endl<<endl;
     _useBinned=false;
   }
   wArr.clear();
@@ -191,7 +206,8 @@ void xmlAnaWSBuilder::generateWS(){
   // Save the original snapshot
   // _combWS->saveSnapshot("nominalNuis",*_mConfig->GetNuisanceParameters());
   // _combWS->saveSnapshot("nominalGlobs",*_mConfig->GetGlobalObservables());
-  if(_useBinned) cout<<"\033[91m \tREGTEST: Fitting binned dataset. \033[0m\n"<<endl;
+  if(_goBlind) _asimovHandler->setRange(SBLO+","+SBHI);
+  if(_useBinned) cout<<endl<<auxUtil::WARNING<<" \tREGTEST: Fitting binned dataset. "<<auxUtil::ENDC<<endl<<endl;
   
   if(_asimovHandler->genAsimov()) _asimovHandler->generateAsimov(_mConfig.get(), _useBinned?_dataName+"binned":_dataName);
   _combWS->importClassCode();
@@ -231,8 +247,6 @@ void xmlAnaWSBuilder::readSyst(TXMLNode* systNode, TString domain){
     auxUtil::alertAndAbort("For constraint term type "+syst.constrTerm+Form(" non-positive central value (%f) is not acceptable", syst.nominal));
   TString uncert=auxUtil::getAttributeValue(systNode, "Mag");
   
-  auxUtil::removeWhiteSpace(uncert);
-
   syst.beta=auxUtil::stripSign(uncert);
   
   if(uncert.Contains(',')){
@@ -266,15 +280,13 @@ void xmlAnaWSBuilder::readSample(TXMLNode* sampleNode){
   Sample sample;
   sample.procName=auxUtil::getAttributeValue(sampleNode, "Name");
   // sample.yield=atof(auxUtil::getAttributeValue(sampleNode, "Norm"));
-  sample.inputFile=auxUtil::getAttributeValue(sampleNode, "InputFile", (_Type.back()==COUNTING), "");
+  sample.inputFile=auxUtil::getAttributeValue(sampleNode, "InputFile", (_categoryType==COUNTING), "");
 
   // TString importSystGroupList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, COMMON);
   TString importSystGroupList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, SELF);
-  auxUtil::removeWhiteSpace(importSystGroupList);
   sample.systGroups=auxUtil::splitString(importSystGroupList.Data(),',');
-  sort( sample.systGroups.begin(), sample.systGroups.end() );
-  sample.systGroups.erase( unique( sample.systGroups.begin(), sample.systGroups.end() ), sample.systGroups.end() );
-  sample.systGroups.erase( remove( sample.systGroups.begin(), sample.systGroups.end(), sample.procName ), sample.systGroups.end() ); 
+  auxUtil::removeDuplicatedString(sample.systGroups);
+  auxUtil::removeString(sample.systGroups, sample.procName);
   
   TString norm=auxUtil::getAttributeValue(sampleNode, "Norm", true, ""); // default value 1
   TString xsection=auxUtil::getAttributeValue(sampleNode, "XSection", true, ""); // default value 1
@@ -352,20 +364,20 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   TXMLNode* rootNode = xmldoc->GetRootNode();
 
   // Get the category name and property from
-  TString channelname=auxUtil::getAttributeValue(rootNode, "Name");
-  TString channeltype=auxUtil::getAttributeValue(rootNode, "Type");
+  _categoryName=auxUtil::getAttributeValue(rootNode, "Name");
+  _categoryType=auxUtil::getAttributeValue(rootNode, "Type");
   _luminosity=atof(auxUtil::getAttributeValue(rootNode, "Lumi", true, "-1"));
   
-  channeltype.ToLower();
+  _categoryType.ToLower();
 
-  if(find(_CN.begin(), _CN.end(), channelname)==_CN.end()) _CN.push_back(channelname);
-  else auxUtil::alertAndAbort("Category name "+channelname+" used in XML file"+xmlName+" is already used by other categories. Please use a different name");
-  auxUtil::printTitle("Category "+channelname);
+  if(find(_CN.begin(), _CN.end(), _categoryName)==_CN.end()) _CN.push_back(_categoryName);
+  else auxUtil::alertAndAbort("Category name "+_categoryName+" used in XML file"+xmlName+" is already used by other categories. Please use a different name");
+  auxUtil::printTitle("Category "+_categoryName);
   
-  _Type.push_back(channeltype);
+  _Type.push_back(_categoryType);
   /* all the attributes of a channel */
 
-  unique_ptr<RooWorkspace> wfactory(new RooWorkspace("factory_"+channelname));
+  unique_ptr<RooWorkspace> wfactory(new RooWorkspace("factory_"+_categoryName));
   if(_luminosity>0) implementObj(wfactory.get(), LUMINAME+Form("[%f]", _luminosity)); // First thing: create a luminosity variable
 
   TXMLNode *dataNode=auxUtil::findNode(rootNode, "Data"); // This attribute is only allowed to appear once per-channel, and cannot be hided in a sub-XML file
@@ -378,55 +390,30 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
 
   if(_xMax<=_xMin) auxUtil::alertAndAbort("Invalid range for observable "+_observableName+Form(": min %f, max %f", _xMin, _xMax));
 
-  TString blindRange=auxUtil::getAttributeValue(dataNode, "BlindRange", true, "");
-  if(_goBlind){
-    if(blindRange!=""){
-      vector<TString> rangeComp=auxUtil::splitString(blindRange,',');
-      if(rangeComp.size()!=2 || !rangeComp[0].IsFloat() || !rangeComp[1].IsFloat()) auxUtil::alertAndAbort("Invalid format for blinding range: "+blindRange);
-      _blindMin=rangeComp[0].Atof();
-      _blindMax=rangeComp[1].Atof();
-      if(_blindMax<=_blindMin || _blindMax>_xMax || _blindMin<_xMin) auxUtil::alertAndAbort(Form("Invalid blinding range provided: min %f, max %f", _blindMin, _blindMax));
-
-      wfactory->var(_observableName)->setRange(SBLO+"_"+channelname, _xMin, _blindMin);
-      wfactory->var(_observableName)->setRange(BLIND+"_"+channelname, _blindMin, _blindMax);
-      wfactory->var(_observableName)->setRange(SBHI+"_"+channelname, _blindMax, _xMax);
-
-      if(_blindMax==_xMax && _blindMin==_xMin){
-	cout<<"\n\033[91m \tREGTEST: Category "+channelname+" fully blinded. No side-band exists. \033[0m\n"<<endl;
-	_rangeName="";
-      }
-      else if(_blindMax==_xMax) _rangeName=SBLO;
-      else if(_blindMin==_xMin) _rangeName=SBHI;
-      else _rangeName=SBLO+","+SBHI;
-    }
-    else{
-      _blindMin=_xMax;
-      _blindMax=_xMin;
-    }
-  }
-
-  int nbinx=(channeltype==COUNTING) ? 1 : atoi(auxUtil::getAttributeValue(dataNode, "Binning"));
+  int nbinx=(_categoryType==COUNTING) ? 1 : atoi(auxUtil::getAttributeValue(dataNode, "Binning"));
   wfactory->var(_observableName)->setBins(nbinx);
   
-  _inputDataFileName=auxUtil::getAttributeValue(dataNode, "InputFile", (channeltype==COUNTING), "");
+  _inputDataFileName=auxUtil::getAttributeValue(dataNode, "InputFile", (_categoryType==COUNTING), "");
   _inputDataFileType=auxUtil::getAttributeValue(dataNode, "FileType", true, ASCII);
   _inputDataFileType.ToLower();
-  if(_inputDataFileType!=ASCII){	// means that we are reading data from a tree
-    _inputDataTreeName=auxUtil::getAttributeValue(dataNode, "TreeName");
-    _inputDataVarName=auxUtil::getAttributeValue(dataNode, "VarName");
-    _Cut=auxUtil::getAttributeValue(dataNode, "Cut", true, "");
-    translateKeyword(_Cut);
+  if(_inputDataFileType!=ASCII){	// means that we are reading data from a ntuple or histogram
+    if(_inputDataFileType==HISTOGRAM) _inputDataHistName=auxUtil::getAttributeValue(dataNode, "HistName");
+    else{
+      _inputDataTreeName=auxUtil::getAttributeValue(dataNode, "TreeName");
+      _inputDataVarName=auxUtil::getAttributeValue(dataNode, "VarName");
+      _Cut=auxUtil::getAttributeValue(dataNode, "Cut", true, "");
+      translateKeyword(_Cut);
+    }
   }
   _injectGhost=auxUtil::to_bool(auxUtil::getAttributeValue(dataNode, "InjectGhost", true, "0")); // Default false
 
-  _numData=(channeltype==COUNTING && _inputDataFileName=="") ? atoi(auxUtil::getAttributeValue(dataNode, "NumData")) : -1; // Only needed for counting experiment where the input data file is not specified
+  _numData=(_categoryType==COUNTING && _inputDataFileName=="") ? atoi(auxUtil::getAttributeValue(dataNode, "NumData")) : -1; // Only needed for counting experiment where the input data file is not specified
   
   dataFileSanityCheck();	// Check now and report, before it is too late
   
   TXMLNode *correlateNode=auxUtil::findNode(rootNode, "Correlate"); // This attribute is only allowed to appear at most once per-channel, and cannot be hided in a sub-XML file
   if(correlateNode){	// If you would like to put some parameters which are not POI correlated
     TString itemStr=correlateNode->GetText();
-    auxUtil::removeWhiteSpace(itemStr);
     _ItemsCorrelate=auxUtil::splitString(itemStr.Data(),',');
   }
 
@@ -536,9 +523,9 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
     
     implementObj(wfactory.get(), normStr);
     
-    cout<<"\tREGTEST: Yield for category \""<<channelname<<"\" process \""<<sample.procName<<"\": "<<wfactory->function(sample.normName)->getVal()<<endl;
+    cout<<"\tREGTEST: Yield for category \""<<_categoryName<<"\" process \""<<sample.procName<<"\": "<<wfactory->function(sample.normName)->getVal()<<endl;
     if(_debug) wfactory->Print();
-    getModel(wfactory.get(), &sample, channeltype, &nuispara, &constraints, &globobs);
+    getModel(wfactory.get(), &sample, &nuispara, &constraints, &globobs);
   }
 
   if(_debug) wfactory->Print();
@@ -551,8 +538,44 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   if(_debug) cout<<sumPdfStr<<endl;
   implementObj(wfactory.get(), sumPdfStr);
   // sumPdfStr=auxUtil::getObjName(sumPdfStr);
-  
-  checkNuisParam(wfactory->pdf(SUMPDFNAME), &nuispara);
+  RooAddPdf *SBPdf=dynamic_cast<RooAddPdf*>(wfactory->pdf(SUMPDFNAME));
+
+  // Now handle blinding if needed
+  TString blindRange=auxUtil::getAttributeValue(dataNode, "BlindRange", true, "");
+  if(_goBlind){
+    TString rangeName="";
+    if(blindRange!=""){
+      cout<<auxUtil::WARNING<<" \tREGTEST: Implement blind range "<<blindRange<<auxUtil::ENDC<<endl;
+      vector<TString> rangeComp=auxUtil::splitString(blindRange,',');
+      if(rangeComp.size()!=2 || !rangeComp[0].IsFloat() || !rangeComp[1].IsFloat()) auxUtil::alertAndAbort("Invalid format for blinding range: "+blindRange);
+      _blindMin=rangeComp[0].Atof();
+      _blindMax=rangeComp[1].Atof();
+      if(_blindMax<=_blindMin || _blindMax>_xMax || _blindMin<_xMin) auxUtil::alertAndAbort(Form("Invalid blinding range provided: min %f, max %f", _blindMin, _blindMax));
+
+      wfactory->var(_observableName)->setRange(SBLO+"_"+_categoryName, _xMin, _blindMin);
+      wfactory->var(_observableName)->setRange(BLIND+"_"+_categoryName, _blindMin, _blindMax);
+      wfactory->var(_observableName)->setRange(SBHI+"_"+_categoryName, _blindMax, _xMax);
+      wfactory->var(_observableName)->setRange("FULL", _xMin, _xMax); // Suggested by Wouter
+
+      if(_blindMax==_xMax && _blindMin==_xMin){
+	cout<<endl<<auxUtil::WARNING<<" \tREGTEST: Category "+_categoryName+" fully blinded. No side-band exists. "<<auxUtil::ENDC<<endl<<endl;
+	rangeName="";
+      }
+      else if(_blindMax==_xMax) rangeName=SBLO+"_"+_categoryName;
+      else if(_blindMin==_xMin) rangeName=SBHI+"_"+_categoryName;
+      else rangeName=SBLO+"_"+_categoryName+","+SBHI+"_"+_categoryName;
+
+      SBPdf->fixCoefRange("FULL");
+    }
+    else{
+      _blindMin=_xMax;
+      _blindMax=_xMin;
+    }
+    _rangeList.push_back(rangeName);
+  }
+
+
+  checkNuisParam(SBPdf, &nuispara);
 
   // Keep Track of Correlated variables
   TString correlated = "";
@@ -560,9 +583,8 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   for(auto poi : _POIList) _ItemsCorrelate.push_back(poi);
 
   // remove duplicates from list of _ItemsCorrelate (must be sorted to work)
-  sort( _ItemsCorrelate.begin(), _ItemsCorrelate.end() );
-  _ItemsCorrelate.erase( unique( _ItemsCorrelate.begin(), _ItemsCorrelate.end() ), _ItemsCorrelate.end() );
-
+  auxUtil::removeDuplicatedString(_ItemsCorrelate);
+  
   for(auto item : _ItemsCorrelate){
     if(!wfactory->obj(item)) continue; // Does not exist
     if(!wfactory->var(item)) auxUtil::alertAndAbort("Correlated variable "+item+" is not properly implemented as RooRealVar in the workspace"); // Only variables can be keep the names unchanged.
@@ -575,10 +597,10 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
 
   // Now, import the pdf to a new workspace, where the renaming of objects will happen automatically
   if(_debug) cout<<"\tREGTEST: The following variables will not be renamed: "<<correlated<<endl;
-  wchannel->import( (*wfactory->pdf(SUMPDFNAME)), RenameAllNodes(channelname), RenameAllVariablesExcept(channelname,correlated), Silence());
+  wchannel->import( (*wfactory->pdf(SUMPDFNAME)), RenameAllNodes(_categoryName), RenameAllVariablesExcept(_categoryName,correlated), Silence());
 
   // Import constraint terms. Note we should not rename the constraint term gaussians
-  attachConstraints(wchannel, SUMPDFNAME+"_"+channelname, &constraints, FINALPDFNAME+"_"+channelname);
+  attachConstraints(wchannel, SUMPDFNAME+"_"+_categoryName, &constraints, FINALPDFNAME+"_"+_categoryName);
 
   auxUtil::defineSet(wchannel, _POIList, "POI");
   auxUtil::defineSet(wchannel, nuispara, "nuisanceParameters");
@@ -711,7 +733,7 @@ void xmlAnaWSBuilder::NPMaker(RooWorkspace *w, Systematic *syst, RooArgSet *nuis
   if(_debug) cout<<"REGTEST: finished implementing systematic "<<syst->NPName<<endl;
 }
 
-void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, TString channeltype, RooArgSet *nuispara, RooArgSet *constraints, RooArgSet *globobs){
+void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, RooArgSet *nuispara, RooArgSet *constraints, RooArgSet *globobs){
   if(_debug) cout<<"Entering function getModel"<<endl;
   bool isSharedPdf=(sample->sharePdfGroup!="");
   TString tagName=(isSharedPdf?sample->sharePdfGroup:sample->procName);
@@ -727,7 +749,7 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, TString channelt
   }
   
   if(_debug) cout<<sample->modelName<<endl;
-  if(channeltype==COUNTING){
+  if(_categoryType==COUNTING){
     // In counting experiment we only need a uniform pdf
     implementObj(w, "RooUniform::"+sample->modelName+"("+_observableName+")");
   }
@@ -748,6 +770,7 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, TString channelt
       if(_debug) cout<<"\tREGTEST: Creating user-defined pdf from "<<inputFileName<<endl;
       int cacheBinning=atoi(auxUtil::getAttributeValue(rootNode, "CacheBinning", true, "-1"));
       if(cacheBinning>0) w->var(_observableName)->setBins(cacheBinning, "cache"); // For the accuracy of Fourier transformation
+      bool isSuccess=false;
       while ( node != 0 ){
 	TString nodeName=node->GetNodeName();
 	if(_debug) cout<<nodeName<<endl;
@@ -759,6 +782,7 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, TString channelt
 	  TString oldPdfName=auxUtil::getObjName(factoryStr);
 	  factoryStr.ReplaceAll(oldPdfName, sample->modelName);
 	  implementObj(w, factoryStr);
+	  isSuccess=true;
 	  break;		// Assume model already constructed. No need to continue;
 	}
 	else{
@@ -766,6 +790,7 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, TString channelt
 	}
 	node=node->GetNextNode();
       }
+      if(!isSuccess) auxUtil::alertAndAbort("Cannot find \"ModelItem\" in XML file "+inputFileName);
     }
     else if(modelType==EXTERNAL){
       // In this case a workspace containing the model is used as input
@@ -862,11 +887,12 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, TString channelt
       // Create a signal with simple histogram
       TString inputHistFileName=auxUtil::getAttributeValue(rootNode, "Input");
       TString modelName=auxUtil::getAttributeValue(rootNode, "ModelName");
-
+      int rebin=atoi(auxUtil::getAttributeValue(rootNode, "Rebin", true, "-1"));
       unique_ptr<TFile> fExtHist(TFile::Open(inputHistFileName, "read"));
 
       TH1 *h=dynamic_cast<TH1*>(fExtHist->Get(modelName));
-
+      if(rebin>0) h->Rebin(rebin);
+      
       RooDataHist hdata("hdata","hdata",*w->var(_observableName), h);
 
       RooHistPdf hpdf(sample->modelName,sample->modelName,*w->var(_observableName),hdata);
@@ -887,7 +913,7 @@ void xmlAnaWSBuilder::attachConstraints(RooWorkspace *w, TString sumPdfName, Roo
     TString NPName=constrName.ReplaceAll(CONSTRTERMPREFIX, "");
 
     if(!pdf->getVariables()->find(NPName)){
-      cerr<<"\tWARNING: Constraint term "<<parg->GetName()<<" with NP "<<NPName<<" is redundant in channel \""<<_CN.back()<<"\". It will be removed..."<<endl;
+      cerr<<"\tWARNING: Constraint term "<<parg->GetName()<<" with NP "<<NPName<<" is redundant in channel \""<<_categoryName<<"\". It will be removed..."<<endl;
       constraints->remove(*parg);
     }
     else w->import(*parg, Silence());
@@ -931,7 +957,7 @@ void xmlAnaWSBuilder::checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara){
 
   if(floatSet.getSize()<nNP){
     // There are redundant nuisance parameters in the model, which we do not care...
-    cerr<<"\tWARNING: There supposed to be "<<nPOI+nNP<<" free parameters, but only seen "<<floatSet.getSize()<<" in the channel "<<_CN.back()<<endl;
+    cerr<<"\tWARNING: There supposed to be "<<nPOI+nNP<<" free parameters, but only seen "<<floatSet.getSize()<<" in the channel "<<_categoryName<<endl;
     cout<<"\tIn principle not a issue, but please make sure you understand what you are doing."<<endl;
     if(_debug){
       cout<<"++++++++++++++++++++++ all the free parameters ++++++++++++++++++++++"<<endl;
@@ -949,8 +975,6 @@ void xmlAnaWSBuilder::checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara){
 TString xmlAnaWSBuilder::getItemExpr(TXMLNode *node, TString attrName, TString process){
   TString expr=auxUtil::getAttributeValue(node, attrName);
 
-  translateKeyword(expr);
-  
   if(expr.Contains(PROCESS)){
     if(process=="") auxUtil::alertAndAbort("Process name not provided for expression "+expr);
     expr.ReplaceAll(PROCESS, "_"+process);
@@ -966,7 +990,7 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
   
   RooDataSet* obsdata=new RooDataSet(OBSDSNAME,OBSDSNAME,obs_plus_wt,WeightVar(*w));
 
-  if(_Type.back()==COUNTING && _numData>=0){ // Generate number of events for counting experiment
+  if(_categoryType==COUNTING && _numData>=0){ // Generate number of events for counting experiment
     double binCenter=(x->getMin()+x->getMax())/2.;
     double weight=(_numData==0)?auxUtil::epsilon/1000.:_numData;
     x->setVal(binCenter);
@@ -978,6 +1002,11 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
 
     if(_inputDataFileType==ASCII){
       obsdata_tmp.reset(RooDataSet::read(_inputDataFileName, RooArgList(*x)));
+    }
+    else if(_inputDataFileType==HISTOGRAM){
+      unique_ptr<TFile> f(TFile::Open(_inputDataFileName));
+      TH1* h=dynamic_cast<TH1*>(f->Get(_inputDataHistName));
+      obsdata_tmp.reset(auxUtil::histToDataSet(h, x, w));
     }
     else{
       unique_ptr<TFile> f(TFile::Open(_inputDataFileName));
@@ -994,7 +1023,7 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
     for (int i=0 ; i<obsdata_tmp->numEntries() ; i++) {
       obsdata_tmp->get(i) ;
       x->setVal(xdata_tmp->getVal());
-      double weight=1;
+      double weight=obsdata_tmp->weight();
       w->setVal(weight);
       if(_goBlind && x->getVal()>_blindMin && x->getVal()<_blindMax) continue;
       obsdata->add( RooArgSet(*x, *w), weight);
@@ -1005,6 +1034,7 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
 }
 
 TString xmlAnaWSBuilder::implementObj(RooWorkspace *w, TString expr, bool checkExistBeforeImp){
+  translateKeyword(expr);
   // If the obj is claimed to exist, but actually not, then abort.
   int type=auxUtil::getItemType(expr);
   if(type==auxUtil::EXIST){
@@ -1071,7 +1101,7 @@ void xmlAnaWSBuilder::readChannelXMLNode(TXMLNode *node){
 }
 
 void xmlAnaWSBuilder::dataFileSanityCheck(){
-  if(_Type.back()==COUNTING){
+  if(_categoryType==COUNTING){
     if(_inputDataFileName!="" && !auxUtil::checkExist(_inputDataFileName)) auxUtil::alertAndAbort("Cannot find input data file "+_inputDataFileName);
     else if(_inputDataFileName=="" && _numData<0) auxUtil::alertAndAbort("Please either provide a input data file, or provide a valid number of data events for a counting experiment");
   }
@@ -1079,10 +1109,16 @@ void xmlAnaWSBuilder::dataFileSanityCheck(){
     if(!auxUtil::checkExist(_inputDataFileName)) auxUtil::alertAndAbort("Cannot find input data file "+_inputDataFileName);
     if(_inputDataFileType!=ASCII){	// means that we are reading data from a tree
       TFile *f=TFile::Open(_inputDataFileName);
-      TTree *t=dynamic_cast<TTree*>(f->Get(_inputDataTreeName));
-      if(!t) auxUtil::alertAndAbort("Cannot find TTree "+_inputDataTreeName+" in data file "+_inputDataFileName);
-      TBranch *b=t->FindBranch(_inputDataVarName);
-      if(!b) auxUtil::alertAndAbort("Cannot find TBranch "+_inputDataVarName+" in TTree "+_inputDataTreeName+" in data file "+_inputDataFileName);
+      if(_inputDataFileType==HISTOGRAM){
+	TH1 *h=dynamic_cast<TH1*>(f->Get(_inputDataHistName));
+	if(!h) auxUtil::alertAndAbort("Cannot find TH1 "+_inputDataHistName+" in data file "+_inputDataFileName);
+      }
+      else{
+	TTree *t=dynamic_cast<TTree*>(f->Get(_inputDataTreeName));
+	if(!t) auxUtil::alertAndAbort("Cannot find TTree "+_inputDataTreeName+" in data file "+_inputDataFileName);
+	TBranch *b=t->FindBranch(_inputDataVarName);
+	if(!b) auxUtil::alertAndAbort("Cannot find TBranch "+_inputDataVarName+" in TTree "+_inputDataTreeName+" in data file "+_inputDataFileName);
+      }
       f->Close();
     }
   }
@@ -1091,6 +1127,7 @@ void xmlAnaWSBuilder::dataFileSanityCheck(){
 void xmlAnaWSBuilder::translateKeyword(TString &expr){
   expr.ReplaceAll(RESPONSE, RESPONSEPREFIX+SHAPE+"_"); // Implement proper response terms. Assume only shape uncertainty would appear
   expr.ReplaceAll(OBSERVABLE, _observableName); // Implement proper observables
+  expr.ReplaceAll(CATEGORY, _categoryName); // Category name
   expr.ReplaceAll(LT,"<");
   expr.ReplaceAll(LE,"<=");
   expr.ReplaceAll(GT,">");
@@ -1102,7 +1139,17 @@ void xmlAnaWSBuilder::translateKeyword(TString &expr){
 void xmlAnaWSBuilder::Summary(TString outputFigName){
   RooMsgService::instance().setGlobalKillBelow(RooFit::FATAL);
   gErrorIgnoreLevel=kWarning;
-
+  vector<TString> options=auxUtil::splitString(_plotOpt,',');
+  int m_rebin=1;
+  bool m_logy=false;
+  for(auto opt : options){
+    if(opt.Contains("rebin")){
+      m_rebin=atoi(opt(opt.First("rebin")+5,opt.Length()).Data());
+      cout<<auxUtil::WARNING<<"Rebin with "<<m_rebin<<auxUtil::ENDC<<endl;
+    }
+    if(opt.Contains("logy")) m_logy=true;
+  }
+  
   RooSimultaneous *m_pdf = dynamic_cast<RooSimultaneous*>(_mConfig->GetPdf()); assert (m_pdf);
   RooAbsCategoryLValue* m_cat = const_cast<RooAbsCategoryLValue*>(&m_pdf->indexCat());
   const RooArgSet *m_gobs = dynamic_cast<const RooArgSet*>(_mConfig->GetGlobalObservables()); assert(m_gobs);
@@ -1123,23 +1170,109 @@ void xmlAnaWSBuilder::Summary(TString outputFigName){
     cout << "\t\tIndex: " << i << ", Pdf: " << pdfi->GetName() << ", Data: " << datai->GetName() << ", SumEntries: " << datai->sumEntries() << endl;
 
     RooRealVar *x=dynamic_cast<RooRealVar*>(pdfi->getObservables(datai)->first());
+    int obsNBins = x->numBins()/m_rebin;
     unique_ptr<RooPlot> frame(x->frame());
-    datai->plotOn(frame.get(), DataError(RooAbsData::Poisson));
+    datai->plotOn(frame.get(), DataError(RooAbsData::Poisson), RooFit::Binning(obsNBins));
 
-    if(_goBlind){
-      pdfi->plotOn(frame.get(), LineColor(kBlue), LineStyle(2), NormRange(SBLO+"_"+channelname+","+SBHI+"_"+channelname), Normalization(1.0,RooAbsReal::RelativeExpected));
-      pdfi->plotOn(frame.get(), LineColor(kBlue), LineStyle(1), Range(SBLO+"_"+channelname+","+SBHI+"_"+channelname), NormRange(SBLO+"_"+channelname+","+SBHI+"_"+channelname), Normalization(1.0,RooAbsReal::RelativeExpected));
+    double addSF=1;
+    if(_goBlind && _rangeList[i]!=""){
+      pdfi->plotOn(frame.get(), LineColor(kBlue), LineStyle(2), NormRange(_rangeList[i]));
+      pdfi->plotOn(frame.get(), LineColor(kBlue), LineStyle(1), Range(_rangeList[i]), NormRange(_rangeList[i]));
+      addSF=pdfi->createIntegral(RooArgSet(*x), NormSet(*x))->getVal()/pdfi->createIntegral(RooArgSet(*x), NormSet(*x), Range(_rangeList[i]))->getVal();
     }
-    else pdfi->plotOn(frame.get(), LineColor(kBlue), Normalization(1.0,RooAbsReal::RelativeExpected));
+    else pdfi->plotOn(frame.get(), LineColor(kBlue));
 
     c.cd();
-    frame->SetMinimum(auxUtil::epsilon*10);
-    if(_plotOpt.Contains("logy")){
+    TPad pad1("pad1_"+channelname,"pad1",0.01,0.40,0.99,0.99);
+    TPad pad2("pad2_"+channelname,"pad2",0.01,0.05,0.99,0.402);
+    pad1.Draw();
+    pad2.Draw();
+    pad1.SetBottomMargin(0.);
+    pad1.cd();
+    frame->SetMinimum(auxUtil::epsilon*1000);
+    if(m_logy){
       frame->SetMinimum(1e-1);
       c.SetLogy();
     }
     
+    frame->SetLabelFont(43,"y");
+    frame->SetLabelOffset(0.005,"y");
+    frame->SetLabelSize(14,"y");
+    frame->SetTitleFont(43,"y");
+    frame->SetTitleOffset(1.2,"y");
+    frame->SetTitleSize(17,"y");
+    frame->SetXTitle("");
     frame->Draw();
+
+    pad2.SetTopMargin(0.);
+    pad2.SetBottomMargin(0.25);
+    pad2.cd();
+    
+    TH1D hsub("hsub_"+channelname,"hsub",obsNBins,x->getMin(),x->getMax()); 
+    hsub.Sumw2();
+
+    unique_ptr<TH1D> hbkg((TH1D*)pdfi->createHistogram("hbkg", *x, RooFit::Binning(obsNBins)));
+    unique_ptr<TH1D> hdata((TH1D*)datai->createHistogram("hdata", *x, RooFit::Binning(obsNBins)));
+    for(int ibin=1;ibin<=obsNBins;ibin++) hdata->SetBinError(ibin, sqrt(hdata->GetBinContent(ibin)));
+    hbkg->Scale(hdata->Integral()/hbkg->Integral("width")*addSF);
+
+    for( int i = 0 ; i < obsNBins; i ++ ){
+      double weight = hbkg->GetBinContent(i+1);
+      double value = hdata->GetBinContent(i+1);
+      double error = hdata->GetBinError(i+1);
+      if(value>0.5) {
+	hsub.SetBinContent(i+1,value/weight);
+	hsub.SetBinError(i+1,error/weight);
+      }
+    }
+    hsub.GetYaxis()->SetRangeUser(0.801,1.199);
+    hsub.SetMarkerStyle(kFullCircle);
+    hsub.SetMarkerColor(kBlack);
+    hsub.SetMarkerSize(1.);
+    hsub.SetStats(kFALSE);
+    hsub.SetTitle("");
+    hsub.SetLineColor(kBlack);
+    
+    hsub.GetYaxis()->SetTitle("Data / Fit ");
+    hsub.GetYaxis()->SetTitleFont(43);
+    hsub.GetYaxis()->SetTitleSize(17);
+    hsub.GetYaxis()->SetTitleOffset(1.3);
+    hsub.GetYaxis()->SetLabelFont(43);
+    hsub.GetYaxis()->SetLabelSize(14);
+
+    hsub.GetXaxis()->SetTitleFont(43);
+    hsub.GetXaxis()->SetTitleSize(17);
+    // TString xAxisTitle(x->GetTitle()) ;
+    hsub.GetXaxis()->SetTitle(Form("%s [%s]", x->GetTitle(), x->getUnit()));
+    hsub.GetXaxis()->SetTitleOffset(3.5);
+    hsub.GetXaxis()->SetLabelFont(43);
+    hsub.GetXaxis()->SetLabelSize(14);
+    hsub.GetXaxis()->SetLabelOffset(0.016);
+    hsub.SetLineWidth(1);
+
+    unique_ptr<RooPlot> frameS(x->frame());
+    hsub.Draw();
+
+    TLine l(x->getMin(),1,x->getMax(),1);
+    l.SetLineColor(kCyan+2);
+    l.SetLineWidth(2);
+    l.Draw("same");
+
+    TLine ldown(x->getMin(),1.1,x->getMax(),1.1);
+    ldown.SetLineColor(kCyan+1);
+    ldown.SetLineWidth(1);
+    ldown.SetLineStyle(kDashed);
+    ldown.Draw("same");
+
+    TLine lup(x->getMin(),0.9,x->getMax(),0.9);
+    lup.SetLineColor(kCyan+1);
+    lup.SetLineWidth(1);
+    lup.SetLineStyle(kDashed);
+    lup.Draw("same");
+
+    hsub.Draw("same");
+    frameS->Draw("same");
+
     c.Print(outputFigName);
   }
   c.Print(outputFigName+"]");

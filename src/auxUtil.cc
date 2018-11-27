@@ -8,6 +8,9 @@ TString auxUtil::UNCERTHIPREFIX="uncertHi__";
 TString auxUtil::UNCERTLOPREFIX="uncertLo__";
 TString auxUtil::UNCERTSYMMPREFIX="uncertSymm__";
 
+TString auxUtil::WARNING="\033[91m";
+TString auxUtil::ENDC="\033[0m";
+
 void auxUtil::printTitle(TString titleText, TString separator, int width){
   TString fullLine="", line="";
   
@@ -197,7 +200,6 @@ void auxUtil::removeWhiteSpace(TString& item){
 }
 
 vector<TString> auxUtil::decomposeFuncStr(TString function){
-  removeWhiteSpace(function);
   vector<TString> itemList=splitString(function(function.First('(')+1,function.Last(')')-function.First('(')-1),',');
   if(function.Contains("expr::")) itemList.erase(itemList.begin()); // TODO: find other special syntax to be taken care of
   return itemList;
@@ -239,4 +241,30 @@ bool auxUtil::checkExist(TString name) {
     return true;
   }
   else return false;
+}
+
+vector<TString> auxUtil::diffSet(vector<TString> A, vector<TString> B){
+  sort(A.begin(), A.end());
+  sort(B.begin(), B.end());
+  vector<TString> results;
+  std::set_difference(A.begin(), A.end(),
+		      B.begin(), B.end(),
+		      std::back_inserter(results));
+  return results;
+}
+
+RooDataSet* auxUtil::histToDataSet(TH1* h, RooRealVar* x, RooRealVar* w){
+  double xmin=x->getMin();
+  double xmax=x->getMax();
+  RooDataSet *histData =new RooDataSet(h->GetName(),h->GetTitle(),RooArgSet(*x,*w),WeightVar(*w));
+  int nbin=h->GetNbinsX();
+  for( int ibin = 1 ; ibin <= nbin ; ibin ++ ) {
+    double center=h->GetBinCenter(ibin);
+    if(center>xmax||center<xmin) continue;
+    x->setVal(h->GetBinCenter(ibin));
+    double weight = h->GetBinContent(ibin);
+    w->setVal(weight);
+    histData -> add( RooArgSet(*x,*w) , weight);
+  }
+  return histData;
 }
