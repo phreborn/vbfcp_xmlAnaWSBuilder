@@ -555,7 +555,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
       wfactory->var(_observableName)->setRange(SBLO+"_"+_categoryName, _xMin, _blindMin);
       wfactory->var(_observableName)->setRange(BLIND+"_"+_categoryName, _blindMin, _blindMax);
       wfactory->var(_observableName)->setRange(SBHI+"_"+_categoryName, _blindMax, _xMax);
-      wfactory->var(_observableName)->setRange("FULL", _xMin, _xMax); // Suggested by Wouter
+      // wfactory->var(_observableName)->setRange("FULL", _xMin, _xMax); // Suggested by Wouter
 
       if(_blindMax==_xMax && _blindMin==_xMin){
 	cout<<endl<<auxUtil::WARNING<<" \tREGTEST: Category "+_categoryName+" fully blinded. No side-band exists. "<<auxUtil::ENDC<<endl<<endl;
@@ -565,7 +565,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
       else if(_blindMin==_xMin) rangeName=SBHI+"_"+_categoryName;
       else rangeName=SBLO+"_"+_categoryName+","+SBHI+"_"+_categoryName;
 
-      SBPdf->fixCoefRange("FULL");
+      // SBPdf->fixCoefRange("FULL");
     }
     else{
       _blindMin=_xMax;
