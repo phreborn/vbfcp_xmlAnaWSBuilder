@@ -227,6 +227,7 @@ void xmlAnaWSBuilder::generateWS(){
 }
 
 void xmlAnaWSBuilder::readSyst(TXMLNode* systNode, TString domain){
+  if(_debug) cout<<"\tREGTEST: Reading systematic: "<<auxUtil::getAttributeValue(systNode, "Name")<<endl;
   Systematic syst;
   syst.NPName=auxUtil::getAttributeValue(systNode, "Name");
   syst.process=auxUtil::getAttributeValue(systNode, "Process", true, ""); // If the process of the systematic is specified, use the specified process. Otherwise use the default one
@@ -320,7 +321,6 @@ void xmlAnaWSBuilder::readSample(TXMLNode* sampleNode){
 void xmlAnaWSBuilder::readSampleXMLNode(TXMLNode* node, Sample& sample){
   while ( node != 0 ){
     if ( node->GetNodeName() == TString( "Systematic" ) ){
-      if(_debug) cout<<"\tREGTEST: Reading systematic: "<<auxUtil::getAttributeValue(node, "Name")<<endl;
       readSyst(node, sample.procName);
     }
     else if ( node->GetNodeName() == TString( "NormFactor" ) ){
@@ -1073,7 +1073,7 @@ void xmlAnaWSBuilder::readChannelXMLNode(TXMLNode *node){
   while ( node != 0 ){
     if ( node->GetNodeName() == TString( "Item" ) ){
       TString item=getItemExpr(node, "Name");
-      if(item.Contains(RESPONSEPREFIX)) _ItemsLowPriority.push_back(item);
+      if(item.Contains(RESPONSE)) _ItemsLowPriority.push_back(item);
       else _ItemsHighPriority.push_back(item);
     }
     
