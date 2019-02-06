@@ -1,0 +1,7 @@
+2019-02-06 Hongtao Yang <Hongtao.Yang@cern.ch>
+	* Starting CHANGELOG
+	* Move keyword translation from implementObj to getItemExpr
+	* Allow observable and NP names to contain keywords
+	* Fix bug for ratio plot display
+	* More plotting options
+	* Allow applying scale factor to data

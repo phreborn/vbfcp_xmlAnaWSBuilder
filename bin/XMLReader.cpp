@@ -85,6 +85,7 @@ int main( int argc , char **argv){
       break;
     case 'o':
       plotOption = optarg;
+      cout<<"Set plot option: "<<plotOption<<endl;
       break;
     case 'h':
       printHelp(argv[0]);

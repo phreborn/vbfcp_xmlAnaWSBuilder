@@ -229,7 +229,7 @@ void xmlAnaWSBuilder::generateWS(){
 void xmlAnaWSBuilder::readSyst(TXMLNode* systNode, TString domain){
   if(_debug) cout<<"\tREGTEST: Reading systematic: "<<auxUtil::getAttributeValue(systNode, "Name")<<endl;
   Systematic syst;
-  syst.NPName=auxUtil::getAttributeValue(systNode, "Name");
+  syst.NPName=getItemExpr(systNode, "Name");
   syst.process=auxUtil::getAttributeValue(systNode, "Process", true, ""); // If the process of the systematic is specified, use the specified process. Otherwise use the default one
   if(domain==ALLPROC){		// Common systematics
     if(syst.process!="") syst.domain=syst.process; // If a process name is specified, use it as domain name and remove it from common systematic
@@ -383,7 +383,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   TXMLNode *dataNode=auxUtil::findNode(rootNode, "Data"); // This attribute is only allowed to appear once per-channel, and cannot be hided in a sub-XML file
   if (!dataNode) auxUtil::alertAndAbort("No data node found in channel XML file "+xmlName);
   
-  _observableName=auxUtil::getAttributeValue(dataNode, "Observable");
+  _observableName=getItemExpr(dataNode, "Observable");
   _observableName=implementObj(wfactory.get(), _observableName);
   _xMin=wfactory->var(_observableName)->getMin();
   _xMax=wfactory->var(_observableName)->getMax();
@@ -408,7 +408,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   _injectGhost=auxUtil::to_bool(auxUtil::getAttributeValue(dataNode, "InjectGhost", true, "0")); // Default false
 
   _numData=(_categoryType==COUNTING && _inputDataFileName=="") ? atoi(auxUtil::getAttributeValue(dataNode, "NumData")) : -1; // Only needed for counting experiment where the input data file is not specified
-  
+  _scaleData=atof(auxUtil::getAttributeValue(dataNode, "ScaleData", true, "1"));
   dataFileSanityCheck();	// Check now and report, before it is too late
   
   TXMLNode *correlateNode=auxUtil::findNode(rootNode, "Correlate"); // This attribute is only allowed to appear at most once per-channel, and cannot be hided in a sub-XML file
@@ -974,7 +974,7 @@ void xmlAnaWSBuilder::checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara){
 
 TString xmlAnaWSBuilder::getItemExpr(TXMLNode *node, TString attrName, TString process){
   TString expr=auxUtil::getAttributeValue(node, attrName);
-
+  translateKeyword(expr);
   if(expr.Contains(PROCESS)){
     if(process=="") auxUtil::alertAndAbort("Process name not provided for expression "+expr);
     expr.ReplaceAll(PROCESS, "_"+process);
@@ -992,7 +992,7 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
 
   if(_categoryType==COUNTING && _numData>=0){ // Generate number of events for counting experiment
     double binCenter=(x->getMin()+x->getMax())/2.;
-    double weight=(_numData==0)?auxUtil::epsilon/1000.:_numData;
+    double weight=(_numData==0)?auxUtil::epsilon/1000.:_numData*_scaleData;
     x->setVal(binCenter);
     w->setVal(weight);
     obsdata->add( RooArgSet(*x, *w), weight);
@@ -1023,7 +1023,7 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
     for (int i=0 ; i<obsdata_tmp->numEntries() ; i++) {
       obsdata_tmp->get(i) ;
       x->setVal(xdata_tmp->getVal());
-      double weight=obsdata_tmp->weight();
+      double weight=obsdata_tmp->weight()*_scaleData;
       w->setVal(weight);
       if(_goBlind && x->getVal()>_blindMin && x->getVal()<_blindMax) continue;
       obsdata->add( RooArgSet(*x, *w), weight);
@@ -1034,7 +1034,6 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
 }
 
 TString xmlAnaWSBuilder::implementObj(RooWorkspace *w, TString expr, bool checkExistBeforeImp){
-  translateKeyword(expr);
   // If the obj is claimed to exist, but actually not, then abort.
   int type=auxUtil::getItemType(expr);
   if(type==auxUtil::EXIST){
@@ -1073,7 +1072,7 @@ void xmlAnaWSBuilder::readChannelXMLNode(TXMLNode *node){
   while ( node != 0 ){
     if ( node->GetNodeName() == TString( "Item" ) ){
       TString item=getItemExpr(node, "Name");
-      if(item.Contains(RESPONSE)) _ItemsLowPriority.push_back(item);
+      if(item.Contains(RESPONSE) || item.Contains(RESPONSEPREFIX)) _ItemsLowPriority.push_back(item);
       else _ItemsHighPriority.push_back(item);
     }
     
@@ -1142,19 +1141,43 @@ void xmlAnaWSBuilder::Summary(TString outputFigName){
   vector<TString> options=auxUtil::splitString(_plotOpt,',');
   int m_rebin=1;
   bool m_logy=false;
+  double m_subMin=0.801, m_subMax=1.199;
+  double m_thresholdMin=0.9, m_thresholdMax=1.1;
+  TString m_dataName=_dataName;
   for(auto opt : options){
     if(opt.Contains("rebin")){
-      m_rebin=atoi(opt(opt.First("rebin")+5,opt.Length()).Data());
-      cout<<auxUtil::WARNING<<"Rebin with "<<m_rebin<<auxUtil::ENDC<<endl;
+      m_rebin=atoi(auxUtil::readNumFromOption(opt, "rebin").Data());
+      cout<<"Plotting: Rebin with "<<m_rebin<<endl;
     }
-    if(opt.Contains("logy")) m_logy=true;
+    else if(opt.Contains("submin")){
+      m_subMin=atof(auxUtil::readNumFromOption(opt, "submin").Data());
+      cout<<"Plotting: Sub panel minimum "<<m_subMin<<endl;
+    }
+    else if(opt.Contains("submax")){
+      m_subMax=atof(auxUtil::readNumFromOption(opt, "submax").Data());
+      cout<<"Plotting: Sub panel maximum "<<m_subMax<<endl;
+    }
+    else if(opt.Contains("thmin")){
+      m_thresholdMin=atof(auxUtil::readNumFromOption(opt, "thmin").Data());
+      cout<<"Plotting: Sub panel threshold minimum "<<m_thresholdMin<<endl;
+    }
+    else if(opt.Contains("thmax")){
+      m_thresholdMax=atof(auxUtil::readNumFromOption(opt, "thmax").Data());
+      cout<<"Plotting: Sub panel threshold maximum "<<m_thresholdMax<<endl;
+    }
+    else if(opt.Contains("data")){
+      m_dataName=auxUtil::readNumFromOption(opt, "data").Data();
+      cout<<"Plotting: Dataset name "<<m_dataName<<endl;
+    }
+    else if(opt.Contains("logy")) m_logy=true;
+    else cout<<auxUtil::WARNING<<"Plotting: Unsupported plotting option "<<opt<<". Skipping..."<<auxUtil::ENDC<<endl;
   }
   
   RooSimultaneous *m_pdf = dynamic_cast<RooSimultaneous*>(_mConfig->GetPdf()); assert (m_pdf);
   RooAbsCategoryLValue* m_cat = const_cast<RooAbsCategoryLValue*>(&m_pdf->indexCat());
   const RooArgSet *m_gobs = dynamic_cast<const RooArgSet*>(_mConfig->GetGlobalObservables()); assert(m_gobs);
   int numChannels = m_cat->numBins(0);
-  RooDataSet *m_data=dynamic_cast<RooDataSet*>(_combWS->data(_dataName));
+  RooDataSet *m_data=dynamic_cast<RooDataSet*>(_combWS->data(m_dataName));
   TList *m_dataList = m_data->split( *m_cat, true );
 
   auxUtil::printTitle("Begin summary", "~");
@@ -1214,7 +1237,7 @@ void xmlAnaWSBuilder::Summary(TString outputFigName){
     unique_ptr<TH1D> hbkg((TH1D*)pdfi->createHistogram("hbkg", *x, RooFit::Binning(obsNBins)));
     unique_ptr<TH1D> hdata((TH1D*)datai->createHistogram("hdata", *x, RooFit::Binning(obsNBins)));
     for(int ibin=1;ibin<=obsNBins;ibin++) hdata->SetBinError(ibin, sqrt(hdata->GetBinContent(ibin)));
-    hbkg->Scale(hdata->Integral()/hbkg->Integral("width")*addSF);
+    hbkg->Scale(hdata->Integral("width")/hbkg->Integral("width")*addSF);
 
     for( int i = 0 ; i < obsNBins; i ++ ){
       double weight = hbkg->GetBinContent(i+1);
@@ -1225,7 +1248,7 @@ void xmlAnaWSBuilder::Summary(TString outputFigName){
 	hsub.SetBinError(i+1,error/weight);
       }
     }
-    hsub.GetYaxis()->SetRangeUser(0.801,1.199);
+    hsub.GetYaxis()->SetRangeUser(m_subMin,m_subMax);
     hsub.SetMarkerStyle(kFullCircle);
     hsub.SetMarkerColor(kBlack);
     hsub.SetMarkerSize(1.);
@@ -1258,13 +1281,13 @@ void xmlAnaWSBuilder::Summary(TString outputFigName){
     l.SetLineWidth(2);
     l.Draw("same");
 
-    TLine ldown(x->getMin(),1.1,x->getMax(),1.1);
+    TLine ldown(x->getMin(),m_thresholdMax,x->getMax(),m_thresholdMax);
     ldown.SetLineColor(kCyan+1);
     ldown.SetLineWidth(1);
     ldown.SetLineStyle(kDashed);
     ldown.Draw("same");
 
-    TLine lup(x->getMin(),0.9,x->getMax(),0.9);
+    TLine lup(x->getMin(),m_thresholdMin,x->getMax(),m_thresholdMin);
     lup.SetLineColor(kCyan+1);
     lup.SetLineWidth(1);
     lup.SetLineStyle(kDashed);
