@@ -229,7 +229,7 @@ void xmlAnaWSBuilder::generateWS(){
 void xmlAnaWSBuilder::readSyst(TXMLNode* systNode, TString domain){
   if(_debug) cout<<"\tREGTEST: Reading systematic: "<<auxUtil::getAttributeValue(systNode, "Name")<<endl;
   Systematic syst;
-  syst.NPName=auxUtil::getAttributeValue(systNode, "Name");
+  syst.NPName=getItemExpr(systNode, "Name");
   syst.process=auxUtil::getAttributeValue(systNode, "Process", true, ""); // If the process of the systematic is specified, use the specified process. Otherwise use the default one
   if(domain==ALLPROC){		// Common systematics
     if(syst.process!="") syst.domain=syst.process; // If a process name is specified, use it as domain name and remove it from common systematic
@@ -383,7 +383,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   TXMLNode *dataNode=auxUtil::findNode(rootNode, "Data"); // This attribute is only allowed to appear once per-channel, and cannot be hided in a sub-XML file
   if (!dataNode) auxUtil::alertAndAbort("No data node found in channel XML file "+xmlName);
   
-  _observableName=auxUtil::getAttributeValue(dataNode, "Observable");
+  _observableName=getItemExpr(dataNode, "Observable");
   _observableName=implementObj(wfactory.get(), _observableName);
   _xMin=wfactory->var(_observableName)->getMin();
   _xMax=wfactory->var(_observableName)->getMax();
