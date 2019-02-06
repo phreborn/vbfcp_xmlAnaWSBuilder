@@ -408,7 +408,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   _injectGhost=auxUtil::to_bool(auxUtil::getAttributeValue(dataNode, "InjectGhost", true, "0")); // Default false
 
   _numData=(_categoryType==COUNTING && _inputDataFileName=="") ? atoi(auxUtil::getAttributeValue(dataNode, "NumData")) : -1; // Only needed for counting experiment where the input data file is not specified
-  
+  _scaleData=atof(auxUtil::getAttributeValue(dataNode, "ScaleData", true, "1"));
   dataFileSanityCheck();	// Check now and report, before it is too late
   
   TXMLNode *correlateNode=auxUtil::findNode(rootNode, "Correlate"); // This attribute is only allowed to appear at most once per-channel, and cannot be hided in a sub-XML file
@@ -992,7 +992,7 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
 
   if(_categoryType==COUNTING && _numData>=0){ // Generate number of events for counting experiment
     double binCenter=(x->getMin()+x->getMax())/2.;
-    double weight=(_numData==0)?auxUtil::epsilon/1000.:_numData;
+    double weight=(_numData==0)?auxUtil::epsilon/1000.:_numData*_scaleData;
     x->setVal(binCenter);
     w->setVal(weight);
     obsdata->add( RooArgSet(*x, *w), weight);
@@ -1023,7 +1023,7 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
     for (int i=0 ; i<obsdata_tmp->numEntries() ; i++) {
       obsdata_tmp->get(i) ;
       x->setVal(xdata_tmp->getVal());
-      double weight=obsdata_tmp->weight();
+      double weight=obsdata_tmp->weight()*_scaleData;
       w->setVal(weight);
       if(_goBlind && x->getVal()>_blindMin && x->getVal()<_blindMax) continue;
       obsdata->add( RooArgSet(*x, *w), weight);

@@ -41,6 +41,7 @@
 	  VarName           CDATA            #IMPLIED
 	  Cut               CDATA            #IMPLIED
 	  HistName          CDATA            #IMPLIED
+	  ScaleData         CDATA            #IMPLIED
           Observable        CDATA            #REQUIRED
           Binning           CDATA            #IMPLIED
           InjectGhost       CDATA            #IMPLIED
