@@ -974,7 +974,7 @@ void xmlAnaWSBuilder::checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara){
 
 TString xmlAnaWSBuilder::getItemExpr(TXMLNode *node, TString attrName, TString process){
   TString expr=auxUtil::getAttributeValue(node, attrName);
-
+  translateKeyword(expr);
   if(expr.Contains(PROCESS)){
     if(process=="") auxUtil::alertAndAbort("Process name not provided for expression "+expr);
     expr.ReplaceAll(PROCESS, "_"+process);
@@ -1034,7 +1034,6 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
 }
 
 TString xmlAnaWSBuilder::implementObj(RooWorkspace *w, TString expr, bool checkExistBeforeImp){
-  translateKeyword(expr);
   // If the obj is claimed to exist, but actually not, then abort.
   int type=auxUtil::getItemType(expr);
   if(type==auxUtil::EXIST){
@@ -1073,7 +1072,7 @@ void xmlAnaWSBuilder::readChannelXMLNode(TXMLNode *node){
   while ( node != 0 ){
     if ( node->GetNodeName() == TString( "Item" ) ){
       TString item=getItemExpr(node, "Name");
-      if(item.Contains(RESPONSE)) _ItemsLowPriority.push_back(item);
+      if(item.Contains(RESPONSE) || item.Contains(RESPONSEPREFIX)) _ItemsLowPriority.push_back(item);
       else _ItemsHighPriority.push_back(item);
     }
     
