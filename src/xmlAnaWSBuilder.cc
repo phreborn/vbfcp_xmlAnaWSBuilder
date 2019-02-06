@@ -1213,7 +1213,7 @@ void xmlAnaWSBuilder::Summary(TString outputFigName){
     unique_ptr<TH1D> hbkg((TH1D*)pdfi->createHistogram("hbkg", *x, RooFit::Binning(obsNBins)));
     unique_ptr<TH1D> hdata((TH1D*)datai->createHistogram("hdata", *x, RooFit::Binning(obsNBins)));
     for(int ibin=1;ibin<=obsNBins;ibin++) hdata->SetBinError(ibin, sqrt(hdata->GetBinContent(ibin)));
-    hbkg->Scale(hdata->Integral()/hbkg->Integral("width")*addSF);
+    hbkg->Scale(hdata->Integral("width")/hbkg->Integral("width")*addSF);
 
     for( int i = 0 ; i < obsNBins; i ++ ){
       double weight = hbkg->GetBinContent(i+1);
