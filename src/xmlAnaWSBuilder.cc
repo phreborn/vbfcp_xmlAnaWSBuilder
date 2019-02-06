@@ -1141,19 +1141,43 @@ void xmlAnaWSBuilder::Summary(TString outputFigName){
   vector<TString> options=auxUtil::splitString(_plotOpt,',');
   int m_rebin=1;
   bool m_logy=false;
+  double m_subMin=0.801, m_subMax=1.199;
+  double m_thresholdMin=0.9, m_thresholdMax=1.1;
+  TString m_dataName=_dataName;
   for(auto opt : options){
     if(opt.Contains("rebin")){
-      m_rebin=atoi(opt(opt.First("rebin")+5,opt.Length()).Data());
-      cout<<auxUtil::WARNING<<"Rebin with "<<m_rebin<<auxUtil::ENDC<<endl;
+      m_rebin=atoi(auxUtil::readNumFromOption(opt, "rebin").Data());
+      cout<<"Plotting: Rebin with "<<m_rebin<<endl;
     }
-    if(opt.Contains("logy")) m_logy=true;
+    else if(opt.Contains("submin")){
+      m_subMin=atof(auxUtil::readNumFromOption(opt, "submin").Data());
+      cout<<"Plotting: Sub panel minimum "<<m_subMin<<endl;
+    }
+    else if(opt.Contains("submax")){
+      m_subMax=atof(auxUtil::readNumFromOption(opt, "submax").Data());
+      cout<<"Plotting: Sub panel maximum "<<m_subMax<<endl;
+    }
+    else if(opt.Contains("thmin")){
+      m_thresholdMin=atof(auxUtil::readNumFromOption(opt, "thmin").Data());
+      cout<<"Plotting: Sub panel threshold minimum "<<m_thresholdMin<<endl;
+    }
+    else if(opt.Contains("thmax")){
+      m_thresholdMax=atof(auxUtil::readNumFromOption(opt, "thmax").Data());
+      cout<<"Plotting: Sub panel threshold maximum "<<m_thresholdMax<<endl;
+    }
+    else if(opt.Contains("data")){
+      m_dataName=auxUtil::readNumFromOption(opt, "data").Data();
+      cout<<"Plotting: Dataset name "<<m_dataName<<endl;
+    }
+    else if(opt.Contains("logy")) m_logy=true;
+    else cout<<auxUtil::WARNING<<"Plotting: Unsupported plotting option "<<opt<<". Skipping..."<<auxUtil::ENDC<<endl;
   }
   
   RooSimultaneous *m_pdf = dynamic_cast<RooSimultaneous*>(_mConfig->GetPdf()); assert (m_pdf);
   RooAbsCategoryLValue* m_cat = const_cast<RooAbsCategoryLValue*>(&m_pdf->indexCat());
   const RooArgSet *m_gobs = dynamic_cast<const RooArgSet*>(_mConfig->GetGlobalObservables()); assert(m_gobs);
   int numChannels = m_cat->numBins(0);
-  RooDataSet *m_data=dynamic_cast<RooDataSet*>(_combWS->data(_dataName));
+  RooDataSet *m_data=dynamic_cast<RooDataSet*>(_combWS->data(m_dataName));
   TList *m_dataList = m_data->split( *m_cat, true );
 
   auxUtil::printTitle("Begin summary", "~");
@@ -1224,7 +1248,7 @@ void xmlAnaWSBuilder::Summary(TString outputFigName){
 	hsub.SetBinError(i+1,error/weight);
       }
     }
-    hsub.GetYaxis()->SetRangeUser(0.801,1.199);
+    hsub.GetYaxis()->SetRangeUser(m_subMin,m_subMax);
     hsub.SetMarkerStyle(kFullCircle);
     hsub.SetMarkerColor(kBlack);
     hsub.SetMarkerSize(1.);
@@ -1257,13 +1281,13 @@ void xmlAnaWSBuilder::Summary(TString outputFigName){
     l.SetLineWidth(2);
     l.Draw("same");
 
-    TLine ldown(x->getMin(),1.1,x->getMax(),1.1);
+    TLine ldown(x->getMin(),m_thresholdMax,x->getMax(),m_thresholdMax);
     ldown.SetLineColor(kCyan+1);
     ldown.SetLineWidth(1);
     ldown.SetLineStyle(kDashed);
     ldown.Draw("same");
 
-    TLine lup(x->getMin(),0.9,x->getMax(),0.9);
+    TLine lup(x->getMin(),m_thresholdMin,x->getMax(),m_thresholdMin);
     lup.SetLineColor(kCyan+1);
     lup.SetLineWidth(1);
     lup.SetLineStyle(kDashed);

@@ -60,7 +60,7 @@ public:
   static RooDataSet* histToDataSet(TH1* h, RooRealVar* x, RooRealVar* w);
     
   static bool checkExist(TString name);
-  
+  static TString readNumFromOption(TString opt, TString key);
   static double epsilon;
   ClassDef(auxUtil, 0);
 };

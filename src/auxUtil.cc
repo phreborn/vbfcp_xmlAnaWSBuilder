@@ -268,3 +268,10 @@ RooDataSet* auxUtil::histToDataSet(TH1* h, RooRealVar* x, RooRealVar* w){
   }
   return histData;
 }
+
+TString auxUtil::readNumFromOption(TString opt, TString key){
+  if(opt.Contains(key)){
+    return opt(opt.First(key)+key.Length(), opt.Length());
+  }
+  else return "";
+}
