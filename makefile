@@ -1,5 +1,5 @@
 DEBUGFLAGS    = -g
-OPTFLAGS      = -O2 -std=c++11 -Wno-deprecated
+OPTFLAGS      = -O2 -Wno-deprecated
 ifeq (debug,$(findstring debug,$(LIMITBUILD)))
 OPT           = $(DEBUGFLAGS)
 NOOPT         =
