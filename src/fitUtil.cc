@@ -14,11 +14,11 @@ int fitUtil::profileToData(ModelConfig *mc, RooAbsData *data, TString rangeName)
 
   RooWorkspace *w=mc->GetWS();
   RooArgSet funcs = w->allPdfs();
-  std::auto_ptr<TIterator> iter(funcs.createIterator());
+  unique_ptr<TIterator> iter(funcs.createIterator());
   for ( RooAbsPdf* v = (RooAbsPdf*)iter->Next(); v!=0; v = (RooAbsPdf*)iter->Next() ) {
-    std::string name = v->GetName();
+    string name = v->GetName();
     if (v->IsA() == RooRealSumPdf::Class()) {
-      std::cout << "\tset binned likelihood for: " << v->GetName() << std::endl;
+      cout << "\tset binned likelihood for: " << v->GetName() << endl;
       v->setAttribute("BinnedLikelihood", true);
     }
   }

@@ -1,0 +1,8 @@
+build/
+CMakeCache.txt
+CMakeFiles/
+G__xmlAnaWSBuilder.cxx
+Makefile
+cmake_install.cmake
+exe/
+lib/

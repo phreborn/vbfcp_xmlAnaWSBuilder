@@ -5,6 +5,7 @@
           DataName           CDATA            #REQUIRED
           OutputFile         CDATA            #REQUIRED
 	  Blind              CDATA            #IMPLIED
+	  Integrator         CDATA            #IMPLIED
 > 
 
 <!ELEMENT Input (#PCDATA) >
@@ -21,7 +22,7 @@
 	  SnapshotGlob      CDATA            #IMPLIED
 	  SnapshotNuis      CDATA            #IMPLIED
 	  SnapshotPOI       CDATA            #IMPLIED
-	  Injection         CDATA            #IMPLIED
+	  Algorithm         CDATA            #IMPLIED
 	  >
 
 <!ELEMENT Channel (Data,Correlate*,(Systematic | Item | ImportItems | IncludeSysts)*,Sample+)>
@@ -78,6 +79,7 @@
           Mag               CDATA            #REQUIRED
 	  WhereTo           CDATA            #REQUIRED
 	  Process           CDATA            #IMPLIED
+	  Beta              CDATA            #IMPLIED
 	  > 
 
 <!ELEMENT NormFactor EMPTY>

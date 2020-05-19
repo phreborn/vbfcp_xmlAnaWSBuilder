@@ -16,6 +16,7 @@ struct option longopts[] = {
   { "nllOffset", required_argument, NULL, 'n'},
   { "printLevel", required_argument, NULL, 'p'},
   { "binned", required_argument, NULL, 'b'},
+  { "changeDataStorageType", required_argument, NULL, 'c'},
   { "plotOption", required_argument, NULL, 'o'},
   { "help", no_argument, NULL, 'h'},
   {0, 0, 0, 0}
@@ -24,16 +25,17 @@ struct option longopts[] = {
 void printHelp(TString exe){
   cout<<"Usage: "<<exe<<" [options]"<<endl;
   cout<<"Allowed options:"<<endl;
-  cout<<" -x [ --xml ] arg                Input xml file location (required)"<<endl;
-  cout<<" -v [ --verbose ] arg            Printing out debug info or not (default no)"<<endl;
-  cout<<" -m [ --minimizerAlgo ] arg      Minimizer algorithm (default Minuit2)"<<endl;
-  cout<<" -s [ --minimizerStrategy ] arg  Minimizer strategy (default 1)"<<endl;
-  cout<<" -t [ --minimizerTolerance ] arg Minimizer tolerance (default 1e-3)"<<endl;
-  cout<<" -n [ --nllOffset ] arg          Enable nllOffset (default on)"<<endl;
-  cout<<" -p [ --printLevel ] arg         Fit log print level (default 2)"<<endl;
-  cout<<" -b [ --binned ] arg             Fit to binned data (default unbinned)"<<endl;
-  cout<<" -o [ --plotOption ] arg         Plot option (default empty)"<<endl;
-  cout<<" -h [ --help ]                   Produce help message"<<endl;
+  cout<<" -x [ --xml ] arg                   Input xml file location (required)"<<endl;
+  cout<<" -v [ --verbose ] arg               Printing out debug info or not (default no)"<<endl;
+  cout<<" -m [ --minimizerAlgo ] arg         Minimizer algorithm (default Minuit2)"<<endl;
+  cout<<" -s [ --minimizerStrategy ] arg     Minimizer strategy (default 1)"<<endl;
+  cout<<" -t [ --minimizerTolerance ] arg    Minimizer tolerance (default 1e-3)"<<endl;
+  cout<<" -n [ --nllOffset ] arg             Enable nllOffset (default on)"<<endl;
+  cout<<" -p [ --printLevel ] arg            Fit log print level (default 2)"<<endl;
+  cout<<" -b [ --binned ] arg                Fit to binned data (default unbinned)"<<endl;
+  cout<<" -c [ --changeDataStorageType] arg  Set RooAbsData StorageType to tree instead of vector (default false)"<<endl;  
+  cout<<" -o [ --plotOption ] arg            Plot option (default empty)"<<endl;
+  cout<<" -h [ --help ]                      Produce help message"<<endl;
 }
 
 int main( int argc , char **argv){
@@ -48,10 +50,11 @@ int main( int argc , char **argv){
   string inputFile="";
   bool isVerbose=false;
   bool binned=false;
+  bool modifyStorageType=false;
   string plotOption="";
 
   int oc;
-  while ((oc=getopt_long(argc, argv, ":x:v:m:s:t:n:p:b:o:h", longopts, NULL)) != -1){
+  while ((oc=getopt_long(argc, argv, ":x:v:m:s:t:n:p:b:c:o:h", longopts, NULL)) != -1){
     switch (oc) {
     case 'x':
       inputFile = optarg;
@@ -83,6 +86,10 @@ int main( int argc , char **argv){
     case 'b':
       binned = auxUtil::to_bool(optarg);
       break;
+    case 'c':
+      modifyStorageType = auxUtil::to_bool(optarg);
+      cout<<"Set RooAbsData defaultStoreType to Tree instead of vector"<<endl;
+      break;
     case 'o':
       plotOption = optarg;
       cout<<"Set plot option: "<<plotOption<<endl;
@@ -113,6 +120,7 @@ int main( int argc , char **argv){
   xmlAnaWSBuilder *wsBuilder=new xmlAnaWSBuilder(inputFile);
   wsBuilder->setDebug(isVerbose);
   wsBuilder->setUseBinned(binned);
+  wsBuilder->setDataStorageType(modifyStorageType);
   wsBuilder->setPlotOption(plotOption.c_str());
   wsBuilder->generateWS();
   return 0 ;

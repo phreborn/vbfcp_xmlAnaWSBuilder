@@ -16,7 +16,7 @@ class asimovUtil : public TObject{
 private:
   vector<TString> _asimovNames, _asimovSetups, _asimovProfiles;
   vector<TString> _SnapshotsAll, _SnapshotsNuis, _SnapshotsGlob, _SnapshotsPOI, _Snapshots;
-  vector<TString> _dataToFit;
+  vector<TString> _dataToFit, _algorithm;
   TString _rangeName;
   // action items
   static TString RAW;
@@ -25,6 +25,7 @@ private:
   static TString GENASIMOV;
   static TString FLOAT;
   static TString FIXSYST;
+  static TString FIXALL;
   static TString MATCHGLOB;
   static TString SAVESNAPSHOT;
 public:
@@ -35,6 +36,7 @@ public:
   bool genAsimov(){return _asimovNames.size()>0;}
   void setRange(TString rangeName){_rangeName=rangeName;}
   void matchGlob(ModelConfig *mc);
+  RooAbsData *generateAsimovDataset(ModelConfig *mc, TString dataName);
   ClassDef(asimovUtil,2);
 };
 
