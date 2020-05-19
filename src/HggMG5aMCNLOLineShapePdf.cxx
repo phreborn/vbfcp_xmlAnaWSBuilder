@@ -1,4 +1,4 @@
-#include "HggMG5aMCNLOLineShapePdf.hh"
+#include "HggMG5aMCNLOLineShapePdf.h"
 
 ClassImp(HggMG5aMCNLOLineShapePdf);
 

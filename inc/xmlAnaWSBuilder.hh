@@ -10,8 +10,9 @@
 
 #include "FlexibleInterpVarMkII.hh"
 // Additional custom classes
-#include "RooTwoSidedCBShape.hh"
-#include "HggMG5aMCNLOLineShapePdf.hh"
+#include "RooTwoSidedCBShape.h"
+#include "HggMG5aMCNLOLineShapePdf.h"
+#include "RooEmpXHistShape.h"
 
 using namespace std;
 using namespace RooFit;
@@ -50,11 +51,10 @@ struct Systematic{
 
 class xmlAnaWSBuilder : public TObject{
 private:
-// Workspace and ModelConfig
-// Use auto_ptr for now as rootcint used by ROOT 5 cannot interpret more modern unique_ptr
-  auto_ptr<RooWorkspace> _combWS;
-  auto_ptr<ModelConfig> _mConfig;
-  auto_ptr<asimovUtil> _asimovHandler;
+  // Workspace and ModelConfig
+  unique_ptr<RooWorkspace> _combWS;
+  unique_ptr<ModelConfig> _mConfig;
+  unique_ptr<asimovUtil> _asimovHandler;
 
   // Important object names
   TString _wsName;
@@ -82,6 +82,7 @@ private:
   bool _injectGhost;
   int _numData;
   double _scaleData;
+  TString _integrator;
   
   // Vectors and maps which will be cleared after generating model for each channel
   map<TString, vector<Systematic> > _Systematics;
@@ -96,11 +97,15 @@ private:
   vector<TString> _Type;
   vector<TString> _POIList;
   vector<TString> _rangeList;
+  map<TString, shared_ptr<TH1D> > _dataHist;
   
   // Flags
   bool _useBinned;
   TString _plotOpt;
   bool _debug;			// Flag for printing out more info
+
+  // Tree for using ntuple
+  unique_ptr<TTree> _chain;
   
   // Global names
 
@@ -139,7 +144,8 @@ private:
   static TString GAUSSIAN;
   static TString LOGNORMAL;
   static TString ASYMMETRIC;
-
+  static TString DFD;
+  
   // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
   // Hard-coded object naming partten: do not duplicate
   // these partten when constructing your own model!
@@ -179,23 +185,26 @@ private:
   void readSampleXMLNode(TXMLNode* node, Sample& sample);
   void getModel(RooWorkspace *w, Sample *sample, RooArgSet *nuispara=NULL, RooArgSet *constraints=NULL, RooArgSet *globobs=NULL);
   void checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara);
-  void clearUp(){_Systematics.clear();_ItemsLowPriority.clear(); _ItemsHighPriority.clear(); _ItemsCorrelate.clear(); _Samples.clear();}
+  void clearUp();
   void attachConstraints(RooWorkspace *w, TString sumPdfStr, RooArgSet *constraints, TString finalModelName);
-  TString getItemExpr(TXMLNode *node, TString attrName, TString process="");
+  TString getTranslatedExpr(TXMLNode *node, TString attrName, TString process="");
   RooDataSet* readInData(RooRealVar *x, RooRealVar *w);
   TString implementObj(RooWorkspace *w, TString expr, bool checkExistBeforeImp=false);
   TString implementObjArray(RooWorkspace *w, vector<TString> objArr);
   TString implementUncertExpr(RooWorkspace *w, TString expr, TString varName, int uncertType);
   void readChannelXMLNode(TXMLNode *node);
+  void histToDataSet(RooDataSet* histData, TH1* h, RooRealVar* x, RooRealVar* w, double scaleData=1);
 public:
   xmlAnaWSBuilder(TString inputFile);
   void generateWS();
   void setDebug(bool flag){_debug=flag;};
   void setUseBinned(bool flag){_useBinned=flag;};
+  void setDataStorageType(bool modify) {if (modify) RooAbsData::setDefaultStorageType(RooAbsData::StorageType::Tree);}
   void setPlotOption(TString option){_plotOpt=option;};
   void dataFileSanityCheck();
   void translateKeyword(TString &expr);
-
+  void releaseTheGhost(RooDataSet *obsdata, RooRealVar *x, RooRealVar *w, double ghostwt=1e-9);
+  
   void Summary(TString outputFigName);
   ClassDef(xmlAnaWSBuilder,3);
 };

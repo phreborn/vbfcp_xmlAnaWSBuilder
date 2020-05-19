@@ -101,24 +101,6 @@ void auxUtil::defineSet(RooWorkspace *w, vector<TString> set, TString setName){
   w->defineSet(setName, nameSet);
 }
 
-void auxUtil::releaseTheGhost(RooDataSet *obsdata, RooRealVar *x, RooRealVar *w, double ghostwt){
-  TH1D h_data("h_data","",x->numBins(),x->getMin(),x->getMax());
-  RooArgSet* obs = const_cast<RooArgSet*>(obsdata->get());
-  RooRealVar* xdata = dynamic_cast<RooRealVar*>(obs->find(x->GetName()));
-  int nevt1=obsdata->numEntries();
-  for (int i=0 ; i<nevt1 ; i++) {
-    obsdata->get(i) ;
-    h_data.Fill( xdata->getVal() );
-  }
-  for( int ibin = 1 ; ibin <= x->numBins() ; ibin++) {
-    if(h_data.GetBinContent(ibin)==0){
-      x->setVal(h_data.GetBinCenter(ibin));
-      w->setVal(ghostwt);
-      obsdata->add( RooArgSet(*x,*w), ghostwt);
-    }
-  }
-}
-
 int auxUtil::getItemType(TString item){
   if(item.Contains("::")&&item.Contains("(")) return FUNCTION; // Function or pdf
   else if(item.Contains("[")) return VARIABLE;			// Variable
@@ -235,12 +217,13 @@ TXMLAttr *auxUtil::findAttribute(TXMLNode* rootNode, TString attributeKey){
   return NULL;
 }
 
-bool auxUtil::checkExist(TString name) {
-  if (FILE *file = fopen(name, "r")) {
-    fclose(file);
-    return true;
+bool auxUtil::checkExist(TString nameList) {
+  vector<TString> fileNames = auxUtil::splitString(nameList, ',');
+  for( auto name : fileNames ){
+    if(FILE *file = fopen(name, "r")) fclose(file);
+    else return false;
   }
-  else return false;
+  return true;
 }
 
 vector<TString> auxUtil::diffSet(vector<TString> A, vector<TString> B){
@@ -253,25 +236,217 @@ vector<TString> auxUtil::diffSet(vector<TString> A, vector<TString> B){
   return results;
 }
 
-RooDataSet* auxUtil::histToDataSet(TH1* h, RooRealVar* x, RooRealVar* w){
-  double xmin=x->getMin();
-  double xmax=x->getMax();
-  RooDataSet *histData =new RooDataSet(h->GetName(),h->GetTitle(),RooArgSet(*x,*w),WeightVar(*w));
-  int nbin=h->GetNbinsX();
-  for( int ibin = 1 ; ibin <= nbin ; ibin ++ ) {
-    double center=h->GetBinCenter(ibin);
-    if(center>xmax||center<xmin) continue;
-    x->setVal(h->GetBinCenter(ibin));
-    double weight = h->GetBinContent(ibin);
-    w->setVal(weight);
-    histData -> add( RooArgSet(*x,*w) , weight);
-  }
-  return histData;
-}
-
 TString auxUtil::readNumFromOption(TString opt, TString key){
   if(opt.Contains(key)){
     return opt(opt.First(key)+key.Length(), opt.Length());
   }
   else return "";
+}
+
+int auxUtil::findBin(TH1 *h, double lowedge){
+  int nbin=h->GetNbinsX();
+  if(lowedge<h->GetBinLowEdge(1)&&fabs(lowedge-h->GetBinLowEdge(1)>epsilon)) return 0;
+  if(lowedge>h->GetBinLowEdge(nbin)&&fabs(lowedge-h->GetBinLowEdge(nbin)>epsilon)) return nbin+1;
+  for(int ibin=1;ibin<=nbin;ibin++){
+    double temp=h->GetBinLowEdge(ibin);
+    if(fabs(temp-lowedge)<epsilon) return ibin;
+  }
+  return -1;
+}
+
+TStyle* auxUtil::ATLASStyle() 
+{
+  TStyle *atlasStyle = new TStyle("ATLAS","Atlas style");
+
+  // use plain black on white colors
+  Int_t icol=0; // WHITE
+  atlasStyle->SetFrameBorderMode(icol);
+  atlasStyle->SetFrameFillColor(icol);
+  atlasStyle->SetCanvasBorderMode(icol);
+  atlasStyle->SetCanvasColor(icol);
+  atlasStyle->SetPadBorderMode(icol);
+  atlasStyle->SetPadColor(icol);
+  atlasStyle->SetStatColor(icol);
+  //atlasStyle->SetFillColor(icol); // don't use: white fill color for *all* objects
+
+  // set the paper & margin sizes
+  atlasStyle->SetPaperSize(20,26);
+
+  // set margin sizes
+  atlasStyle->SetPadTopMargin(0.05);
+  atlasStyle->SetPadRightMargin(0.05);
+  atlasStyle->SetPadBottomMargin(0.16);
+  atlasStyle->SetPadLeftMargin(0.16);
+
+  // set title offsets (for axis label)
+  atlasStyle->SetTitleXOffset(1.1);
+  atlasStyle->SetTitleYOffset(1.3);
+
+  // use large fonts
+  //Int_t font=72; // Helvetica italics
+  Int_t font=42; // Helvetica
+  Double_t tsize=0.05; // originally 0.05
+  atlasStyle->SetTextFont(font);
+
+  atlasStyle->SetTextSize(tsize);
+  atlasStyle->SetLabelFont(font,"x");
+  atlasStyle->SetTitleFont(font,"x");
+  atlasStyle->SetLabelFont(font,"y");
+  atlasStyle->SetTitleFont(font,"y");
+  atlasStyle->SetLabelFont(font,"z");
+  atlasStyle->SetTitleFont(font,"z");
+  
+  atlasStyle->SetLabelSize(tsize,"x");
+  atlasStyle->SetTitleSize(tsize,"x");
+  atlasStyle->SetLabelSize(tsize,"y");
+  atlasStyle->SetTitleSize(tsize,"y");
+  atlasStyle->SetLabelSize(tsize,"z");
+  atlasStyle->SetTitleSize(tsize,"z");
+
+  // use bold lines and markers
+  atlasStyle->SetMarkerStyle(20);
+  atlasStyle->SetMarkerSize(1.2);
+  atlasStyle->SetHistLineWidth((Width_t)3.0);
+  atlasStyle->SetLineStyleString(2,"[12 12]"); // postscript dashes
+
+  // get rid of X error bars 
+  //atlasStyle->SetErrorX(0.001);
+  // get rid of error bar caps
+  atlasStyle->SetEndErrorSize(0.);
+
+  // do not display any of the standard histogram decorations
+  atlasStyle->SetOptTitle(0);
+  //atlasStyle->SetOptStat(1111);
+  atlasStyle->SetOptStat(0);
+  //atlasStyle->SetOptFit(1111);
+  atlasStyle->SetOptFit(0);
+
+  // put tick marks on top and RHS of plots
+  atlasStyle->SetPadTickX(1);
+  atlasStyle->SetPadTickY(1);
+
+  return atlasStyle;
+
+}
+
+void auxUtil::setATLASStyle()
+{
+  std::cout << "\nApplying ATLAS style settings...\n" << std::endl ;
+  ATLASStyle();
+  gROOT->SetStyle("ATLAS");
+  gROOT->ForceStyle();
+}
+
+int auxUtil::getNDOF(RooAbsPdf *pdf, RooRealVar *x, bool exclSyst){
+  RooArgSet *params=pdf->getVariables();
+  unique_ptr<RooAbsPdf> nuispdf(RooStats::MakeNuisancePdf(*pdf, RooArgSet(*x), "nuisancePdf"));
+  unique_ptr<TIterator> iter(params->createIterator());
+  RooRealVar *var=NULL;
+  int counter=0;
+  while((var=(RooRealVar*)iter->Next()))
+    if(!var->isConstant()
+       && var->GetName() != x->GetName()
+       && (exclSyst && !nuispdf->dependsOn(RooArgSet(*var)))) counter++;
+
+  return counter;
+}
+
+int auxUtil::getNDOF(ModelConfig *mc, bool exclSyst){
+  RooArgSet *params=mc->GetPdf()->getVariables();
+  unique_ptr<RooAbsPdf> nuispdf(RooStats::MakeNuisancePdf(*mc->GetPdf(), *mc->GetObservables(), "nuisancePdf"));
+  unique_ptr<TIterator> iter(params->createIterator());
+  RooRealVar *var=NULL;
+  int counter=0;
+  while((var=(RooRealVar*)iter->Next()))
+    if(!var->isConstant()
+       && !mc->GetObservables()->find(var->GetName())
+       && (exclSyst && !nuispdf->dependsOn(RooArgSet(*var)))) counter++;
+
+  return counter;
+}
+
+map<TString, double> auxUtil::calcChi2(TH1* hdata, TH1* hpdf, double blindMin, double blindMax, double threshold){
+  if(hdata->GetNbinsX() != hpdf->GetNbinsX()) auxUtil::alertAndAbort("Number of bins do not match between data and pdf histograms used for chi2 calculation");
+  const int obsNBins = hdata->GetNbinsX();
+  map<TString, double> result;
+  bool goBlind = (blindMin < blindMax) && ( (blindMin > hdata->GetXaxis()->GetXmin()) || (blindMax < hdata->GetXaxis()->GetXmax()) );
+
+  // ******************** Calculate chi2 ********************
+  double chi2 = 0, content_data_chi2 = 0, content_pdf_chi2 = 0, error2_data_chi2 = 0, last_increment_chi2 = 0;
+  int nbin_chi2 = 0, last_increment_bin_chi2 = 1;
+  
+  for( int ibin = 1 ; ibin <= obsNBins; ibin ++ ){
+    if(goBlind && hdata->GetBinCenter(ibin) > blindMin && hdata->GetBinCenter(ibin) < blindMax ) continue;
+
+    content_data_chi2 += hdata->GetBinContent(ibin);
+    content_pdf_chi2 += hpdf->GetBinContent(ibin);
+    error2_data_chi2 += pow(hdata->GetBinError(ibin), 2);
+
+    if( content_data_chi2/sqrt(error2_data_chi2) < threshold || fabs(content_data_chi2) < auxUtil::epsilon ){ // Less than 3 sigma from 0 (if it is data it is 9 events)
+      if(ibin<obsNBins) continue; // Not the last bin yet, continue aggregating
+      else{			// Reached last bin but still did not get 10 events, then merge back to last increment
+	chi2 -= last_increment_chi2; // Subtract out last increment first
+	content_data_chi2 = hdata->IntegralAndError(last_increment_bin_chi2, obsNBins, error2_data_chi2);
+	error2_data_chi2 *= error2_data_chi2;
+	content_pdf_chi2 = hpdf->Integral(last_increment_bin_chi2, obsNBins);
+	chi2 += pow( (content_data_chi2-content_pdf_chi2)/sqrt(error2_data_chi2), 2 );
+	if(nbin_chi2==0) nbin_chi2++; // Corner case where the total number of data events is less than 10, in which case there should be one bin
+      }
+    }
+    else{
+      last_increment_chi2 = pow( (content_data_chi2-content_pdf_chi2)/sqrt(error2_data_chi2), 2 );
+      last_increment_bin_chi2 = ibin;
+      chi2 += last_increment_chi2;
+      nbin_chi2++;
+      content_data_chi2 = 0;
+      content_pdf_chi2 = 0;
+      error2_data_chi2 = 0;
+    }
+  }
+  
+  // ******************** Calculate likelihood ********************
+  double nll = 0, nllsat = 0, content_data_nll = 0, content_pdf_nll = 0, last_increment_nll = 0, last_increment_nllsat = 0;
+  int nbin_nll = 0, last_increment_bin_nll = 1;
+
+  for( int ibin = 1 ; ibin <= obsNBins; ibin ++ ){
+    if(goBlind && hdata->GetBinCenter(ibin) > blindMin && hdata->GetBinCenter(ibin) < blindMax ) continue;
+
+    content_data_nll += hdata->GetBinContent(ibin);
+    content_pdf_nll += hpdf->GetBinContent(ibin);
+
+    if( fabs(content_data_nll) < 2 ){ // reject empty bin
+      if(ibin<obsNBins) continue; // Not the last bin yet, continue aggregating
+      else{			// Reached last bin but still did not get 10 events, then merge back to last increment
+	nll -= last_increment_nll; // Subtract out last increment first
+	nllsat -= last_increment_nllsat; // Subtract out last increment first
+	content_data_nll = hdata->Integral(last_increment_bin_nll, obsNBins);
+	content_pdf_nll = hpdf->Integral(last_increment_bin_nll, obsNBins);
+	nll += -TMath::Log(TMath::Poisson(content_data_nll, content_pdf_nll));
+	nllsat += -TMath::Log(TMath::Poisson(content_data_nll, content_data_nll)); // Saturated
+	if(nbin_nll==0) nbin_nll++; // Corner case where the total number of data events is less than 10, in which case there should be one bin
+      }
+    }
+    else{
+      last_increment_nll = -TMath::Log(TMath::Poisson(content_data_nll, content_pdf_nll));
+      last_increment_nllsat = -TMath::Log(TMath::Poisson(content_data_nll, content_data_nll));
+      nll += last_increment_nll;
+      nllsat += last_increment_nllsat;
+      
+      last_increment_bin_nll = ibin;
+
+      nbin_nll++;
+
+      content_data_nll = 0;
+      content_pdf_nll = 0;
+    }
+
+  }
+
+  result["chi2"] = chi2;
+  result["nbinchi2"] = nbin_chi2;
+  result["nll"] = nll;
+  result["nllsat"] = nllsat;
+  result["nbinnll"] = nbin_nll;
+  
+  return result;
 }

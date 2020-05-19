@@ -41,8 +41,6 @@ public:
 
   static void Reset(RooArgSet* original, RooArgSet* snapshot);
 
-  static void releaseTheGhost(RooDataSet *obsdata, RooRealVar *x, RooRealVar *w, double ghostwt=1e-9);
-
   static int getItemType(TString item);
   static TString translateItemType(int type);
   static TString translateItemType(TString item){return translateItemType(getItemType(item));}
@@ -57,10 +55,15 @@ public:
   static bool to_bool(TString str);
   static TXMLNode* findNode(TXMLNode* rootNode, TString nodeName);
   static TXMLAttr* findAttribute(TXMLNode* rootNode, TString attributeKey);
-  static RooDataSet* histToDataSet(TH1* h, RooRealVar* x, RooRealVar* w);
-    
+   
   static bool checkExist(TString name);
   static TString readNumFromOption(TString opt, TString key);
+  static int findBin(TH1 *h, double lowedge);
+  static TStyle* ATLASStyle();
+  static void setATLASStyle();
+  static int getNDOF(RooAbsPdf* pdf, RooRealVar* x, bool exclSyst=true);
+  static int getNDOF(ModelConfig *mc, bool exclSyst=true);
+  static map<TString, double> calcChi2(TH1* hdata, TH1* hpdf, double blindMin = std::numeric_limits<double>::min(), double blindMax = std::numeric_limits<double>::max(), double threshold = 3);
   static double epsilon;
   ClassDef(auxUtil, 0);
 };

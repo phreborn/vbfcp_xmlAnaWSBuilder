@@ -8,6 +8,7 @@ TString asimovUtil::RESET="reset";
 TString asimovUtil::GENASIMOV="genasimov";
 TString asimovUtil::FLOAT="float";
 TString asimovUtil::FIXSYST="fixsyst";
+TString asimovUtil::FIXALL="fixall";
 TString asimovUtil::MATCHGLOB="matchglob";
 TString asimovUtil::SAVESNAPSHOT="savesnapshot";
 
@@ -69,10 +70,10 @@ void asimovUtil::generateAsimov(ModelConfig *mc, TString dataName){
       // Do fit
       int status=-1;
       if(action==FIT){
-	if(_dataToFit[iAsimov]!=""){
+	if(_dataToFit[iAsimov]!="" && _dataToFit[iAsimov] != dataName){
 	  RooAbsData* newData=w->data(_dataToFit[iAsimov]);
-	  if(!newData) auxUtil::alertAndAbort("Dataset"+_dataToFit[iAsimov]+" cannot be found in the workspace");
-	  status=fitUtil::profileToData(mc, newData, _rangeName);
+	  if(!newData) auxUtil::alertAndAbort("Dataset "+_dataToFit[iAsimov]+" cannot be found in the workspace");
+	  status=fitUtil::profileToData(mc, newData); // Cannot blind Asimov data
 	}
 	else status=fitUtil::profileToData(mc, data, _rangeName);
 	if(status!=0&&status!=1){
@@ -99,8 +100,10 @@ void asimovUtil::generateAsimov(ModelConfig *mc, TString dataName){
       // Generating Asimov
       else if(action==GENASIMOV){
 	cout<<"\tREGTEST: Generating Asimov dataset "<<_asimovNames[iAsimov]<<endl;
-        unique_ptr<RooAbsData> asimovData(AsymptoticCalculator::GenerateAsimovData( *mc->GetPdf(), *mc->GetObservables()));
-	// Need to perform injection here.
+	unique_ptr<RooAbsData> asimovData;
+	if(_algorithm[iAsimov]=="roostats")
+	  asimovData.reset(AsymptoticCalculator::GenerateAsimovData( *mc->GetPdf(), *mc->GetObservables()));
+        else asimovData.reset(generateAsimovDataset(mc, dataName));
         w->import(*asimovData, Rename(_asimovNames[iAsimov]));
       }
       // Fix all the constrained nuisance parameters
@@ -118,8 +121,17 @@ void asimovUtil::generateAsimov(ModelConfig *mc, TString dataName){
 	  }
 	}
       }
+      // Fix all the constrained nuisance parameters
+      else if(action==FIXALL){
+	unique_ptr<TIterator> iter(mc->GetNuisanceParameters()->createIterator());
+	RooRealVar *parg=NULL;
+	while((parg=dynamic_cast<RooRealVar*>(iter->Next()))){
+	  fixedVar+=parg->GetName()+TString(",");
+	  parg->setConstant(true);
+	}
+      }
       // Matching global observable to nuisance parameter values
-      else if(action==MATCHGLOB) matchGlob(mc);
+      else if(action==MATCHGLOB && mc->GetGlobalObservables()->getSize()>0) matchGlob(mc);
 
       // Save snapshot
       else if(action==SAVESNAPSHOT){
@@ -159,6 +171,7 @@ void asimovUtil::addEntry(TXMLNode *node){
   _SnapshotsNuis.push_back(auxUtil::getAttributeValue(node, "SnapshotNuis", true, ""));
   _SnapshotsPOI.push_back(auxUtil::getAttributeValue(node, "SnapshotPOI", true, ""));
   _dataToFit.push_back(auxUtil::getAttributeValue(node, "Data", true, ""));
+  _algorithm.push_back(auxUtil::getAttributeValue(node, "Algorithm", true, "roostats"));
 }
 
 void asimovUtil::printSummary(){
@@ -268,4 +281,50 @@ void asimovUtil::matchGlob(ModelConfig *mc){
     }
     else throw std::runtime_error( Form( "asimovUtil: can't handle constraint term %s of type %s", cterm->GetName(), cterm->ClassName() ) );
   }
+}
+
+RooAbsData *asimovUtil::generateAsimovDataset(ModelConfig *mc, TString dataName){
+  RooArgSet *Observables=(RooArgSet*)mc->GetObservables();
+  RooSimultaneous *combPdf=(RooSimultaneous*)mc->GetPdf();
+  RooCategory* cat = (RooCategory*)&combPdf->indexCat();
+  const int numChannels = cat->numBins(0);
+  RooDataSet *m_data=dynamic_cast<RooDataSet*>(mc->GetWS()->data(dataName));
+  TList *m_dataList = m_data->split( *cat, true );
+  map<string,RooDataSet*> datasetMap;
+  vector<shared_ptr<RooDataSet> > dAsimov;
+  
+  for ( int ich= 0; ich < numChannels; ich++ ) {
+    cat->setBin(ich);
+    RooAbsPdf* pdfi = combPdf->getPdf(cat->getLabel());
+    RooDataSet* datai = ( RooDataSet* )( m_dataList->At( ich ) );
+    TString channelname = cat->getLabel();
+    cout<<"\tREGTEST: Generate asimov dataset for category "+channelname<<endl;
+    RooRealVar *x=dynamic_cast<RooRealVar*>(pdfi->getObservables(datai)->first());
+    int obsNBins = x->numBins();
+    double xmin = x->getMin(), xmax = x->getMax(), binWidth = (xmax-xmin)/double(obsNBins);
+    RooRealVar wt("wt","wt",1);
+    RooArgSet obs_plus_wt;
+    obs_plus_wt.add(*x);
+    obs_plus_wt.add(wt);
+    dAsimov.push_back(shared_ptr<RooDataSet>(new RooDataSet(Form("asimov_%d", ich), Form("asimov_%d", ich), obs_plus_wt, WeightVar(wt))));
+    
+    for( int ibin = 1 ; ibin <= obsNBins; ibin ++ ){
+      x->setRange("bin", xmin, xmin + ibin * binWidth);
+      double weight=pdfi->createIntegral(RooArgSet(*x), NormSet(*x), Range("bin"))->getVal()*pdfi->expectedEvents(RooArgSet(*x));
+      x->setVal(xmin + (ibin - 0.5) * binWidth);
+      wt.setVal(weight);
+      dAsimov[ich]->add(RooArgSet(*x ,wt), weight);
+    }
+
+    datasetMap[channelname.Data()]=dAsimov[ich].get();
+  }
+
+  RooRealVar wt("wt","wt",1);//,0,10000);
+
+  RooArgSet *args = new RooArgSet();
+  args->add(*Observables);
+  args->add(wt);
+  RooDataSet* Asimov = new RooDataSet("Asimov","Asimov", *args, Index(*cat), Import(datasetMap) ,WeightVar(wt));
+  return Asimov;
+  // ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 }

@@ -1,11 +1,3 @@
-#include "auxUtil.hh"
-#include "fitUtil.hh"
-#include "asimovUtil.hh"
-#include "xmlAnaWSBuilder.hh"
-#include "FlexibleInterpVarMkII.hh"
-#include "RooTwoSidedCBShape.hh"
-#include "HggMG5aMCNLOLineShapePdf.hh"
-
 #ifdef __CINT__
 
 #pragma link off all globals;
@@ -17,7 +9,9 @@
 #pragma link C++ class asimovUtil+;
 #pragma link C++ class xmlAnaWSBuilder+;
 #pragma link C++ class FlexibleInterpVarMkII+;
-#pragma link C++ class RooTwoSidedCBShape+;
+
+/* Custom classes */
 #pragma link C++ class HggMG5aMCNLOLineShapePdf+;
+#pragma link C++ class RooEmpXHistShape+;
 
 #endif
