@@ -831,8 +831,9 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, RooArgSet *nuisp
 	}
 	else if(nodeName=="Rename"){
 	  // Rename the object names in the input workspace
-	  TString oldName=auxUtil::combineName(getTranslatedExpr(node, "OldName"), tagName);
+	  TString oldName=getTranslatedExpr(node, "OldName", tagName);
 	  TString newName=getTranslatedExpr(node, "NewName", tagName);
+	  doNotTouch+=oldName+",";
 	  oldStr+=oldName+",";
 	  newStr+=newName+",";
 	}
