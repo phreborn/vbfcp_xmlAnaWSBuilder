@@ -11,9 +11,11 @@ if [ ! -d ${outputDir}/RooFitExtensions ]; then
     mkdir -vp ${outputDir}
     echo "Cloning RooFitExtensions into target directory ${outputDir}..."
     git clone https://gitlab.cern.ch/atlas_higgs_combination/software/RooFitExtensions.git ${outputDir}/RooFitExtensions
-    pushd ${outputDir}/RooFitExtensions
-    cmake . && make -j 4
-    popd
+    if [ -d ${outputDir}/RooFitExtensions ]; then
+        pushd ${outputDir}/RooFitExtensions
+        cmake . && make -j 4
+        popd
+    fi
 
     export RooFitExtensions_DIR=${outputDir}/RooFitExtensions
 fi
