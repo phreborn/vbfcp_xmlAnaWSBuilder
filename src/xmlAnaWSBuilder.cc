@@ -1099,6 +1099,9 @@ TString xmlAnaWSBuilder::implementObj(RooWorkspace *w, TString expr, bool checkE
     }
   }
 
+  // Check syntax for common mistakes
+  if(expr.Contains(":") && !expr.Contains("::")) auxUtil::alertAndAbort("Expression \""+expr+"\" contains syntax error: missing colon pair");
+
   // Otherwise we just blindly implement
   if(_debug) cout<<"\tREGTEST: Generating "<<auxUtil::translateItemType(type)<<" "<<expr<<endl;
   if(!w->factory(expr)) auxUtil::alertAndAbort("Creation of expression "+expr+" failed");
