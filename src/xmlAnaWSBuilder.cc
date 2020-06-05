@@ -792,7 +792,7 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, RooArgSet *nuisp
 	else if(nodeName=="ModelItem"){
 	  TString factoryStr=getTranslatedExpr(node, "Name", tagName);
 	  TString oldPdfName=auxUtil::getObjName(factoryStr);
-	  factoryStr.ReplaceAll(oldPdfName, sample->modelName);
+	  factoryStr.Replace(factoryStr.First("::") + 2, factoryStr.First('(') - factoryStr.First("::") - 2, sample->modelName);
 	  implementObj(w, factoryStr);
 	  isSuccess=true;
 	  break;		// Assume model already constructed. No need to continue;
