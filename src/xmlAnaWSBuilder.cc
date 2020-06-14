@@ -1035,8 +1035,9 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
     int nBins=binHigh-binLow;
     
     if(nBins!=_dataHist[_categoryName]->GetNbinsX()){
-      if(nBins<_dataHist[_categoryName]->GetNbinsX()) auxUtil::alertAndAbort(Form("Histogram %s from file %s has fewer bins (%d) compared with category %s observable (%d)", _inputDataFileName.Data(), _inputDataHistName.Data(), nBins, _categoryName.Data(), _dataHist[_categoryName]->GetNbinsX()));
-      if(nBins>_dataHist[_categoryName]->GetNbinsX() && nBins%_dataHist[_categoryName]->GetNbinsX()!=0) auxUtil::alertAndAbort(Form("Histogram %s from file %s has inconsistent number of bins (%d) compared with category %s observable (%d)", _inputDataFileName.Data(), _inputDataHistName.Data(), nBins, _categoryName.Data(), _dataHist[_categoryName]->GetNbinsX()));
+      if(nBins==0) auxUtil::alertAndAbort(Form("Histogram %s from file %s has a computed numbers of bins equal to 0, please check compatibility between your observable and the histogram range", _inputDataHistName.Data(), _inputDataFileName.Data()));
+      if(nBins<_dataHist[_categoryName]->GetNbinsX()) auxUtil::alertAndAbort(Form("Histogram %s from file %s has fewer bins (%d) compared with category %s observable (%d)", _inputDataHistName.Data(), _inputDataFileName.Data(), nBins, _categoryName.Data(), _dataHist[_categoryName]->GetNbinsX()));
+      if(nBins>_dataHist[_categoryName]->GetNbinsX() && nBins%_dataHist[_categoryName]->GetNbinsX()!=0) auxUtil::alertAndAbort(Form("Histogram %s from file %s has inconsistent number of bins (%d) compared with category %s observable (%d)", _inputDataHistName.Data(), _inputDataFileName.Data(), nBins, _categoryName.Data(), _dataHist[_categoryName]->GetNbinsX()));
       else{
 	cout<<endl<<auxUtil::WARNING<<" \tREGTEST: Rebinning input histogram by "<<nBins/_dataHist[_categoryName]->GetNbinsX()<<" to match the binning of observable. "<<auxUtil::ENDC<<endl<<endl;
 	h->Rebin(nBins/_dataHist[_categoryName]->GetNbinsX());
