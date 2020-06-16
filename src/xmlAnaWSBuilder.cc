@@ -651,7 +651,6 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   if(obsdata->numEntries()>x->numBins()){
     obsdatabinned.reset(new RooDataSet(OBSDSNAME+"binned",OBSDSNAME+"binned",obs_plus_wt,WeightVar(wt)));
     histToDataSet(obsdatabinned.get(), _dataHist[_categoryName].get(), x, &wt);
-    if(_injectGhost) releaseTheGhost(obsdata.get(),x, &wt, auxUtil::epsilon/1000.);
   }
   cout<<"\tREGTEST: Number of data events: "<<obsdata->sumEntries()<<endl;
   wchannel->import(*obsdata);
@@ -1434,6 +1433,8 @@ void xmlAnaWSBuilder::releaseTheGhost(RooDataSet *obsdata, RooRealVar *x, RooRea
       x->setVal(_dataHist[_categoryName]->GetBinCenter(ibin));
       w->setVal(ghostwt);
       obsdata->add(RooArgSet(*x,*w), ghostwt);
+      // Also put the ghost weight in the histograms
+      _dataHist[_categoryName]->SetBinContent(ibin, ghostwt);
     }
   }
 }
