@@ -205,7 +205,7 @@ void xmlAnaWSBuilder::generateWS(){
   _combWS->import(obsData);
   if(obsDatabinned.numEntries()<obsData.numEntries()) _combWS->import(obsDatabinned);
   else{
-    cout<<endl<<auxUtil::WARNING<<" \tREGTEST: No need to keep binned dataset, as the number of data events is smaller than the number of bins in all categories. "<<auxUtil::ENDC<<endl<<endl;
+    cout<<endl<<auxUtil::WARNING<<" \tREGTEST: No need to keep binned dataset, as the number of data events is smaller than or equals to the number of bins in all categories. "<<auxUtil::ENDC<<endl<<endl;
     _useBinned=false;
   }
   wArr.clear();
@@ -648,7 +648,9 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   // prepare binned data
   unique_ptr<RooDataSet> obsdatabinned(dynamic_cast<RooDataSet*>(obsdata->Clone(OBSDSNAME+"binned")));
 
-  if(obsdata->numEntries()>x->numBins()){
+  // Consider that in blinded analysis the number of bins will reduce
+  double blindSF = _goBlind ? (1 - (_blindMax - _blindMin)/(_xMax - _xMin)) : 1;
+  if(obsdata->numEntries()>x->numBins()*blindSF){
     obsdatabinned.reset(new RooDataSet(OBSDSNAME+"binned",OBSDSNAME+"binned",obs_plus_wt,WeightVar(wt)));
     histToDataSet(obsdatabinned.get(), _dataHist[_categoryName].get(), x, &wt);
   }
@@ -1430,6 +1432,7 @@ void xmlAnaWSBuilder::Summary(TString outputFigName){
 void xmlAnaWSBuilder::releaseTheGhost(RooDataSet *obsdata, RooRealVar *x, RooRealVar *w, double ghostwt){
   for( int ibin = 1 ; ibin <= _dataHist[_categoryName]->GetNbinsX(); ibin++) {
     if(_dataHist[_categoryName]->GetBinContent(ibin)==0){
+      if(_goBlind && _dataHist[_categoryName]->GetBinCenter(ibin) > _blindMin && _dataHist[_categoryName]->GetBinCenter(ibin) < _blindMax) continue;
       x->setVal(_dataHist[_categoryName]->GetBinCenter(ibin));
       w->setVal(ghostwt);
       obsdata->add(RooArgSet(*x,*w), ghostwt);
