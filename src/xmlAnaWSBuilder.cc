@@ -1027,6 +1027,13 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
   else if(_inputDataFileType==HISTOGRAM){
     unique_ptr<TFile> f(TFile::Open(_inputDataFileName));
     TH1* h=dynamic_cast<TH1*>(f->Get(_inputDataHistName));
+    for(int ibin = 1; ibin <= h->GetNbinsX(); ibin++)
+      if(h->GetBinContent(ibin) < 0){
+	cout<<auxUtil::WARNING<<Form("\tREGTEST: Input data histogram bin %d in current category has negative weight. Will force it to be zero. Press any key to continue or stop the program with Ctrl+C now.", ibin)<<auxUtil::ENDC<<endl;
+	getchar();
+	h->SetBinContent(ibin, 0);
+	h->SetBinError(ibin, 0);
+      }
     histToDataSet(obsdata, h, x, w, _scaleData);
 
     // Creating data histogram
