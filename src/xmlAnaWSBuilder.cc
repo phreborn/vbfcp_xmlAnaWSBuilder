@@ -245,9 +245,8 @@ void xmlAnaWSBuilder::generateWS(){
 void xmlAnaWSBuilder::readSyst(TXMLNode* systNode, TString domain){
   if(_debug) cout<<"\tREGTEST: Reading systematic: "<<auxUtil::getAttributeValue(systNode, "Name")<<endl;
   Systematic syst;
-  syst.NPName=getTranslatedExpr(systNode, "Name");
-  syst.process=auxUtil::getAttributeValue(systNode, "Process", true, ""); // If the process of the systematic is specified, use the specified process. Otherwise use the default one
-  translateKeyword(syst.process);
+  syst.NPName=getTranslatedExpr(systNode, "Name", domain);
+  syst.process=getTranslatedExpr(systNode, "Process", domain, true, ""); // If the process of the systematic is specified, use the specified process. Otherwise use the default one
   
   if(domain==ALLPROC){		// Common systematics
     if(syst.process!="") syst.domain=syst.process; // If a process name is specified, use it as domain name and remove it from common systematic
@@ -297,23 +296,20 @@ void xmlAnaWSBuilder::readSyst(TXMLNode* systNode, TString domain){
 
 void xmlAnaWSBuilder::readSample(TXMLNode* sampleNode){
   Sample sample;
-  sample.procName=auxUtil::getAttributeValue(sampleNode, "Name");
-  // sample.yield=atof(auxUtil::getAttributeValue(sampleNode, "Norm"));
-  sample.inputFile=auxUtil::getAttributeValue(sampleNode, "InputFile", (_categoryType==COUNTING), "");
-  translateKeyword(sample.inputFile);
+  sample.procName=getTranslatedExpr(sampleNode, "Name");
+  sample.inputFile=getTranslatedExpr(sampleNode, "InputFile", sample.procName, (_categoryType==COUNTING), "");
   
-  // TString importSystGroupList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, COMMON);
-  TString importSystGroupList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, SELF);
+  TString importSystGroupList=getTranslatedExpr(sampleNode, "ImportSyst", sample.procName, true, SELF);
   sample.systGroups=auxUtil::splitString(importSystGroupList.Data(),',');
   auxUtil::removeDuplicatedString(sample.systGroups);
   auxUtil::removeString(sample.systGroups, sample.procName);
   
-  TString norm=auxUtil::getAttributeValue(sampleNode, "Norm", true, ""); // default value 1
-  TString xsection=auxUtil::getAttributeValue(sampleNode, "XSection", true, ""); // default value 1
-  TString br=auxUtil::getAttributeValue(sampleNode, "BR", true, ""); // default value 1
-  TString selectionEff=auxUtil::getAttributeValue(sampleNode, "SelectionEff", true, ""); // default value 1
-  TString acceptance=auxUtil::getAttributeValue(sampleNode, "Acceptance", true, ""); // default value 1
-  TString correction=auxUtil::getAttributeValue(sampleNode, "Correction", true, ""); // default value 1
+  TString norm=getTranslatedExpr(sampleNode, "Norm", sample.procName, true, ""); // default value 1
+  TString xsection=getTranslatedExpr(sampleNode, "XSection", sample.procName, true, ""); // default value 1
+  TString br=getTranslatedExpr(sampleNode, "BR", sample.procName, true, ""); // default value 1
+  TString selectionEff=getTranslatedExpr(sampleNode, "SelectionEff", sample.procName, true, ""); // default value 1
+  TString acceptance=getTranslatedExpr(sampleNode, "Acceptance", sample.procName, true, ""); // default value 1
+  TString correction=getTranslatedExpr(sampleNode, "Correction", sample.procName, true, ""); // default value 1
   
   bool isMultiplyLumi=(_luminosity>0) ? auxUtil::to_bool(auxUtil::getAttributeValue(sampleNode, "MultiplyLumi", true, "1")) : false; // default value true. If luminosity not provided it will always be false
 
@@ -326,7 +322,7 @@ void xmlAnaWSBuilder::readSample(TXMLNode* sampleNode){
   if(acceptance!="") sample.normFactors.push_back(ACCEPTANCENAME+"_"+sample.procName+"["+acceptance+"]");
   if(correction!="") sample.normFactors.push_back(ACCEPTANCENAME+"_"+sample.procName+"["+correction+"]");
 
-  sample.sharePdfGroup=auxUtil::getAttributeValue(sampleNode, "SharePdf", true, ""); // default value false
+  sample.sharePdfGroup=getTranslatedExpr(sampleNode, "SharePdf", sample.procName, true, ""); // default value false
   
   TXMLNode* subNode = sampleNode->GetChildren();
   if(_debug) cout<<"\tREGTEST: Reading sample "<<sample.procName<<endl;
@@ -415,8 +411,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   _dataHist[_categoryName].reset(new TH1D(_categoryName, _categoryName, nbinx, _xMin, _xMax));
   _dataHist[_categoryName]->Sumw2();
   
-  _inputDataFileName=auxUtil::getAttributeValue(dataNode, "InputFile", (_categoryType==COUNTING), "");
-  translateKeyword(_inputDataFileName);
+  _inputDataFileName=getTranslatedExpr(dataNode, "InputFile", "", (_categoryType==COUNTING), "");
   
   _inputDataFileType=auxUtil::getAttributeValue(dataNode, "FileType", true, ASCII);
   _inputDataFileType.ToLower();
@@ -425,8 +420,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
     else{
       _inputDataTreeName=getTranslatedExpr(dataNode, "TreeName");
       _inputDataVarName=getTranslatedExpr(dataNode, "VarName");
-      _Cut=auxUtil::getAttributeValue(dataNode, "Cut", true, "");
-      translateKeyword(_Cut);
+      _Cut=getTranslatedExpr(dataNode, "Cut", "", true, "");
     }
   }
   _injectGhost=auxUtil::to_bool(auxUtil::getAttributeValue(dataNode, "InjectGhost", true, "0")); // Default false
@@ -535,7 +529,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
 
     if(find(sample.systGroups.begin(), sample.systGroups.end(), SELF)==sample.systGroups.end()){ // If :self: appears anywhere, do not do anything
       for(TString systGrp : sample.systGroups){
-	if(systGrp == COMMON){
+	if(systGrp == ALLPROC){
 	  if(expected.getSize()>0) normStr+=", "+EXPECTATIONPREFIX+"common"; // Common systematics: only add if exist
 	}
 	else{
@@ -998,8 +992,8 @@ void xmlAnaWSBuilder::checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara){
   }
 }
 
-TString xmlAnaWSBuilder::getTranslatedExpr(TXMLNode *node, TString attrName, TString process){
-  TString expr=auxUtil::getAttributeValue(node, attrName);
+TString xmlAnaWSBuilder::getTranslatedExpr(TXMLNode *node, TString attrName, TString process, bool allowEmpty, TString defaultStr){
+  TString expr=auxUtil::getAttributeValue(node, attrName, allowEmpty, defaultStr);
   translateKeyword(expr);
   if(expr.Contains(PROCESS)){
     if(process=="") auxUtil::alertAndAbort("Process name not provided for expression "+expr);
