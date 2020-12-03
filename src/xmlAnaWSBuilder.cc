@@ -810,7 +810,8 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, RooArgSet *nuisp
       TString wsName=getTranslatedExpr(rootNode, "WSName");
       TString modelName=getTranslatedExpr(rootNode, "ModelName");
       TString observableName=getTranslatedExpr(rootNode, "ObservableName");
-      
+
+      vector<TString> NPList, GOList, constrList;
       cout<<"\tREGTEST: Use existing PDF named as "<<modelName<<" from "<<inputWSFileName<<endl;
       
       unique_ptr<TFile> fExtWS(TFile::Open(inputWSFileName, "read"));
@@ -839,29 +840,11 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, RooArgSet *nuisp
 	}
 	else if(nodeName=="ExtSyst"){
 	  // Adding external systematics
-	  TString NPName=getTranslatedExpr(node, "NPName");
-	  TString GOName=auxUtil::getAttributeValue(node, "GOName", true, "");
-	  TString constrName=auxUtil::getAttributeValue(node, "ConstrName", (GOName==""), "");
-	  translateKeyword(GOName);
-	  translateKeyword(constrName);
+	  NPList.push_back(getTranslatedExpr(node, "NPName"));
+	  GOList.push_back(getTranslatedExpr(node, "GOName", "", true, ""));
+	  constrList.push_back(getTranslatedExpr(node, "ConstrName", "", (GOList.back()==""), ""));
 	  
-	  doNotTouch+=NPName+",";
-	  if(GOName!=""){
-	    if(!wModel->var(NPName)||!wModel->var(GOName)||!wModel->pdf(constrName)){
-	      auxUtil::alertAndAbort("Something is wrong with "+NPName+" "+GOName+" "+constrName);
-	    }
-	    TString newConstrName=CONSTRTERMPREFIX+NPName;
-	    TString newGOName=GLOBALOBSPREFIX+NPName;
-	    w->import(*wModel->pdf(constrName), RenameVariable(constrName+","+GOName, newConstrName+","+newGOName));
-	    if(_debug){
-	      cout<<w->var(NPName)<<" "<<w->pdf(newConstrName)<<" "<<w->var(newGOName)<<endl;
-	      cout<<"\tREGTEST: import systematics "<<NPName<<endl;
-	    }
-	    constraints->add(*w->pdf(newConstrName),true);
-	    globobs->add(*w->var(newGOName),true);
-	  }
-	  w->var(NPName)->setConstant(false);
-	  nuispara->add(*w->var(NPName),true);
+	  doNotTouch+=NPList.back()+",";
 	}
 	else{
 	  // cerr<<"ERROR: Unknown node name: "<<nodeName<<endl;
@@ -869,24 +852,22 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, RooArgSet *nuisp
 	node=node->GetNextNode();
       }
 
+      // Remove dubplicated variables
+      vector<TString> doNotTouchList = auxUtil::splitString(doNotTouch.Strip(TString::kTrailing, ','), ',');
+      auxUtil::removeDuplicatedString(doNotTouchList);
+      doNotTouch = "";
+      for(auto item : doNotTouchList) doNotTouch += item + ",";
+      
       // N.B. we need to rename everything in this model by adding a tag to it
       RooWorkspace wTemp("wTemp");
       wTemp.import(*pModel, RenameAllNodes(tagName), RenameAllVariablesExcept(tagName, doNotTouch), Silence());
       // wTemp.importClassCode();
       if(_debug) wTemp.Print();
       
-      pModel=dynamic_cast<RooAbsReal*>(wTemp.function(auxUtil::combineName(modelName, tagName))->Clone(sample->modelName));
-      // observableName=auxUtil::combineName(observableName, tagName);
+      pModel = wTemp.function(auxUtil::combineName(modelName, tagName));
       
-      RooRealVar *observable=wTemp.var(observableName);
-
-      if(observableName!=_observableName) {oldStr+=observableName; newStr+=_observableName;}
-      
-      cout<<"\tREGTEST: The following variables will be renamed:"<<endl;
-      cout<<"\tREGTEST: OLD: "<<oldStr<<endl;
-      cout<<"\tREGTEST: NEW: "<<newStr<<endl;
-
       RooAbsPdf *pModelPdf=dynamic_cast<RooAbsPdf*>(pModel);
+      RooRealVar *observable=wTemp.var(observableName);
       
       if(!pModelPdf){
 	cout<<"\tWARNING: The object is not a p.d.f as seen from RooFit"<<endl;
@@ -896,8 +877,53 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, RooArgSet *nuisp
 	RooRealVar frac(sample->modelName+"real_pdf_frac","For RooRealSumPdf construction",1);
 	pModelPdf=new RooRealSumPdf(sample->modelName,"from histFactory",RooArgList(*pModel, dummypdf), RooArgList(frac));
       }
+      else{
+	oldStr += TString(pModelPdf->GetName()) + ",";
+	newStr += sample->modelName + ",";
+      }
 
+      // Rename observable. This step should never happen for a HistFactory workspace!
+      if(observableName!=_observableName) {oldStr+=observableName; newStr+=_observableName;}
+      
+      cout<<"\tREGTEST: The following variables will be renamed:"<<endl;
+      cout<<"\tREGTEST: OLD: "<<oldStr<<endl;
+      cout<<"\tREGTEST: NEW: "<<newStr<<endl;
+	
       w->import(*pModelPdf, RenameVariable(oldStr, newStr), RecycleConflictNodes(), Silence());
+      // Import constraint terms
+      vector<TString> oldNameList = auxUtil::splitString(oldStr.Strip(TString::kTrailing, ','), ',');
+      vector<TString> newNameList = auxUtil::splitString(newStr.Strip(TString::kTrailing, ','), ',');
+      for(unsigned iNP = 0; iNP < NPList.size(); iNP++){
+	const TString NPName = NPList[iNP];
+	const TString GOName = GOList[iNP];
+	const TString constrName = constrList[iNP];
+
+	TString newNPName = NPName;
+	// Check whether NP has been renamed. If yes, update the NP name
+	for(unsigned iRN = 0; iRN < oldNameList.size(); iRN++){
+	  if(NPName == oldNameList[iRN]){
+	    newNPName = newNameList[iRN];
+	    break;
+	  }
+	}
+
+	if(GOName!=""){
+	  if(!wModel->var(NPName)||!wModel->var(GOName)||!wModel->pdf(constrName))
+	    auxUtil::alertAndAbort("Constraint pdf " + constrName + " with NP = "+NPName+" and GO = "+GOName+" does not exist");
+	  TString newConstrName = CONSTRTERMPREFIX + newNPName;
+	  TString newGOName = GLOBALOBSPREFIX + newNPName;
+	  w->import(*wModel->pdf(constrName), RenameVariable(constrName + "," + GOName + "," + NPName, newConstrName + "," + newGOName + "," + newNPName));
+	  if(_debug){
+	    cout<<w->var(newNPName)<<" "<<w->pdf(newConstrName)<<" "<<w->var(newGOName)<<endl;
+	    cout<<"\tREGTEST: import systematics " << newNPName << " with constraint term " << newConstrName <<endl;
+	  }
+	  constraints->add(*w->pdf(newConstrName),true);
+	  globobs->add(*w->var(newGOName),true);
+	}
+	w->var(newNPName)->setConstant(false);
+	nuispara->add(*w->var(newNPName),true);
+      }
+      fExtWS->Close();
     }
     else if(modelType==HISTOGRAM){
       // Create a signal with simple histogram
