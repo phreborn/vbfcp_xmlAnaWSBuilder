@@ -10,9 +10,9 @@
 
 #include "FlexibleInterpVarMkII.hh"
 // Additional custom classes
-#include "RooTwoSidedCBShape.h"
+#include "RooFitExtensions/RooTwoSidedCBShape.h"
 #include "HggMG5aMCNLOLineShapePdf.h"
-#include "RooEmpXHistShape.h"
+#include "RooFitExtensions/RooEmpXHistShape.h"
 
 using namespace std;
 using namespace RooFit;

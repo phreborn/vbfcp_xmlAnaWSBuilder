@@ -12,6 +12,5 @@
 
 /* Custom classes */
 #pragma link C++ class HggMG5aMCNLOLineShapePdf+;
-#pragma link C++ class RooEmpXHistShape+;
 
 #endif
