@@ -1497,8 +1497,8 @@ void xmlAnaWSBuilder::histToDataSet(RooDataSet* histData, TH1* h, RooRealVar* x,
       continue;
     }
     x->setVal(h->GetBinCenter(ibin));
-    double weight = h->GetBinContent(ibin)*scaleData;
+    double weight = std::max(h->GetBinContent(ibin)*scaleData, auxUtil::epsilon/1000.);
     w->setVal(weight);
-    if(weight > 0) histData->add(RooArgSet(*x, *w), weight); // Only fill in an event when the weight is not 0
+    histData->add(RooArgSet(*x, *w), weight);
   }
 }
