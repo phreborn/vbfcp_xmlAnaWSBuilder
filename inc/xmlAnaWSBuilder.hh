@@ -10,9 +10,9 @@
 
 #include "FlexibleInterpVarMkII.hh"
 // Additional custom classes
-#include "RooTwoSidedCBShape.h"
+#include "RooFitExtensions/RooTwoSidedCBShape.h"
 #include "HggMG5aMCNLOLineShapePdf.h"
-#include "RooEmpXHistShape.h"
+#include "RooFitExtensions/RooEmpXHistShape.h"
 
 using namespace std;
 using namespace RooFit;
@@ -187,7 +187,7 @@ private:
   void checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara);
   void clearUp();
   void attachConstraints(RooWorkspace *w, TString sumPdfStr, RooArgSet *constraints, TString finalModelName);
-  TString getTranslatedExpr(TXMLNode *node, TString attrName, TString process="");
+  TString getTranslatedExpr(TXMLNode *node, TString attrName, TString process="", bool allowEmpty = false, TString defaultStr = "");
   RooDataSet* readInData(RooRealVar *x, RooRealVar *w);
   TString implementObj(RooWorkspace *w, TString expr, bool checkExistBeforeImp=false);
   TString implementObjArray(RooWorkspace *w, vector<TString> objArr);

@@ -62,3 +62,7 @@ target_link_libraries( xmlAnaWSBuilder ${ROOT_LIBRARIES} ${RooFitExtensions_LIBR
 add_executable( XMLReader bin/XMLReader.cpp )
 target_link_libraries( XMLReader xmlAnaWSBuilder )
 
+# Installation
+install(TARGETS XMLReader DESTINATION bin)
+install(TARGETS xmlAnaWSBuilder LIBRARY DESTINATION lib)
+install(FILES ${PROJECT_SOURCE_DIR}/lib/libxmlAnaWSBuilder_rdict.pcm ${PROJECT_SOURCE_DIR}/lib/libxmlAnaWSBuilder.rootmap DESTINATION lib)

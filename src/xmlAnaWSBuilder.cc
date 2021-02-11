@@ -245,9 +245,8 @@ void xmlAnaWSBuilder::generateWS(){
 void xmlAnaWSBuilder::readSyst(TXMLNode* systNode, TString domain){
   if(_debug) cout<<"\tREGTEST: Reading systematic: "<<auxUtil::getAttributeValue(systNode, "Name")<<endl;
   Systematic syst;
-  syst.NPName=getTranslatedExpr(systNode, "Name");
-  syst.process=auxUtil::getAttributeValue(systNode, "Process", true, ""); // If the process of the systematic is specified, use the specified process. Otherwise use the default one
-  translateKeyword(syst.process);
+  syst.NPName=getTranslatedExpr(systNode, "Name", domain);
+  syst.process=getTranslatedExpr(systNode, "Process", domain, true, ""); // If the process of the systematic is specified, use the specified process. Otherwise use the default one
   
   if(domain==ALLPROC){		// Common systematics
     if(syst.process!="") syst.domain=syst.process; // If a process name is specified, use it as domain name and remove it from common systematic
@@ -297,23 +296,20 @@ void xmlAnaWSBuilder::readSyst(TXMLNode* systNode, TString domain){
 
 void xmlAnaWSBuilder::readSample(TXMLNode* sampleNode){
   Sample sample;
-  sample.procName=auxUtil::getAttributeValue(sampleNode, "Name");
-  // sample.yield=atof(auxUtil::getAttributeValue(sampleNode, "Norm"));
-  sample.inputFile=auxUtil::getAttributeValue(sampleNode, "InputFile", (_categoryType==COUNTING), "");
-  translateKeyword(sample.inputFile);
+  sample.procName=getTranslatedExpr(sampleNode, "Name");
+  sample.inputFile=getTranslatedExpr(sampleNode, "InputFile", sample.procName, (_categoryType==COUNTING), "");
   
-  // TString importSystGroupList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, COMMON);
-  TString importSystGroupList=auxUtil::getAttributeValue(sampleNode, "ImportSyst", true, SELF);
+  TString importSystGroupList=getTranslatedExpr(sampleNode, "ImportSyst", sample.procName, true, SELF);
   sample.systGroups=auxUtil::splitString(importSystGroupList.Data(),',');
   auxUtil::removeDuplicatedString(sample.systGroups);
   auxUtil::removeString(sample.systGroups, sample.procName);
   
-  TString norm=auxUtil::getAttributeValue(sampleNode, "Norm", true, ""); // default value 1
-  TString xsection=auxUtil::getAttributeValue(sampleNode, "XSection", true, ""); // default value 1
-  TString br=auxUtil::getAttributeValue(sampleNode, "BR", true, ""); // default value 1
-  TString selectionEff=auxUtil::getAttributeValue(sampleNode, "SelectionEff", true, ""); // default value 1
-  TString acceptance=auxUtil::getAttributeValue(sampleNode, "Acceptance", true, ""); // default value 1
-  TString correction=auxUtil::getAttributeValue(sampleNode, "Correction", true, ""); // default value 1
+  TString norm=getTranslatedExpr(sampleNode, "Norm", sample.procName, true, ""); // default value 1
+  TString xsection=getTranslatedExpr(sampleNode, "XSection", sample.procName, true, ""); // default value 1
+  TString br=getTranslatedExpr(sampleNode, "BR", sample.procName, true, ""); // default value 1
+  TString selectionEff=getTranslatedExpr(sampleNode, "SelectionEff", sample.procName, true, ""); // default value 1
+  TString acceptance=getTranslatedExpr(sampleNode, "Acceptance", sample.procName, true, ""); // default value 1
+  TString correction=getTranslatedExpr(sampleNode, "Correction", sample.procName, true, ""); // default value 1
   
   bool isMultiplyLumi=(_luminosity>0) ? auxUtil::to_bool(auxUtil::getAttributeValue(sampleNode, "MultiplyLumi", true, "1")) : false; // default value true. If luminosity not provided it will always be false
 
@@ -326,7 +322,7 @@ void xmlAnaWSBuilder::readSample(TXMLNode* sampleNode){
   if(acceptance!="") sample.normFactors.push_back(ACCEPTANCENAME+"_"+sample.procName+"["+acceptance+"]");
   if(correction!="") sample.normFactors.push_back(ACCEPTANCENAME+"_"+sample.procName+"["+correction+"]");
 
-  sample.sharePdfGroup=auxUtil::getAttributeValue(sampleNode, "SharePdf", true, ""); // default value false
+  sample.sharePdfGroup=getTranslatedExpr(sampleNode, "SharePdf", sample.procName, true, ""); // default value false
   
   TXMLNode* subNode = sampleNode->GetChildren();
   if(_debug) cout<<"\tREGTEST: Reading sample "<<sample.procName<<endl;
@@ -415,8 +411,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
   _dataHist[_categoryName].reset(new TH1D(_categoryName, _categoryName, nbinx, _xMin, _xMax));
   _dataHist[_categoryName]->Sumw2();
   
-  _inputDataFileName=auxUtil::getAttributeValue(dataNode, "InputFile", (_categoryType==COUNTING), "");
-  translateKeyword(_inputDataFileName);
+  _inputDataFileName=getTranslatedExpr(dataNode, "InputFile", "", (_categoryType==COUNTING), "");
   
   _inputDataFileType=auxUtil::getAttributeValue(dataNode, "FileType", true, ASCII);
   _inputDataFileType.ToLower();
@@ -425,8 +420,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
     else{
       _inputDataTreeName=getTranslatedExpr(dataNode, "TreeName");
       _inputDataVarName=getTranslatedExpr(dataNode, "VarName");
-      _Cut=auxUtil::getAttributeValue(dataNode, "Cut", true, "");
-      translateKeyword(_Cut);
+      _Cut=getTranslatedExpr(dataNode, "Cut", "", true, "");
     }
   }
   _injectGhost=auxUtil::to_bool(auxUtil::getAttributeValue(dataNode, "InjectGhost", true, "0")); // Default false
@@ -535,7 +529,7 @@ void xmlAnaWSBuilder::generateSingleChannel(TString xmlName, RooWorkspace *wchan
 
     if(find(sample.systGroups.begin(), sample.systGroups.end(), SELF)==sample.systGroups.end()){ // If :self: appears anywhere, do not do anything
       for(TString systGrp : sample.systGroups){
-	if(systGrp == COMMON){
+	if(systGrp == ALLPROC){
 	  if(expected.getSize()>0) normStr+=", "+EXPECTATIONPREFIX+"common"; // Common systematics: only add if exist
 	}
 	else{
@@ -798,7 +792,7 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, RooArgSet *nuisp
 	else if(nodeName=="ModelItem"){
 	  TString factoryStr=getTranslatedExpr(node, "Name", tagName);
 	  TString oldPdfName=auxUtil::getObjName(factoryStr);
-	  factoryStr.ReplaceAll(oldPdfName, sample->modelName);
+	  factoryStr.Replace(factoryStr.First("::") + 2, factoryStr.First('(') - factoryStr.First("::") - 2, sample->modelName);
 	  implementObj(w, factoryStr);
 	  isSuccess=true;
 	  break;		// Assume model already constructed. No need to continue;
@@ -816,7 +810,8 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, RooArgSet *nuisp
       TString wsName=getTranslatedExpr(rootNode, "WSName");
       TString modelName=getTranslatedExpr(rootNode, "ModelName");
       TString observableName=getTranslatedExpr(rootNode, "ObservableName");
-      
+
+      vector<TString> NPList, GOList, constrList;
       cout<<"\tREGTEST: Use existing PDF named as "<<modelName<<" from "<<inputWSFileName<<endl;
       
       unique_ptr<TFile> fExtWS(TFile::Open(inputWSFileName, "read"));
@@ -837,36 +832,19 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, RooArgSet *nuisp
 	}
 	else if(nodeName=="Rename"){
 	  // Rename the object names in the input workspace
-	  TString oldName=auxUtil::combineName(getTranslatedExpr(node, "OldName"), tagName);
+	  TString oldName=getTranslatedExpr(node, "OldName", tagName);
 	  TString newName=getTranslatedExpr(node, "NewName", tagName);
+	  doNotTouch+=oldName+",";
 	  oldStr+=oldName+",";
 	  newStr+=newName+",";
 	}
 	else if(nodeName=="ExtSyst"){
 	  // Adding external systematics
-	  TString NPName=getTranslatedExpr(node, "NPName");
-	  TString GOName=auxUtil::getAttributeValue(node, "GOName", true, "");
-	  TString constrName=auxUtil::getAttributeValue(node, "ConstrName", (GOName==""), "");
-	  translateKeyword(GOName);
-	  translateKeyword(constrName);
+	  NPList.push_back(getTranslatedExpr(node, "NPName"));
+	  GOList.push_back(getTranslatedExpr(node, "GOName", "", true, ""));
+	  constrList.push_back(getTranslatedExpr(node, "ConstrName", "", (GOList.back()==""), ""));
 	  
-	  doNotTouch+=NPName+",";
-	  if(GOName!=""){
-	    if(!wModel->var(NPName)||!wModel->var(GOName)||!wModel->pdf(constrName)){
-	      auxUtil::alertAndAbort("Something is wrong with "+NPName+" "+GOName+" "+constrName);
-	    }
-	    TString newConstrName=CONSTRTERMPREFIX+NPName;
-	    TString newGOName=GLOBALOBSPREFIX+NPName;
-	    w->import(*wModel->pdf(constrName), RenameVariable(constrName+","+GOName, newConstrName+","+newGOName));
-	    if(_debug){
-	      cout<<w->var(NPName)<<" "<<w->pdf(newConstrName)<<" "<<w->var(newGOName)<<endl;
-	      cout<<"\tREGTEST: import systematics "<<NPName<<endl;
-	    }
-	    constraints->add(*w->pdf(newConstrName),true);
-	    globobs->add(*w->var(newGOName),true);
-	  }
-	  w->var(NPName)->setConstant(false);
-	  nuispara->add(*w->var(NPName),true);
+	  doNotTouch+=NPList.back()+",";
 	}
 	else{
 	  // cerr<<"ERROR: Unknown node name: "<<nodeName<<endl;
@@ -874,24 +852,22 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, RooArgSet *nuisp
 	node=node->GetNextNode();
       }
 
+      // Remove dubplicated variables
+      vector<TString> doNotTouchList = auxUtil::splitString(doNotTouch.Strip(TString::kTrailing, ','), ',');
+      auxUtil::removeDuplicatedString(doNotTouchList);
+      doNotTouch = "";
+      for(auto item : doNotTouchList) doNotTouch += item + ",";
+      
       // N.B. we need to rename everything in this model by adding a tag to it
       RooWorkspace wTemp("wTemp");
       wTemp.import(*pModel, RenameAllNodes(tagName), RenameAllVariablesExcept(tagName, doNotTouch), Silence());
       // wTemp.importClassCode();
       if(_debug) wTemp.Print();
       
-      pModel=dynamic_cast<RooAbsReal*>(wTemp.function(auxUtil::combineName(modelName, tagName))->Clone(sample->modelName));
-      // observableName=auxUtil::combineName(observableName, tagName);
+      pModel = wTemp.function(auxUtil::combineName(modelName, tagName));
       
-      RooRealVar *observable=wTemp.var(observableName);
-
-      if(observableName!=_observableName) {oldStr+=observableName; newStr+=_observableName;}
-      
-      cout<<"\tREGTEST: The following variables will be renamed:"<<endl;
-      cout<<"\tREGTEST: OLD: "<<oldStr<<endl;
-      cout<<"\tREGTEST: NEW: "<<newStr<<endl;
-
       RooAbsPdf *pModelPdf=dynamic_cast<RooAbsPdf*>(pModel);
+      RooRealVar *observable=wTemp.var(observableName);
       
       if(!pModelPdf){
 	cout<<"\tWARNING: The object is not a p.d.f as seen from RooFit"<<endl;
@@ -901,8 +877,53 @@ void xmlAnaWSBuilder::getModel(RooWorkspace *w, Sample *sample, RooArgSet *nuisp
 	RooRealVar frac(sample->modelName+"real_pdf_frac","For RooRealSumPdf construction",1);
 	pModelPdf=new RooRealSumPdf(sample->modelName,"from histFactory",RooArgList(*pModel, dummypdf), RooArgList(frac));
       }
+      else{
+	oldStr += TString(pModelPdf->GetName()) + ",";
+	newStr += sample->modelName + ",";
+      }
 
+      // Rename observable. This step should never happen for a HistFactory workspace!
+      if(observableName!=_observableName) {oldStr+=observableName; newStr+=_observableName;}
+      
+      cout<<"\tREGTEST: The following variables will be renamed:"<<endl;
+      cout<<"\tREGTEST: OLD: "<<oldStr<<endl;
+      cout<<"\tREGTEST: NEW: "<<newStr<<endl;
+	
       w->import(*pModelPdf, RenameVariable(oldStr, newStr), RecycleConflictNodes(), Silence());
+      // Import constraint terms
+      vector<TString> oldNameList = auxUtil::splitString(oldStr.Strip(TString::kTrailing, ','), ',');
+      vector<TString> newNameList = auxUtil::splitString(newStr.Strip(TString::kTrailing, ','), ',');
+      for(unsigned iNP = 0; iNP < NPList.size(); iNP++){
+	const TString NPName = NPList[iNP];
+	const TString GOName = GOList[iNP];
+	const TString constrName = constrList[iNP];
+
+	TString newNPName = NPName;
+	// Check whether NP has been renamed. If yes, update the NP name
+	for(unsigned iRN = 0; iRN < oldNameList.size(); iRN++){
+	  if(NPName == oldNameList[iRN]){
+	    newNPName = newNameList[iRN];
+	    break;
+	  }
+	}
+
+	if(GOName!=""){
+	  if(!wModel->var(NPName)||!wModel->var(GOName)||!wModel->pdf(constrName))
+	    auxUtil::alertAndAbort("Constraint pdf " + constrName + " with NP = "+NPName+" and GO = "+GOName+" does not exist");
+	  TString newConstrName = CONSTRTERMPREFIX + newNPName;
+	  TString newGOName = GLOBALOBSPREFIX + newNPName;
+	  w->import(*wModel->pdf(constrName), RenameVariable(constrName + "," + GOName + "," + NPName, newConstrName + "," + newGOName + "," + newNPName));
+	  if(_debug){
+	    cout<<w->var(newNPName)<<" "<<w->pdf(newConstrName)<<" "<<w->var(newGOName)<<endl;
+	    cout<<"\tREGTEST: import systematics " << newNPName << " with constraint term " << newConstrName <<endl;
+	  }
+	  constraints->add(*w->pdf(newConstrName),true);
+	  globobs->add(*w->var(newGOName),true);
+	}
+	w->var(newNPName)->setConstant(false);
+	nuispara->add(*w->var(newNPName),true);
+      }
+      fExtWS->Close();
     }
     else if(modelType==HISTOGRAM){
       // Create a signal with simple histogram
@@ -998,8 +1019,8 @@ void xmlAnaWSBuilder::checkNuisParam(RooAbsPdf *model, RooArgSet *nuispara){
   }
 }
 
-TString xmlAnaWSBuilder::getTranslatedExpr(TXMLNode *node, TString attrName, TString process){
-  TString expr=auxUtil::getAttributeValue(node, attrName);
+TString xmlAnaWSBuilder::getTranslatedExpr(TXMLNode *node, TString attrName, TString process, bool allowEmpty, TString defaultStr){
+  TString expr=auxUtil::getAttributeValue(node, attrName, allowEmpty, defaultStr);
   translateKeyword(expr);
   if(expr.Contains(PROCESS)){
     if(process=="") auxUtil::alertAndAbort("Process name not provided for expression "+expr);
@@ -1027,6 +1048,13 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
   else if(_inputDataFileType==HISTOGRAM){
     unique_ptr<TFile> f(TFile::Open(_inputDataFileName));
     TH1* h=dynamic_cast<TH1*>(f->Get(_inputDataHistName));
+    for(int ibin = 1; ibin <= h->GetNbinsX(); ibin++)
+      if(h->GetBinContent(ibin) < 0){
+	cout<<auxUtil::WARNING<<Form("\tREGTEST: Input data histogram bin %d in current category has negative weight. Will force it to be zero. Press any key to continue or stop the program with Ctrl+C now.", ibin)<<auxUtil::ENDC<<endl;
+	getchar();
+	h->SetBinContent(ibin, 0);
+	h->SetBinError(ibin, 0);
+      }
     histToDataSet(obsdata, h, x, w, _scaleData);
 
     // Creating data histogram
@@ -1034,8 +1062,9 @@ RooDataSet* xmlAnaWSBuilder::readInData(RooRealVar *x, RooRealVar *w){
     int nBins=binHigh-binLow;
     
     if(nBins!=_dataHist[_categoryName]->GetNbinsX()){
-      if(nBins<_dataHist[_categoryName]->GetNbinsX()) auxUtil::alertAndAbort(Form("Histogram %s from file %s has fewer bins (%d) compared with category %s observable (%d)", _inputDataFileName.Data(), _inputDataHistName.Data(), nBins, _categoryName.Data(), _dataHist[_categoryName]->GetNbinsX()));
-      if(nBins>_dataHist[_categoryName]->GetNbinsX() && nBins%_dataHist[_categoryName]->GetNbinsX()!=0) auxUtil::alertAndAbort(Form("Histogram %s from file %s has inconsistent number of bins (%d) compared with category %s observable (%d)", _inputDataFileName.Data(), _inputDataHistName.Data(), nBins, _categoryName.Data(), _dataHist[_categoryName]->GetNbinsX()));
+      if(nBins==0) auxUtil::alertAndAbort(Form("Histogram %s from file %s has a computed numbers of bins equal to 0, please check compatibility between your observable and the histogram range", _inputDataHistName.Data(), _inputDataFileName.Data()));
+      if(nBins<_dataHist[_categoryName]->GetNbinsX()) auxUtil::alertAndAbort(Form("Histogram %s from file %s has fewer bins (%d) compared with category %s observable (%d)", _inputDataHistName.Data(), _inputDataFileName.Data(), nBins, _categoryName.Data(), _dataHist[_categoryName]->GetNbinsX()));
+      if(nBins>_dataHist[_categoryName]->GetNbinsX() && nBins%_dataHist[_categoryName]->GetNbinsX()!=0) auxUtil::alertAndAbort(Form("Histogram %s from file %s has inconsistent number of bins (%d) compared with category %s observable (%d)", _inputDataHistName.Data(), _inputDataFileName.Data(), nBins, _categoryName.Data(), _dataHist[_categoryName]->GetNbinsX()));
       else{
 	cout<<endl<<auxUtil::WARNING<<" \tREGTEST: Rebinning input histogram by "<<nBins/_dataHist[_categoryName]->GetNbinsX()<<" to match the binning of observable. "<<auxUtil::ENDC<<endl<<endl;
 	h->Rebin(nBins/_dataHist[_categoryName]->GetNbinsX());
@@ -1096,6 +1125,9 @@ TString xmlAnaWSBuilder::implementObj(RooWorkspace *w, TString expr, bool checkE
       return varName;
     }
   }
+
+  // Check syntax for common mistakes
+  if(expr.Contains(":") && !expr.Contains("::")) auxUtil::alertAndAbort("Expression \""+expr+"\" contains syntax error: missing colon pair");
 
   // Otherwise we just blindly implement
   if(_debug) cout<<"\tREGTEST: Generating "<<auxUtil::translateItemType(type)<<" "<<expr<<endl;
@@ -1256,7 +1288,7 @@ void xmlAnaWSBuilder::Summary(TString outputFigName){
     m_cat->setBin(i);
     TString channelname=m_cat->getLabel();
     RooAbsPdf* pdfi = m_pdf->getPdf(channelname);
-    RooDataSet* datai = ( RooDataSet* )( m_dataList->At( i ) );
+    RooDataSet *datai = (RooDataSet *)(m_dataList->FindObject(channelname));
     cout << "\t\tIndex: " << i << ", Pdf: " << pdfi->GetName() << ", Data: " << datai->GetName() << ", SumEntries: " << datai->sumEntries() << endl;
 
     _dataHist[channelname]->Rebin(m_rebin);
