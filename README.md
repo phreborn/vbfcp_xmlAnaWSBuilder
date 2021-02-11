@@ -36,13 +36,11 @@ The XML analytic workspace builder has now moved to cmake. To compile, run
 mkdir build && cd build
 cmake ..
 make -j4
+make install
 cd ..
 ```
 
-If you have root privilege and would like to use the software everywhere, you could also run under "build" folder
-```
-make install
-```
+By default the installation step will put the executable and library under ```xmlAnaWSBuilder``` folder. If you would like to install them in a different location, please specify it at the cmake step.
 
 ## Using the software
 After the installation is finished, on lxplus you only need to set up the environment by
