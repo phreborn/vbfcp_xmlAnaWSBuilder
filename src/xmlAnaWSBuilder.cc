@@ -1288,7 +1288,7 @@ void xmlAnaWSBuilder::Summary(TString outputFigName){
     m_cat->setBin(i);
     TString channelname=m_cat->getLabel();
     RooAbsPdf* pdfi = m_pdf->getPdf(channelname);
-    RooDataSet* datai = ( RooDataSet* )( m_dataList->At( i ) );
+    RooDataSet *datai = (RooDataSet *)(m_dataList->FindObject(channelname));
     cout << "\t\tIndex: " << i << ", Pdf: " << pdfi->GetName() << ", Data: " << datai->GetName() << ", SumEntries: " << datai->sumEntries() << endl;
 
     _dataHist[channelname]->Rebin(m_rebin);
