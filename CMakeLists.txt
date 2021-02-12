@@ -5,12 +5,13 @@ cmake_minimum_required( VERSION 2.8 )
 # Declare the package name:
 project( xmlAnaWSBuilder )
 
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/exe)
-set(CMAKE_INSTALL_LIBDIR ${PROJECT_SOURCE_DIR}/lib)
-set(TARGET_INSTALL_AREA ${PROJECT_SOURCE_DIR})
-set(SHARED_INSTALL_AREA ${PROJECT_SOURCE_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+  set(CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR} CACHE PATH "..." FORCE)
+endif()
+set(CMAKE_INSTALL_LIBDIR ${CMAKE_INSTALL_PREFIX}/lib)
 
 file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
 file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/exe)
@@ -59,10 +60,9 @@ add_library( xmlAnaWSBuilder SHARED ${xmlAnaWSBuilderSources} G__xmlAnaWSBuilder
 target_link_libraries( xmlAnaWSBuilder ${ROOT_LIBRARIES} ${RooFitExtensions_LIBRARIES} )
 
 #add executables
-add_executable( XMLReader bin/XMLReader.cpp )
+add_executable( XMLReader app/XMLReader.cpp )
 target_link_libraries( XMLReader xmlAnaWSBuilder )
 
 # Installation
 install(TARGETS XMLReader DESTINATION bin)
 install(TARGETS xmlAnaWSBuilder LIBRARY DESTINATION lib)
-install(FILES ${PROJECT_SOURCE_DIR}/lib/libxmlAnaWSBuilder_rdict.pcm ${PROJECT_SOURCE_DIR}/lib/libxmlAnaWSBuilder.rootmap DESTINATION lib)
