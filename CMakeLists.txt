@@ -14,7 +14,7 @@ endif()
 set(CMAKE_INSTALL_LIBDIR ${CMAKE_INSTALL_PREFIX}/lib)
 
 file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/lib)
-file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/exe)
+file(MAKE_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
 
 # You need to tell CMake where to find the ROOT installation. This can be done in a number of ways:
 #   - ROOT built with classic configure/make use the provided $ROOTSYS/etc/cmake/FindROOT.cmake
