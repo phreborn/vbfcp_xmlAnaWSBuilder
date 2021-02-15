@@ -18,7 +18,7 @@ export _DIRXMLWSBUILDER=${PWD}
 
 # Modify to describe your directory structure. Default is to use the a structure where
 # all directories are below the SFrame base directory specified above
-export _BIN_PATH=${_DIRXMLWSBUILDER}/exe
+export _BIN_PATH=${_DIRXMLWSBUILDER}/bin
 export _LIB_PATH=${_DIRXMLWSBUILDER}/lib
 
 # The Makefiles depend only on the root-config script to use ROOT,
