@@ -15,7 +15,6 @@ Then please set up ROOT and cmake. The recommended version is 6.18 or above. If 
 ```
 source setup_lxplus.sh
 ```
-**A note on ROOT version**: `setup_lxplus.sh` is an example setup script. Users are encouraged to prepare their own setup script following this example. ROOT version that serves best their purpose can be used as long as it is above 6.18. Please report an issue if you find using a newer version leads to problems. Thank you.
 
 ### Install RooFitExtensions
 
@@ -48,17 +47,22 @@ After the installation is finished, on lxplus you only need to set up the enviro
 ```
 source setup_lxplus.sh
 ```
-every time before using the software. The most important things this script takes care of are
+every time before using the software. 
 
-* Set up ROOT
-* Attach "lib" folder to ${LD_LIBRARY_PATH} (IMPORTANT if you are using any custom class not in vanila ROOT -- otherwise when you open the workspace it will crash)
-* Attach "exe" folder to ${PATH} (allow you to use XMLReader command everywhere)
+For more details on how to use the software, please checkout https://twiki.cern.ch/twiki/bin/view/AtlasProtected/XmlAnaWSBuilder
 
-If you are on a different machine/cluster, please prepare a similar setup script by yourself if needed. Essentially you only need to replace the following two lines in the script
+## A note on setup script
+The `setup_lxplus.sh` provided in the repository and discussed above is **an example**. It will be maintained up-to-date on a best effort basis, but users are recommended to prepare their own setup script following this example (when using an environment different than `lxplus` this is actually mandatory). 
+
+A different ROOT version can be used as long as it is above 6.18 (please report an issue in case a newer version leads to problems). Cmake version can also be adjusted.
+Essentially you only need to modify the following two lines in the script
 ```
 source /cvmfs/sft.cern.ch/lcg/releases/LCG_96b/CMake/3.14.3/x86_64-centos7-gcc8-opt/CMake-env.sh
 source /cvmfs/sft.cern.ch/lcg/releases/LCG_96b/ROOT/6.18.04/x86_64-centos7-gcc8-opt/ROOT-env.sh
 ```
-with appropriate ones that works in your case (if ROOT and cmake are already automatically set up these lines can be simply removed).
+If ROOT and cmake are already automatically set up, these lines can be simply removed.
 
-For how to use the software, please checkout https://twiki.cern.ch/twiki/bin/view/AtlasProtected/XmlAnaWSBuilder
+The rest of the script is taking care of the following
+* Attach `lib` folder to ${LD_LIBRARY_PATH} (IMPORTANT if you are using any custom class not in vanila ROOT -- otherwise when you open the workspace it will crash)
+* Attach `bin` folder to ${PATH} (allow you to use XMLReader command everywhere)
+
