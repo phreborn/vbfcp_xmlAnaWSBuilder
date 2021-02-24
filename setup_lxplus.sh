@@ -2,7 +2,7 @@
 
 # Setup software
 source /cvmfs/sft.cern.ch/lcg/releases/LCG_96b/CMake/3.14.3/x86_64-centos7-gcc8-opt/CMake-env.sh
-source /cvmfs/sft.cern.ch/lcg/releases/LCG_96b/ROOT/6.18.04/x86_64-centos7-gcc8-opt/ROOT-env.sh
+source /cvmfs/sft.cern.ch/lcg/releases/LCG_97_ATLAS_1/ROOT/v6.20.02/x86_64-centos7-gcc8-opt/ROOT-env.sh
 
 # More memory
 ulimit -S -s unlimited
