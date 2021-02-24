@@ -11,10 +11,11 @@ git clone ssh://git@gitlab.cern.ch:7999/atlas-hgam-sw/xmlAnaWSBuilder.git
 cd xmlAnaWSBuilder
 ```
 
-Then please set up ROOT and cmake. The recommended version is 6.18 (ATLAS recommended version as of May 15, 2020) or above. If you are on lxplus, you can directly run
+Then please set up ROOT and cmake. The recommended version is 6.18 or above. If you are on lxplus, you can directly run
 ```
 source setup_lxplus.sh
 ```
+**A note on ROOT version**: `setup_lxplus.sh` is an example setup script. Users are encouraged to prepare their own setup script following this example. ROOT version that serves best their purpose can be used as long as it is above 6.18. Please report an issue if you find using a newer version leads to problems. Thank you.
 
 ### Install RooFitExtensions
 
