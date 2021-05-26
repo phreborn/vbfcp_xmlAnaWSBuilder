@@ -1,4 +1,4 @@
-void getNLL(TString fitresult = "outnoLL"){
+void getNLL(TString fitresult = "outAllCats_allSys"){
   map<TString, double> d_map;
   d_map["m00"] = 0.;
   d_map["m01"] = -0.01;
