@@ -1,3 +1,8 @@
+run/exe_Collect_*sh
+run/submit_Collect_*
+run/out*
+run/WS*
+run/config*
 build/
 CMakeCache.txt
 CMakeFiles/
