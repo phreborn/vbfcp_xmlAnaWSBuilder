@@ -11,12 +11,14 @@ if [ ! -d out${preCfg}_statOnly ];then mkdir out${preCfg}_statOnly;fi
 if [ ! -d out${preCfg}_allSys ];then mkdir out${preCfg}_allSys;fi
 if [ ! -d out${preCfg}_jetSys ];then mkdir out${preCfg}_jetSys;fi
 if [ ! -d out${preCfg}_photonSys ];then mkdir out${preCfg}_photonSys;fi
+if [ ! -d out${preCfg}_ssSys ];then mkdir out${preCfg}_ssSys;fi
 
 echo "copying config/..."
 #cp -r config/* config${preCfg}/
 cp -r config${preCfg}/* config/
 echo ""
 
+#dList=($(cat ../../../syst/cHW | grep -v "#"))
 dList=($(cat ../../../syst/Dtilde | grep -v "#"))
 
 sequence=($(seq 1 1 ${#dList[@]}))
@@ -48,6 +50,7 @@ for init in ${sequence[@]};do
     echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d asimovData_SB_SM -p mu=1,mu_VBF_SM=0,mu_VBF_RW=1_0_5 -o out${preCfg}_allSys/out_${dList[${num}]}.root --savefitresult 1" >> exe_${jobName}.sh
     echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d asimovData_SB_SM -p mu=1,mu_VBF_SM=0,mu_VBF_RW=1_0_5 -n ATLAS_PH*,ATLAS_EG*,*PRW*,*pdf*,*aS*,*qcd*,*shower*,*BIAS*,*lumi*,*HIGGS_MASS* -o out${preCfg}_jetSys/out_${dList[${num}]}.root --savefitresult 1" >> exe_${jobName}.sh
     echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d asimovData_SB_SM -p mu=1,mu_VBF_SM=0,mu_VBF_RW=1_0_5 -n ATLAS_JET*,*PRW*,*pdf*,*aS*,*qcd*,*shower*,*BIAS*,*lumi*,*HIGGS_MASS* -o out${preCfg}_photonSys/out_${dList[${num}]}.root --savefitresult 1" >> exe_${jobName}.sh
+    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d asimovData_SB_SM -p mu=1,mu_VBF_SM=0,mu_VBF_RW=1_0_5 -n ATLAS_JET*,ATLAS_PH*,ATLAS_EG*,*PRW*,*pdf*,*aS*,*qcd*,*shower*,*lumi*,*HIGGS_MASS* -o out${preCfg}_ssSys/out_${dList[${num}]}.root --savefitresult 1" >> exe_${jobName}.sh
   done
 
   chmod +x exe_${jobName}.sh
