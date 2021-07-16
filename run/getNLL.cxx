@@ -1,4 +1,28 @@
-void getNLL(TString fitresult = "outAllCats_allSys"){
+void getNLL(TString fitresult = "outAllCats_statOnly"){
+//void getNLL(TString fitresult = "outAllCats_allSys"){
+//void getNLL(TString fitresult = "outAllCats_ssSys"){
+//void getNLL(TString fitresult = "outAllCats_jetSys"){
+//void getNLL(TString fitresult = "outAllCats_photonSys"){
+//void getNLL(TString fitresult = "outTT_statOnly"){
+//void getNLL(TString fitresult = "outTT_allSys"){
+//void getNLL(TString fitresult = "outTL_statOnly"){
+//void getNLL(TString fitresult = "outTL_allSys"){
+//void getNLL(TString fitresult = "outLT_statOnly"){
+//void getNLL(TString fitresult = "outLT_allSys"){
+//void getNLL(TString fitresult = "outLL_statOnly"){
+//void getNLL(TString fitresult = "outLL_allSys"){
+  map<TString, TString> cHWs;
+  cHWs["m2d5"] = "-2.5";
+  cHWs["m2d0"] = "-2";
+  cHWs["m1d5"] = "-1.5";
+  cHWs["m1d0"] = "-1";
+  cHWs["m0d5"] = "-0.5";
+  cHWs["m0d0"] = "-0";
+  cHWs["p0d5"] = "0.5";
+  cHWs["p1d0"] = "1";
+  cHWs["p1d5"] = "1.5";
+  cHWs["p2d0"] = "2";
+  cHWs["p2d5"] = "2.5";
   map<TString, double> d_map;
   d_map["m00"] = 0.;
   d_map["m01"] = -0.01;
@@ -31,6 +55,7 @@ void getNLL(TString fitresult = "outAllCats_allSys"){
   d_map["p20"] = 0.20;
 
   TFile *f_SM = new TFile(fitresult+"/out_m00.root", "read");
+  //TFile *f_SM = new TFile(fitresult+"/out_m0d0.root", "read");
   TTree *t_SM = (TTree*)f_SM->Get("nllscan");
 
   double nll_SM;
@@ -38,6 +63,7 @@ void getNLL(TString fitresult = "outAllCats_allSys"){
   t_SM->GetEntry(0);
 
   for(auto d = d_map.begin(); d != d_map.end(); d++){
+  //for(auto d = cHWs.begin(); d != cHWs.end(); d++){
     TFile *f = new TFile(fitresult+"/out_"+d->first+".root", "read");
     TTree *t = (TTree*)f->Get("nllscan");
 
