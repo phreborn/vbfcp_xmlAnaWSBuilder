@@ -1,4 +1,4 @@
-void getNLL(TString fitresult = "outAllCats_statOnly"){
+void getNLL(TString fitresult = "outAllCats_SMEFT_statOnly"){
 //void getNLL(TString fitresult = "outAllCats_allSys"){
 //void getNLL(TString fitresult = "outAllCats_ssSys"){
 //void getNLL(TString fitresult = "outAllCats_jetSys"){
@@ -83,8 +83,8 @@ void getNLL(TString fitresult = "outAllCats_statOnly"){
   d_map["p18"] = 0.18;
   d_map["p20"] = 0.20;
 
-  TFile *f_SM = new TFile(fitresult+"/out_m00.root", "read");
-  //TFile *f_SM = new TFile(fitresult+"/out_m0d0.root", "read");
+  //TFile *f_SM = new TFile(fitresult+"/out_m00.root", "read");
+  TFile *f_SM = new TFile(fitresult+"/out_m0d00.root", "read");
   TTree *t_SM = (TTree*)f_SM->Get("nllscan");
 
   double nll_SM;
@@ -92,8 +92,8 @@ void getNLL(TString fitresult = "outAllCats_statOnly"){
   t_SM->GetEntry(0);
 
   double minNLL = nll_SM;
-  for(auto d = d_map.begin(); d != d_map.end(); d++){
-  //for(auto d = cHWs.begin(); d != cHWs.end(); d++){
+  //for(auto d = d_map.begin(); d != d_map.end(); d++){
+  for(auto d = cHWs.begin(); d != cHWs.end(); d++){
     TFile *f = new TFile(fitresult+"/out_"+d->first+".root", "read");
     TTree *t = (TTree*)f->Get("nllscan");
 
@@ -105,8 +105,8 @@ void getNLL(TString fitresult = "outAllCats_statOnly"){
     delete f;
   }
 
-  for(auto d = d_map.begin(); d != d_map.end(); d++){
-  //for(auto d = cHWs.begin(); d != cHWs.end(); d++){
+  //for(auto d = d_map.begin(); d != d_map.end(); d++){
+  for(auto d = cHWs.begin(); d != cHWs.end(); d++){
     TFile *f = new TFile(fitresult+"/out_"+d->first+".root", "read");
     TTree *t = (TTree*)f->Get("nllscan");
 
