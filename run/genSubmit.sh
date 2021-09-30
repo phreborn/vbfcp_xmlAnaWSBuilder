@@ -1,6 +1,6 @@
 tag=ggF
 
-preCfg="AllCats"
+preCfg="AllCats_SMEFT"
 
 allJobs=jobsSub.sh
 > ${allJobs}
@@ -18,8 +18,8 @@ echo "copying config/..."
 cp -r config${preCfg}/* config/
 echo ""
 
-#dList=($(cat ../../../syst/cHW | grep -v "#"))
 dList=($(cat ../../../syst/Dtilde | grep -v "#"))
+dList=($(cat ../../../syst/cHW_fine | grep -v "#"))
 
 sequence=($(seq 1 1 ${#dList[@]}))
 
