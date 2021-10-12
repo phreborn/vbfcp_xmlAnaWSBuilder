@@ -1,8 +1,12 @@
 #!/bin/bash
 
 cat=AllCats
-for suffix in statOnly allSys ssSys jetSys photonSys;do
-  outnll=autonll/dNLL_${suffix}.log
+#cat=Inject
+#cat=LL
+#cat=StatOnly
+for suffix in statOnly allSys ssSys jetSys photonSys theorySys;do
+#for suffix in statOnly allSys;do
+  outnll=autonll/dNLL_${cat}_${suffix}.log
   > ${outnll}
   tmpall=tmpall
   root -b -q getNLL.cxx\(\"out${cat}_${suffix}\"\) | grep nll | cut -d : -f 2 > ${tmpall}
