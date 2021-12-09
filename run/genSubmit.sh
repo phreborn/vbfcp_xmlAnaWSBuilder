@@ -1,7 +1,7 @@
 tag=ggF
 
 preCfg="AllCats_SMEFT"
-#preCfg="LL_SMEFT"
+#preCfg="LT_SMEFT"
 
 allJobs=jobsSub.sh
 > ${allJobs}

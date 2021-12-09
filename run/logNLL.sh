@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cat=AllCats_SMEFT
-#cat=LL_SMEFT
+#cat=LT_SMEFT
 for suffix in statOnly allSys ssSys jetSys photonSys theorySys;do
 #for suffix in statOnly allSys;do
   outnll=autonll/dNLL_${cat}_${suffix}.log
