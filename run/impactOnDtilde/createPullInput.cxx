@@ -97,11 +97,11 @@ void createPullInput(){
     t->Branch("nuis_hi", &nuis_hi);
     t->Branch("nuis_lo", &nuis_lo);
     t->Branch("nuis_prefit", &nuis_prefit);
-    t->Branch("mu_VBF_RW_hat", &mu_VBF_RW_hat);
-    t->Branch("mu_VBF_RW_up", &mu_VBF_RW_up);
-    t->Branch("mu_VBF_RW_down", &mu_VBF_RW_down);
-    t->Branch("mu_VBF_RW_up_nom", &mu_VBF_RW_up_nom);
-    t->Branch("mu_VBF_RW_down_nom", &mu_VBF_RW_down_nom);
+    t->Branch("tilde_d_hat", &mu_VBF_RW_hat);
+    t->Branch("tilde_d_up", &mu_VBF_RW_up);
+    t->Branch("tilde_d_down", &mu_VBF_RW_down);
+    t->Branch("tilde_d_up_nom", &mu_VBF_RW_up_nom);
+    t->Branch("tilde_d_down_nom", &mu_VBF_RW_down_nom);
     t->Fill();
     t->Write();
     fout->Close();
