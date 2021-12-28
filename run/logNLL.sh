@@ -1,6 +1,7 @@
 #!/bin/bash
 
 cat=AllCats
+cat=CPeven20
 #cat=Inject
 #cat=LL
 #cat=StatOnly
