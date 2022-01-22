@@ -28,7 +28,7 @@ void histBias(){
   h1->Draw("e");
 
   myText(0.22, 0.88, 1, Form("%lli toys", nlines));
-  myText(0.22, 0.83, 1, Form("#mu = %0.3f, #sigma = %0.3f", mu, sigma));
+  myText(0.22, 0.83, 1, Form("#mu = %0.4f, #sigma = %0.3f", mu, sigma));
 
   canv->SaveAs("distr_tildeD.png");
 }
