@@ -32,23 +32,23 @@ void HistIntvlWidth(){
 
   TCanvas *canv1 = new TCanvas("c1", "canvas", 800, 600);
 
-  h1->GetXaxis()->SetTitle("best-fit #tilde{d}");
+  h1->GetXaxis()->SetTitle("68\%CL interval width");
   h1->GetYaxis()->SetTitle("nEvents/bin");
   h1->Draw("e");
 
   myText(0.22, 0.88, 1, Form("%lli toys", nlines));
-  myText(0.22, 0.83, 1, Form("0.68CL #mu = %0.2f, #sigma = %0.3f", mu1, sigma1));
+  myText(0.22, 0.83, 1, Form("#mu = %0.2f, #sigma = %0.3f", mu1, sigma1));
 
   canv1->SaveAs("distr_68IntvlWidth.png");
 
   TCanvas *canv2 = new TCanvas("c2", "canvas", 800, 600);
 
-  h2->GetXaxis()->SetTitle("best-fit #tilde{d}");
+  h2->GetXaxis()->SetTitle("95\%CL interval width");
   h2->GetYaxis()->SetTitle("nEvents/bin");
   h2->Draw("e");
 
   myText(0.22, 0.88, 1, Form("%lli toys", nlines));
-  myText(0.22, 0.83, 1, Form("0.95CL #mu = %0.2f, #sigma = %0.3f", mu2, sigma2));
+  myText(0.22, 0.83, 1, Form("#mu = %0.2f, #sigma = %0.3f", mu2, sigma2));
 
   canv2->SaveAs("distr_95IntvlWidth.png");
 }
