@@ -22,13 +22,17 @@ void HistIntvlWidth(){
   h1->Fit("gaus1");
   float mu1 = gaus1->GetParameter(1);
   float sigma1 = gaus1->GetParameter(2);
-  cout<<"68\%CL mu, sigma: "<<mu1<<", "<<sigma1<<endl;
+  float chisqur1 = gaus1->GetChisquare();
+  float ndof1 = gaus1->GetNDF();
+  cout<<"68\%CL mu, sigma, chi2/ndof: "<<mu1<<", "<<sigma1<<", "<<chisqur1/ndof1<<endl;
 
   TF1 *gaus2 = new TF1("gaus2", "gaus(0)", -0.5, 0.5);
   h2->Fit("gaus2");
   float mu2 = gaus2->GetParameter(1);
   float sigma2 = gaus2->GetParameter(2);
-  cout<<"95\%CL mu, sigma: "<<mu2<<", "<<sigma2<<endl;
+  float chisqur2 = gaus2->GetChisquare();
+  float ndof2 = gaus2->GetNDF();
+  cout<<"95\%CL mu, sigma, chi2/ndof: "<<mu2<<", "<<sigma2<<", "<<chisqur2/ndof2<<endl;
 
   TCanvas *canv1 = new TCanvas("c1", "canvas", 800, 600);
 
@@ -38,6 +42,7 @@ void HistIntvlWidth(){
 
   myText(0.22, 0.88, 1, Form("%lli toys", nlines));
   myText(0.22, 0.83, 1, Form("#mu = %0.2f, #sigma = %0.3f", mu1, sigma1));
+  myText(0.22, 0.78, 1, Form("#chi^{2}/ndof = %0.2f", chisqur1/ndof1));
 
   canv1->SaveAs("distr_68IntvlWidth.png");
 
@@ -49,6 +54,7 @@ void HistIntvlWidth(){
 
   myText(0.22, 0.88, 1, Form("%lli toys", nlines));
   myText(0.22, 0.83, 1, Form("#mu = %0.2f, #sigma = %0.3f", mu2, sigma2));
+  myText(0.22, 0.78, 1, Form("#chi^{2}/ndof = %0.2f", chisqur2/ndof2));
 
   canv2->SaveAs("distr_95IntvlWidth.png");
 }
