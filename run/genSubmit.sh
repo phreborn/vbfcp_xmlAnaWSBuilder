@@ -1,5 +1,8 @@
 tag=ggF
 
+dataset=asimovData_SB_SM
+dataset=combData
+
 preCfg="AllCats_SMEFT"
 #preCfg="LT_SMEFT"
 
@@ -48,12 +51,12 @@ for init in ${sequence[@]};do
     echo "if [ ! -d WS${preCfg} ];then mkdir WS${preCfg};fi" >> exe_${jobName}.sh
     echo "if [ -d WS${preCfg}/vbf_cp_${dList[${num}]} ];then rm -r WS${preCfg}/vbf_cp_${dList[${num}]};fi" >> exe_${jobName}.sh
     echo "cp -r workspace/vbf_cp_${dList[${num}]} WS${preCfg}" >> exe_${jobName}.sh
-    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d asimovData_SB_SM -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5 -n ATLAS_* -o out${preCfg}_statOnly/out_${dList[${num}]}.root --savefitresult 1" >> exe_${jobName}.sh
-    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d asimovData_SB_SM -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5 -o out${preCfg}_allSys/out_${dList[${num}]}.root --savefitresult 1" >> exe_${jobName}.sh
-    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d asimovData_SB_SM -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5 -n ATLAS_PH*,ATLAS_EG*,*PRW*,*pdf*,*aS*,*qcd*,*shower*,*BIAS*,*lumi*,*HIGGS_MASS* -o out${preCfg}_jetSys/out_${dList[${num}]}.root --savefitresult 1" >> exe_${jobName}.sh
-    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d asimovData_SB_SM -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5 -n ATLAS_JET*,*PRW*,*pdf*,*aS*,*qcd*,*shower*,*BIAS*,*lumi*,*HIGGS_MASS* -o out${preCfg}_photonSys/out_${dList[${num}]}.root --savefitresult 1" >> exe_${jobName}.sh
-    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d asimovData_SB_SM -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5 -n ATLAS_JET*,ATLAS_PH*,ATLAS_EG*,*PRW*,*pdf*,*aS*,*qcd*,*shower*,*lumi*,*HIGGS_MASS* -o out${preCfg}_ssSys/out_${dList[${num}]}.root --savefitresult 1" >> exe_${jobName}.sh
-    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d asimovData_SB_SM -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5 -n ATLAS_JET*,ATLAS_PH*,ATLAS_EG*,*PRW*,*BIAS*,*lumi*,*HIGGS_MASS* -o out${preCfg}_theorySys/out_${dList[${num}]}.root --savefitresult 1" >> exe_${jobName}.sh
+    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5 -n ATLAS_* -o out${preCfg}_statOnly/out_${dList[${num}]}.root --savefitresult 1" >> exe_${jobName}.sh
+    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5 -o out${preCfg}_allSys/out_${dList[${num}]}.root --savefitresult 1" >> exe_${jobName}.sh
+    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5 -n ATLAS_PH*,ATLAS_EG*,*PRW*,*pdf*,*aS*,*qcd*,*shower*,*BIAS*,*lumi*,*HIGGS_MASS* -o out${preCfg}_jetSys/out_${dList[${num}]}.root --savefitresult 1" >> exe_${jobName}.sh
+    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5 -n ATLAS_JET*,*PRW*,*pdf*,*aS*,*qcd*,*shower*,*BIAS*,*lumi*,*HIGGS_MASS* -o out${preCfg}_photonSys/out_${dList[${num}]}.root --savefitresult 1" >> exe_${jobName}.sh
+    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5 -n ATLAS_JET*,ATLAS_PH*,ATLAS_EG*,*PRW*,*pdf*,*aS*,*qcd*,*shower*,*lumi*,*HIGGS_MASS* -o out${preCfg}_ssSys/out_${dList[${num}]}.root --savefitresult 1" >> exe_${jobName}.sh
+    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5 -n ATLAS_JET*,ATLAS_PH*,ATLAS_EG*,*PRW*,*BIAS*,*lumi*,*HIGGS_MASS* -o out${preCfg}_theorySys/out_${dList[${num}]}.root --savefitresult 1" >> exe_${jobName}.sh
   done
 
   chmod +x exe_${jobName}.sh
