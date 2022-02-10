@@ -70,6 +70,7 @@ void createPullInput(){
   for (auto sys : sysAttribs){
     TString sysname = sys.first;
     TFile *fout = new TFile("../../../StatisticsTools/root-files/dtilde/pulls/"+sysname+".root", "recreate");
+//    TFile *fout = new TFile("../../../StatisticsTools/root-files/cHWt/pulls/"+sysname+".root", "recreate");
     TTree *t = new TTree("result", "");
     string nuisance;
     double nuis_nom;
@@ -83,17 +84,21 @@ void createPullInput(){
     double mu_VBF_RW_up_nom;
     double mu_VBF_RW_down_nom;
     nuisance = sysname.Data();
-    nuis_nom = sysNPrslts[sysname].at(0);
+    nuis_nom = 0;
+    nuis_hat = sysNPrslts[sysname].at(0);
     nuis_hi = sysNPrslts[sysname].at(1);
     nuis_lo = sysNPrslts[sysname].at(2);
     nuis_prefit = 1;
-    mu_VBF_RW_hat = -4.46624040037e-05;
+    //mu_VBF_RW_hat = -4.46624040037e-05; // expected tilde{d}
+    mu_VBF_RW_hat = 0.014967455866; // observed tilde{d}
+//    mu_VBF_RW_hat = 0.238368862189; // observed c_HWt
     mu_VBF_RW_up = sysAttribs[sysname].at(1);
     mu_VBF_RW_down = sysAttribs[sysname].at(2);
     mu_VBF_RW_up_nom = sysAttribs[sysname].at(3);
     mu_VBF_RW_down_nom = sysAttribs[sysname].at(4);
     t->Branch("nuisance", &nuisance);
     t->Branch("nuis_nom", &nuis_nom);
+    t->Branch("nuis_hat", &nuis_hat);
     t->Branch("nuis_hi", &nuis_hi);
     t->Branch("nuis_lo", &nuis_lo);
     t->Branch("nuis_prefit", &nuis_prefit);
@@ -102,6 +107,11 @@ void createPullInput(){
     t->Branch("tilde_d_down", &mu_VBF_RW_down);
     t->Branch("tilde_d_up_nom", &mu_VBF_RW_up_nom);
     t->Branch("tilde_d_down_nom", &mu_VBF_RW_down_nom);
+//    t->Branch("cHWt_hat", &mu_VBF_RW_hat);
+//    t->Branch("cHWt_up", &mu_VBF_RW_up);
+//    t->Branch("cHWt_down", &mu_VBF_RW_down);
+//    t->Branch("cHWt_up_nom", &mu_VBF_RW_up_nom);
+//    t->Branch("cHWt_down_nom", &mu_VBF_RW_down_nom);
     t->Fill();
     t->Write();
     fout->Close();

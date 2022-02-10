@@ -11,7 +11,8 @@ except:
     print("Failed to import numpy.")
     exit()
 
-dirpath = "../../../StatisticsTools/root-files/test/pulls/"
+dirpath = "../../../StatisticsTools/root-files/p01/pulls/"
+#dirpath = "../../../StatisticsTools/root-files/p0d25/pulls/"
 
 outfile = "postNPErr.txt"
 with open(outfile, 'w') as fout:

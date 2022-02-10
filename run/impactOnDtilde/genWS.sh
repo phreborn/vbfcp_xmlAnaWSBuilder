@@ -7,7 +7,7 @@ preCfg="AllCats"
 allJobs=jobsSub.sh
 > ${allJobs}
 
-if [ ! -d config${preCfg} ];then mkdir config${preCfg};fi
+#if [ ! -d config${preCfg} ];then mkdir config${preCfg};fi
 if [ ! -d WS${preCfg} ];then mkdir WS${preCfg};fi
 if [ ! -d out${preCfg}_allSys ];then mkdir out${preCfg}_allSys;fi
 

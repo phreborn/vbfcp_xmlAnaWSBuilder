@@ -22,6 +22,8 @@ for popr in post pre;do
   root -b -q getNLL.cxx\(\"out${cat}_${suffix}\",\"${sysname}\",\"${fittype}\"\) | grep nll | cut -d : -f 2 > ${tmpall}
   cat ${tmpall} | grep m | sort -r | sed 's/m/-0\./g' >> ${outnll}
   cat ${tmpall} | grep p | sed 's/p/0\./g' >> ${outnll}
+  #cat ${tmpall} | grep m | sort -r | sed 's/m/-/g' | sed 's/d/\./g' >> ${outnll}
+  #cat ${tmpall} | grep p | sed 's/p/+/g' | sed 's/d/\./g' >> ${outnll}
   rm ${tmpall}
 done
 done

@@ -23,8 +23,8 @@ with open("postNPErr.txt", 'r') as f:
 #  for fitType in ['up_post', 'dn_post', 'up_pre', 'dn_pre']:
 dirname = "autonll/"
 #inNLL = dirname + "dNLL_testest.log"
-#inNLL = dirname + "dNLL_AllCats_allSys_nominal.log"
-inNLL = dirname + "dNLL_AllCats_allSys_ATLAS_Hgg_BIAS_OO_TT_b6_up_post.log"
+inNLL = dirname + "dNLL_AllCats_allSys_nominal.log"
+#inNLL = dirname + "dNLL_AllCats_allSys_ATLAS_Hgg_BIAS_OO_TT_b6_up_post.log"
 
 ### reading NLL points and ordering ###
 nlls = {}

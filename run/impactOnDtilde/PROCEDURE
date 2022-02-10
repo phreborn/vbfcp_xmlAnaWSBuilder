@@ -1,0 +1,9 @@
+* CPV parameter range in Dtilde
+python getPostNPErr.py => postNPErr.txt
+use 'source genWS.sh' (or copy from ../) => WSAllCats/
+use 'source genFit.sh' => outAllCats_allSys/
+source logNLL.sh (* CPV parameter range in getNLL.cxx) => autonll/
+python getConfidIntvl.py => impactDtilde.txt
+* write autonll/dNLL_AllCats_allSys_nominal.log by hand
+python getBestFitNom.py => best-fit for var 'mu_VBF_RW_hat' in createPullInput.cxx
+root -b -q createPullInput.cxx => ../../../StatisticsTools/root-files/dtilde/pulls/
