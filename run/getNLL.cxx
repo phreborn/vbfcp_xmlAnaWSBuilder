@@ -84,7 +84,7 @@ void getNLL(TString fitresult = "outAllCats_statOnly"){
   d_map["p20"] = 0.20;
 
   TFile *f_SM = new TFile(fitresult+"/out_m00.root", "read");
-  //TFile *f_SM = new TFile(fitresult+"/out_m0d0.root", "read");
+  //TFile *f_SM = new TFile(fitresult+"/out_m0d00.root", "read");
   TTree *t_SM = (TTree*)f_SM->Get("nllscan");
 
   double nll_SM;
