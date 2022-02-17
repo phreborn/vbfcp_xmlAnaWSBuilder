@@ -1,10 +1,6 @@
 #!/bin/bash
 
 cat=AllCats
-#cat=CPeven20
-#cat=Inject
-#cat=LT
-#cat=StatOnly
 for suffix in statOnly allSys ssSys jetSys photonSys theorySys;do
 #for suffix in statOnly allSys;do
   outnll=autonll/dNLL_${cat}_${suffix}.log
