@@ -1,4 +1,5 @@
 copy your config file in run/, for example : config${preCfg}
 in run/:
-1)set 'preCfg' 'dataset' in genSubmit.sh, source genSubmit.sh => jobsSub.sh to submit condor jobs
-2)source logNLL.sh (set 'preCfg') to get the NLL curve points
+1)source copydtd.sh config${preCfg}
+2)set 'preCfg' 'dataset' in genSubmit.sh, source genSubmit.sh => jobsSub.sh to submit condor jobs
+3)source logNLL.sh (set 'preCfg') to get the NLL curve points

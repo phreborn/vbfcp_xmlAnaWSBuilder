@@ -3,7 +3,8 @@
 allJobs=jobsSub.sh
 > ${allJobs}
 
-cfpath=/publicfs/atlas/atlasnew/higgs/hgg/chenhr/vbfcp/WSconfigs/configToys/
+cfgdir=configToys
+cfpath=/publicfs/atlas/atlasnew/higgs/hgg/chenhr/vbfcp/WSconfigs/${cfgdir}/
 
 for i in $(seq 0 49)
 do

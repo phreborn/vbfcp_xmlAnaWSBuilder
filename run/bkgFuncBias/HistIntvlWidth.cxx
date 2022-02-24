@@ -42,7 +42,7 @@ void HistIntvlWidth(){
 
   myText(0.22, 0.88, 1, Form("%lli toys", nlines));
   myText(0.22, 0.83, 1, Form("#mu = %0.2f, #sigma = %0.3f", mu1, sigma1));
-  myText(0.22, 0.78, 1, Form("#chi^{2}/ndof = %0.2f", chisqur1/ndof1));
+  myText(0.22, 0.78, 1, Form("#chi^{2}/ndof = %0.2f/%0.f", chisqur1, ndof1));
 
   canv1->SaveAs("distr_68IntvlWidth.png");
 
@@ -54,7 +54,7 @@ void HistIntvlWidth(){
 
   myText(0.22, 0.88, 1, Form("%lli toys", nlines));
   myText(0.22, 0.83, 1, Form("#mu = %0.2f, #sigma = %0.3f", mu2, sigma2));
-  myText(0.22, 0.78, 1, Form("#chi^{2}/ndof = %0.2f", chisqur2/ndof2));
+  myText(0.22, 0.78, 1, Form("#chi^{2}/ndof = %0.2f/%0.f", chisqur2, ndof2));
 
   canv2->SaveAs("distr_95IntvlWidth.png");
 }
