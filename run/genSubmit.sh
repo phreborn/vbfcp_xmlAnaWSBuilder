@@ -9,11 +9,15 @@ if [ ${injectTest} -eq 1 ];then injPoi=",mu_ggH_${injectPoint}=0,mu_VBF_${inject
 
 dataset=asimovData_SB_p01
 dataset=asimovData_SB_SM
+dataset=asimovData_SM_floatMu
+dataset=asimovData_SM_Mu1
 dataset=combData
 
 preCfg="ExtCheck"
 preCfg="LT_p01Asi"
 preCfg="AllCats"
+
+tole=0.001
 
 allJobs=jobsSub.sh
 > ${allJobs}
@@ -30,7 +34,6 @@ if [ ${decompSys} -eq 1 ];then
 fi
 
 echo "copying config/..."
-#cp -r config/* config${preCfg}/
 cp -r config${preCfg}/* config/
 echo ""
 
@@ -58,12 +61,12 @@ for init in ${sequence[@]};do
   echo "cd run" >> exe_${jobName}.sh
   for num in `seq ${init} 1 ${fin}`;do
     echo "" >> exe_${jobName}.sh
-    echo "../bin/XMLReader -x config/vbf_cp_${dList[${num}]}/d_tilde_${dList[${num}]}.xml" >> exe_${jobName}.sh
+    echo "../bin/XMLReader -x config/vbf_cp_${dList[${num}]}/d_tilde_${dList[${num}]}.xml -t ${tole}" >> exe_${jobName}.sh
     echo "if [ ! -d WS${preCfg} ];then mkdir WS${preCfg};fi" >> exe_${jobName}.sh
     echo "if [ -d WS${preCfg}/vbf_cp_${dList[${num}]} ];then rm -r WS${preCfg}/vbf_cp_${dList[${num}]};fi" >> exe_${jobName}.sh
     echo "cp -r workspace/vbf_cp_${dList[${num}]} WS${preCfg}" >> exe_${jobName}.sh
-    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5${injPoi} -n ATLAS_* -o out${preCfg}_statOnly/out_${dList[${num}]}.root --savefitresult 1 --saveWS 1" >> exe_${jobName}.sh
-    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5${injPoi} -o out${preCfg}_allSys/out_${dList[${num}]}.root --savefitresult 1 --saveWS 1" >> exe_${jobName}.sh
+    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5${injPoi} -n ATLAS_* -o out${preCfg}_statOnly/out_${dList[${num}]}.root --savefitresult 1 --saveWS 1 --minTolerance ${tole}" >> exe_${jobName}.sh
+    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5${injPoi} -o out${preCfg}_allSys/out_${dList[${num}]}.root --savefitresult 1 --saveWS 1 --minTolerance ${tole}" >> exe_${jobName}.sh
     if [ ${decompSys} -eq 1 ];then
       echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5 -n ATLAS_PH*,ATLAS_EG*,*PRW*,*pdf*,*aS*,*qcd*,*shower*,*BIAS*,*lumi*,*HIGGS_MASS*,*rest_Higgs*,*mcstat* -o out${preCfg}_jetSys/out_${dList[${num}]}.root --savefitresult 1 --saveWS 1" >> exe_${jobName}.sh
       echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5 -n ATLAS_JET*,*PRW*,*pdf*,*aS*,*qcd*,*shower*,*BIAS*,*lumi*,*HIGGS_MASS*,*rest_Higgs*,*mcstat* -o out${preCfg}_photonSys/out_${dList[${num}]}.root --savefitresult 1 --saveWS 1" >> exe_${jobName}.sh
