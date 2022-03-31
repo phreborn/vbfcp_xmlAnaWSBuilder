@@ -3,3 +3,14 @@ in run/:
 1)source copydtd.sh config${preCfg}
 2)set 'preCfg' 'dataset' in genSubmit.sh, source genSubmit.sh => jobsSub.sh to submit condor jobs
 3)source logNLL.sh (set 'preCfg') to get the NLL curve points
+
+Toy test:
+1)use toyGen.sh to run fit to toys in condor mode (scratchfs disk set files number limit as 200000, every toy fit create 122 output files, use 'lfs quota -h .' to see how many quota left and decide how much toys to run at one time)
+2)use ToyLogNLL.sh to get the NLL points
+in bkgFuncBias/:
+3)use truncAtMin_toys.py to truncate the 7 lowest NLL points. (saved in bkgFuncBias/autonll/)
+4)use bestfits.sh to get the best-fit d~
+5)use histBias.cxx to draw the distr of best-fit d~
+if you want to get the distr of 68%/95% CL interval width:
+6)use confidIntvl.py to get the interval width
+7)use to HistIntvlWidth.cxx/HistIntvlEnds95CL.cxx draw the distr of intvl width

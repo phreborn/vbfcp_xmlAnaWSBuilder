@@ -1,5 +1,8 @@
 #!/bin/bash
 
+cat=AllCats_w1
+cat=TT_w1
+cat=AllCats_unblindAsi
 cat=AllCats
 #for suffix in statOnly allSys ssSys jetSys photonSys theorySys;do
 for suffix in statOnly allSys;do
