@@ -1,4 +1,6 @@
-tag=ggF
+#!/bin/bash
+
+pois="mu=1,mu_yy=1,mu_spur_SM=0,mu_ggH_SM=0,mu_VBF_SM=0,mu_spur=1,mu_ggH=1,mu_VBF_RW=1_0_5"
 
 dataset=asimovData_SB_SM
 dataset=combData
@@ -56,10 +58,10 @@ for init in ${sequence[@]};do
 #    echo "if [ ! -d WS${preCfg} ];then mkdir WS${preCfg};fi" >> ${executable}
 #    echo "if [ -d WS${preCfg}/vbf_cp_${dList[${num}]} ];then rm -r WS${preCfg}/vbf_cp_${dList[${num}]};fi" >> ${executable}
 #    echo "cp -r workspace/vbf_cp_${dList[${num}]} WS${preCfg}" >> ${executable}
-    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5,${npname}=${npup} -o out${preCfg}_allSys/out_${dList[${num}]}_${npname}_up_post.root --savefitresult 1" >> ${executable}
-    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5,${npname}=${npdn} -o out${preCfg}_allSys/out_${dList[${num}]}_${npname}_dn_post.root --savefitresult 1" >> ${executable}
-    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5,${npname}=1 -o out${preCfg}_allSys/out_${dList[${num}]}_${npname}_up_pre.root --savefitresult 1" >> ${executable}
-    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5,${npname}=-1 -o out${preCfg}_allSys/out_${dList[${num}]}_${npname}_dn_pre.root --savefitresult 1" >> ${executable}
+    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p ${pois},${npname}=${npup} -o out${preCfg}_allSys/out_${dList[${num}]}_${npname}_up_post.root --savefitresult 1" >> ${executable}
+    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p ${pois},${npname}=${npdn} -o out${preCfg}_allSys/out_${dList[${num}]}_${npname}_dn_post.root --savefitresult 1" >> ${executable}
+    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p ${pois},${npname}=1 -o out${preCfg}_allSys/out_${dList[${num}]}_${npname}_up_pre.root --savefitresult 1" >> ${executable}
+    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p ${pois},${npname}=-1 -o out${preCfg}_allSys/out_${dList[${num}]}_${npname}_dn_pre.root --savefitresult 1" >> ${executable}
   done
   echo "echo \$(date \"+%Y-%m-%d %H:%M:%S\")" >> ${executable}
 

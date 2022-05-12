@@ -3,14 +3,15 @@ tag=ggF
 decompSys=0
 
 pois="mu=1,mu_yy=1,mu_ggH_SM=0,mu_VBF_SM=0,mu_ggH=1,mu_VBF_RW=1_0_5"
+pois="${pois},mu_spur=1,mu_spur_SM=0"
+snapshot=""
 
 injectTest=0
 injectPoint=p01
 if [ ${injectTest} -eq 1 ];then pois="${pois},mu_ggH_${injectPoint}=0,mu_VBF_${injectPoint}=0";fi
 
-# 0: no, 1: Asimov data exported for m00 workspace, 2: both SM syst and BSM syst
-unblindAsi=2
-if [ ${unblindAsi} -eq 2 ];then pois="${pois},mu_spur=1,mu_spur_SM=0";fi
+# DEPRE:: 0: no, 1: Asimov data exported for m00 workspace, 2: both SM syst and BSM syst
+unblindExp=0
 
 dataset=asimovData_SB_p01
 dataset=asimovData_SB_SM
@@ -27,6 +28,11 @@ preCfg="TT_w1"
 preCfg="AllCats_m00forAsi"
 preCfg="AllCats_unblindAsi"
 preCfg="AllCats"
+
+if [ ${unblindExp} -eq 1 ];then
+  snapshot="-s Glob_SM_Mu1"
+  dataset=asimovData_SM_Mu1
+fi
 
 tole=0.001
 
@@ -84,8 +90,8 @@ for init in ${sequence[@]};do
     echo "if [ -d WS${preCfg}/vbf_cp_${dList[${num}]} ];then rm -r WS${preCfg}/vbf_cp_${dList[${num}]};fi" >> exe_${jobName}.sh
     echo "cp -r workspace/vbf_cp_${dList[${num}]} WS${preCfg}" >> exe_${jobName}.sh
     fi
-    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p ${pois} -n ATLAS_* -o out${preCfg}_statOnly/out_${dList[${num}]}.root --savefitresult 1 --saveWS 1 --minTolerance ${tole}" >> exe_${jobName}.sh
-    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p ${pois} -o out${preCfg}_allSys/out_${dList[${num}]}.root --savefitresult 1 --saveWS 1 --minTolerance ${tole}" >> exe_${jobName}.sh
+    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} ${snapshot} -p ${pois} -n ATLAS_* -o out${preCfg}_statOnly/out_${dList[${num}]}.root --savefitresult 1 --saveWS 1 --minTolerance ${tole}" >> exe_${jobName}.sh
+    echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} ${snapshot} -p ${pois} -o out${preCfg}_allSys/out_${dList[${num}]}.root --savefitresult 1 --saveWS 1 --minTolerance ${tole}" >> exe_${jobName}.sh
     if [ ${decompSys} -eq 1 ];then
       echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5 -n ATLAS_PH*,ATLAS_EG*,*PRW*,*pdf*,*aS*,*qcd*,*shower*,*BIAS*,*lumi*,*HIGGS_MASS*,*rest_Higgs*,*mcstat* -o out${preCfg}_jetSys/out_${dList[${num}]}.root --savefitresult 1 --saveWS 1" >> exe_${jobName}.sh
       echo "quickFit -f WS${preCfg}/vbf_cp_${dList[${num}]}/vbf_cp_${dList[${num}]}.root -w combWS -d ${dataset} -p mu=1,mu_VBF_SM=0,mu_ggH=1,mu_ggH_SM=0,mu_VBF_RW=1_0_5 -n ATLAS_JET*,*PRW*,*pdf*,*aS*,*qcd*,*shower*,*BIAS*,*lumi*,*HIGGS_MASS*,*rest_Higgs*,*mcstat* -o out${preCfg}_photonSys/out_${dList[${num}]}.root --savefitresult 1 --saveWS 1" >> exe_${jobName}.sh
